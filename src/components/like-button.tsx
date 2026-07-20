@@ -1,3 +1,5 @@
+'use client'
+
 import { useCallback, useEffect, useState } from 'react'
 import useSWR from 'swr'
 import { motion, AnimatePresence } from 'motion/react'
@@ -82,7 +84,7 @@ export default function LikeButton({ slug = 'yysuni', delay, className }: LikeBu
 			<motion.button
 				initial={{ opacity: 0, scale: 0.6 }}
 				animate={{ opacity: 1, scale: 1 }}
-				whileHover={{ scale: 1.05 }}
+				whileHover={{ scale: 1 }}
 				whileTap={{ scale: 0.95 }}
 				aria-label='Like this post'
 				onClick={handleLike}

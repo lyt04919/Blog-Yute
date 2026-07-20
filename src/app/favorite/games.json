@@ -1,26 +1,41 @@
 [
 	{
-		"name": "塞尔达传说：荒野之息",
-		"category": "RPG",
-		"desc": "开放世界设计的里程碑之作。极致的探索自由度与精妙的物理化学引擎交互规则。",
-		"cover": "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=800&auto=format&fit=crop",
-		"platform": "Switch",
-		"status": "已通关",
-		"rating": 5,
-		"review": "它重新定义了开放世界游戏，带给我最纯粹的冒险快乐。",
+		"name": "Red Dead Redemption 2",
+		"cover": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1174180/header.jpg?t=1759502961",
+		"subtitle": "PC",
+		"desc": "Arthur Morgan and the Van der Linde Gang are outlaws on the run. With federal agents and bounty hunters massing on their heels, the gang must rob, steal, and fight their way across the rugged heartland in order to survive.",
+		"review": "",
+		"link": "https://store.steampowered.com/app/1174180/",
+		"isPinned": false,
 		"isShow": true,
-		"isPinned": true
+		"stars": 5,
+		"status": "正在玩",
+		"category": "Action/Adventure"
 	},
 	{
-		"name": "艾尔登法环",
-		"category": "动作/魂系",
-		"desc": "黑暗奇幻风格的动作角色扮演游戏。宏大的交界地，精妙的地图设计与极具挑战性的硬核战斗。",
-		"cover": "https://images.unsplash.com/photo-1655821888788-6107699e173b?q=80&w=800&auto=format&fit=crop",
-		"platform": "PC",
-		"status": "正在玩",
-		"rating": 5,
-		"review": "宫崎英高的集大成之作，探索每一片遗迹都充满了未知的诱惑与惊悚。",
+		"name": "DAVE THE DIVER",
+		"cover": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1868140/81bdb3bce15d27ca1b4554a642d91096e89be229/header.jpg?t=1781198537",
+		"subtitle": "PC",
+		"desc": "DAVE THE DIVER is a casual, singleplayer adventure RPG featuring deep-sea exploration and fishing during the day and sushi restaurant management at night. Join Dave and his quirky friends as they seek to uncover the secrets of the mysterious Blue Hole.",
+		"review": "",
+		"link": "https://store.steampowered.com/app/1868140/",
+		"isPinned": false,
 		"isShow": true,
-		"isPinned": false
+		"stars": 5,
+		"status": "正在玩",
+		"category": "Adventure/Casual/RPG/Simulation"
+	},
+	{
+		"name": "Grand Theft Auto V Enhanced",
+		"cover": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3240220/header.jpg?t=1781187782",
+		"subtitle": "PC",
+		"desc": "Experience entertainment blockbusters Grand Theft Auto V and Grand Theft Auto Online — now upgraded for a new generation with stunning visuals, faster loading, 3D audio, and more, plus exclusive content for GTA Online players.",
+		"review": "",
+		"link": "https://store.steampowered.com/app/3240220/",
+		"isPinned": false,
+		"isShow": true,
+		"stars": 5,
+		"status": "正在玩",
+		"category": "Action/Adventure/Racing"
 	}
 ]

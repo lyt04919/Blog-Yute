@@ -17,11 +17,11 @@ export function ImagesSection({ delay = 0 }: ImagesSectionProps) {
 	const coverId = cover?.id ?? null
 
 	return (
-		<motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay }} className='card relative'>
-			<div className='flex items-center justify-between'>
-				<h2 className='text-sm'>图片管理</h2>
-				<Link href='/image-toolbox' target='_blank' className='text-xs hover:underline'>
-					压缩工具
+		<motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay }} className='relative'>
+			<div className='flex items-center justify-between mb-3 px-1'>
+				<h2 className='text-sm font-semibold text-[var(--color-primary)]'>图片管理</h2>
+				<Link href='/image-toolbox' target='_blank' className='text-xs text-[var(--color-brand)] hover:underline'>
+					图片工具
 				</Link>
 			</div>
 
@@ -34,7 +34,7 @@ export function ImagesSection({ delay = 0 }: ImagesSectionProps) {
 					onChange={e => setUrlInput(e.target.value)}
 				/>
 				<button
-					className='rounded-lg border bg-white/70 px-3 py-2 text-sm'
+					className='rounded-lg border bg-white dark:bg-[#27272a]/70 px-3 py-2 text-sm'
 					onClick={() => {
 						const v = urlInput.trim()
 						if (!v) return
@@ -73,7 +73,7 @@ export function ImagesSection({ delay = 0 }: ImagesSectionProps) {
 						const files = e.dataTransfer.files
 						if (files && files.length) addFiles(files)
 					}}>
-					<span className='text-2xl leading-none text-neutral-400'>+</span>
+					<span className='text-2xl leading-none text-[#a1a1aa]'>+</span>
 				</div>
 
 				{images.map(item => {
@@ -97,7 +97,7 @@ export function ImagesSection({ delay = 0 }: ImagesSectionProps) {
 							/>
 							{isCover && <div className='absolute top-1 left-1 rounded-md bg-blue-500 px-1.5 py-0.5 text-white shadow'>封面</div>}
 							<div className='absolute top-1 right-1 hidden group-hover:flex'>
-								<button type='button' className='rounded-md bg-white/80 px-1.5 py-0.5 shadow hover:bg-white' onClick={() => deleteImage(item.id)}>
+								<button type='button' className='rounded-md bg-white/80 dark:bg-[#27272a]/80 px-1.5 py-0.5 shadow hover:bg-white dark:bg-[#27272a]' onClick={() => deleteImage(item.id)}>
 									删除
 								</button>
 							</div>

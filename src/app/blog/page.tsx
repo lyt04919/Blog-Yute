@@ -11,6 +11,7 @@ import { toast } from 'sonner'
 import { INIT_DELAY } from '@/consts'
 import ShortLineSVG from '@/svgs/short-line.svg'
 import { useBlogIndex, type BlogIndexItem } from '@/hooks/use-blog-index'
+import { useSWRConfig } from 'swr'
 import { useCategories } from '@/hooks/use-categories'
 import { useReadArticles } from '@/hooks/use-read-articles'
 import JuejinSVG from '@/svgs/juejin.svg'
@@ -19,16 +20,24 @@ import { useConfigStore } from '@/app/(home)/stores/config-store'
 import { readFileAsText } from '@/lib/file-utils'
 import { cn } from '@/lib/utils'
 import { saveBlogEdits } from './services/save-blog-edits'
-import { Check } from 'lucide-react'
+import { Check, ArrowRight, BookIcon, Trash2, Save, Upload, X, FolderOpen, SquareCheck, Activity } from 'lucide-react'
 import { BlogCoverHoverPreview, useBlogCoverHover } from './components/blog-cover-hover'
 import { CategoryModal } from './components/category-modal'
+import { StatusModal } from './components/status-modal'
+import { DeleteConfirmDialog } from '@/components/delete-confirm-dialog'
 
 import { BlogGridCard } from '@/components/blog-grid-card'
 import { TagFilter } from '@/components/tag-filter'
+import { BlogSearch } from '@/components/blog-search'
+import { PageTitle } from '@/components/page-title'
+import { EmptyState } from '@/components/empty-state'
+import { StandardPageHeader } from '@/components/ui/standard-page-header'
+import { StandardToolbar } from '@/components/ui/standard-toolbar'
 
 type DisplayMode = 'day' | 'week' | 'month' | 'year' | 'category'
 
 export default function BlogPage() {
+	const { mutate } = useSWRConfig()
 	const { items, loading } = useBlogIndex()
 	const { categories: categoriesFromServer } = useCategories()
 	const { isRead } = useReadArticles()
@@ -44,11 +53,14 @@ export default function BlogPage() {
 	const [saving, setSaving] = useState(false)
 	const [displayMode, setDisplayMode] = useState<DisplayMode>('year')
 	const [categoryModalOpen, setCategoryModalOpen] = useState(false)
+	const [statusModalOpen, setStatusModalOpen] = useState(false)
 	const [categoryList, setCategoryList] = useState<string[]>([])
 	const [newCategory, setNewCategory] = useState('')
 	const [viewLayout, setViewLayout] = useState<'timeline' | 'grid'>('grid')
 	const [selectedTag, setSelectedTag] = useState<string>('All')
 	const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft'>('all')
+	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+	const [imageLoaded, setImageLoaded] = useState<Record<string, boolean>>({})
 
 	const { cancelCoverPreview, onCoverLinkMouseEnter, hoverCoverPreview, mousePosition } = useBlogCoverHover(editMode)
 
@@ -62,7 +74,13 @@ export default function BlogPage() {
 		setCategoryList(categoriesFromServer || [])
 	}, [categoriesFromServer])
 
-	const displayItems = editMode ? editableItems : items
+	const displayItems = useMemo(() => {
+		const baseItems = editMode ? editableItems : items;
+		if (!isAuth) {
+			return baseItems.filter(item => item.status !== 'draft');
+		}
+		return baseItems;
+	}, [editMode, editableItems, items, isAuth]);
 
 	const statusFilteredItems = useMemo(() => {
 		if (statusFilter === 'all') return displayItems
@@ -72,29 +90,30 @@ export default function BlogPage() {
 		})
 	}, [displayItems, statusFilter])
 
-	const allTags = useMemo(() => {
-		const tags = new Set<string>()
-		statusFilteredItems.forEach(item => {
-			if (item.tags) item.tags.forEach(t => tags.add(t))
-		})
-		return ['All', ...Array.from(tags).sort()]
-	}, [statusFilteredItems])
+	const standardBlogCategories = ['前端开发', '3D 与图形', 'AI 与工具', '学习笔记', '生活与随感', '游戏程序']
 
 	const tagCounts = useMemo(() => {
-		const counts: Record<string, number> = { All: statusFilteredItems.length }
+		const counts: Record<string, number> = { All: statusFilteredItems.length, all: statusFilteredItems.length }
 		statusFilteredItems.forEach(item => {
 			if (item.tags) {
 				item.tags.forEach(tag => {
-					counts[tag] = (counts[tag] || 0) + 1
+					const normalized = tag.trim()
+					if (normalized) {
+						counts[normalized] = (counts[normalized] || 0) + 1
+					}
 				})
 			}
 		})
 		return counts
 	}, [statusFilteredItems])
 
+	const allTags = useMemo(() => {
+		return ['All', ...standardBlogCategories]
+	}, [])
+
 	const gridFilteredItems = useMemo(() => {
-		if (selectedTag === 'All') return statusFilteredItems
-		return statusFilteredItems.filter(item => item.tags?.includes(selectedTag))
+		if (selectedTag === 'All' || selectedTag === 'all') return statusFilteredItems
+		return statusFilteredItems.filter(item => item.tags?.some(t => t.toLowerCase() === selectedTag.toLowerCase()))
 	}, [statusFilteredItems, selectedTag])
 
 	const { groupedItems, groupKeys, getGroupLabel } = useMemo(() => {
@@ -164,10 +183,9 @@ export default function BlogPage() {
 			groupKeys: keys,
 			getGroupLabel: (key: string) => grouped[key]?.label || key
 		}
-	}, [displayItems, displayMode, categoryList])
+	}, [statusFilteredItems, displayMode, categoryList])
 
 	const selectedCount = selectedSlugs.size
-	const buttonText = isAuth ? '保存' : '导入密钥'
 
 	const toggleEditMode = useCallback(() => {
 		if (editMode) {
@@ -245,9 +263,15 @@ export default function BlogPage() {
 			toast.info('请选择要删除的文章')
 			return
 		}
+		setDeleteDialogOpen(true)
+	}, [selectedCount])
+
+	const confirmDelete = useCallback(() => {
 		setEditableItems(prev => prev.filter(item => !selectedSlugs.has(item.slug)))
 		setSelectedSlugs(new Set())
-	}, [selectedCount, selectedSlugs])
+		setDeleteDialogOpen(false)
+		toast.success(`已删除 ${selectedCount} 篇文章`)
+	}, [selectedSlugs, selectedCount])
 
 	const handleAssignCategory = useCallback((slug: string, category?: string) => {
 		setEditableItems(prev =>
@@ -256,6 +280,16 @@ export default function BlogPage() {
 				const nextCategory = category?.trim()
 				if (!nextCategory) return { ...item, category: undefined }
 				return { ...item, category: nextCategory }
+			})
+		)
+	}, [])
+
+	const handleAssignStatus = useCallback((slug: string, status?: string) => {
+		setEditableItems(prev =>
+			prev.map(item => {
+				if (item.slug !== slug) return item
+				const nextStatus = (status?.trim() as 'draft' | 'published') || 'published'
+				return { ...item, status: nextStatus }
 			})
 		)
 	}, [])
@@ -308,13 +342,17 @@ export default function BlogPage() {
 			setEditMode(false)
 			setSelectedSlugs(new Set())
 			setCategoryModalOpen(false)
+			// 强制刷新 SWR 缓存
+			await mutate('/blogs/index.json')
+			await mutate('/blogs/categories.json')
+			toast.success('推送到 GitHub 成功！')
 		} catch (error: any) {
 			console.error(error)
 			toast.error(error?.message || '保存失败')
 		} finally {
 			setSaving(false)
 		}
-	}, [items, editableItems, categoryList, categoriesFromServer])
+	}, [items, editableItems, categoryList, categoriesFromServer, mutate])
 
 	const handleSaveLocal = useCallback(async () => {
 		const removedSlugs = items.filter(item => !editableItems.some(editItem => editItem.slug === item.slug)).map(item => item.slug)
@@ -326,7 +364,13 @@ export default function BlogPage() {
 			const nextCategory = next?.category || ''
 			return originCategory !== nextCategory
 		})
-		const hasChanges = removedSlugs.length > 0 || categoryListChanged || categoryAssignmentChanged
+		const statusAssignmentChanged = items.some(origin => {
+			const next = editableItems.find(editItem => editItem.slug === origin.slug)
+			const originStatus = origin.status || 'published'
+			const nextStatus = next?.status || 'published'
+			return originStatus !== nextStatus
+		})
+		const hasChanges = removedSlugs.length > 0 || categoryListChanged || categoryAssignmentChanged || statusAssignmentChanged
 
 		if (!hasChanges) {
 			toast.info('没有需要保存的改动')
@@ -357,6 +401,9 @@ export default function BlogPage() {
 			setEditMode(false)
 			setSelectedSlugs(new Set())
 			setCategoryModalOpen(false)
+			// 强制刷新 SWR 缓存
+			await mutate('/blogs/index.json')
+			await mutate('/blogs/categories.json')
 			toast.success('本地保存成功！')
 		} catch (error: any) {
 			console.error(error)
@@ -390,7 +437,7 @@ export default function BlogPage() {
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
-			if (!editMode && (e.ctrlKey || e.metaKey) && e.key === ',') {
+			if (isAuth && !editMode && (e.ctrlKey || e.metaKey) && e.key === 'e' && e.shiftKey) {
 				e.preventDefault()
 				toggleEditMode()
 			}
@@ -400,10 +447,29 @@ export default function BlogPage() {
 		return () => {
 			window.removeEventListener('keydown', handleKeyDown)
 		}
-	}, [editMode, toggleEditMode])
+	}, [editMode, toggleEditMode, isAuth])
 
 	return (
 		<>
+			<PageTitle title="Blog" />
+			<CategoryModal
+				open={categoryModalOpen}
+				onClose={() => setCategoryModalOpen(false)}
+				categoryList={categoryList}
+				newCategory={newCategory}
+				onNewCategoryChange={setNewCategory}
+				onAddCategory={handleAddCategory}
+				onRemoveCategory={handleRemoveCategory}
+				onReorderCategories={handleReorderCategories}
+				editableItems={editableItems}
+				onAssignCategory={handleAssignCategory}
+			/>
+			<StatusModal
+				open={statusModalOpen}
+				onClose={() => setStatusModalOpen(false)}
+				editableItems={editableItems}
+				onAssignStatus={handleAssignStatus}
+			/>
 			<input
 				ref={keyInputRef}
 				type='file'
@@ -416,91 +482,238 @@ export default function BlogPage() {
 				}}
 			/>
 
-			<div className='min-h-screen relative pb-32'>
-				<div className='mx-auto w-full max-w-7xl px-6 pt-32 pb-8 md:pb-12'>
-					<div className='flex flex-col md:flex-row md:items-end justify-between gap-6'>
-						<div>
-							<h1 className='text-4xl font-extrabold tracking-tight lg:text-5xl mb-4 font-serif text-neutral-900'>
-								Blog
-							</h1>
-							<p className='text-neutral-500 text-lg max-w-lg'>
-								My thoughts, technical explorations, and materials of creation.
-							</p>
-						</div>
-
-						{/* Layout Controls */}
-						{!editMode && (
-							<div className='flex items-center gap-4'>
-								<div className="flex items-center gap-1 bg-neutral-100/50 p-1 rounded-xl">
+			{/* Edit Mode Toolbar */}
+			{editMode && (
+				<motion.div
+					initial={{ opacity: 0, y: -20 }}
+					animate={{ opacity: 1, y: 0 }}
+					exit={{ opacity: 0, y: -20 }}
+					className='sticky top-0 z-40 w-full border-b border-[var(--color-border)] bg-[var(--color-bg)]/80 backdrop-blur-md'>
+					<div className='mx-auto w-full max-w-7xl px-6 py-3'>
+						<div className='flex items-center justify-between gap-4'>
+							<div className='flex items-center gap-2'>
+								<span className='text-sm font-medium text-[var(--color-primary)]'>
+									已选择 {selectedCount} 篇
+								</span>
+								{selectedCount > 0 && (
 									<button
-										onClick={() => setStatusFilter('all')}
-										className={cn('px-3 py-1.5 text-sm rounded-lg transition-colors', statusFilter === 'all' ? 'bg-white shadow-sm font-medium text-neutral-900' : 'text-neutral-500 hover:text-neutral-700')}
-									>
-										全部
+										onClick={handleDeselectAll}
+										className='text-xs text-[var(--color-secondary)] hover:text-[var(--color-primary)] transition-colors'>
+										清空
 									</button>
-									<button
-										onClick={() => setStatusFilter('published')}
-										className={cn('px-3 py-1.5 text-sm rounded-lg transition-colors', statusFilter === 'published' ? 'bg-white shadow-sm font-medium text-neutral-900' : 'text-neutral-500 hover:text-neutral-700')}
-									>
-										已发布
-									</button>
-									<button
-										onClick={() => setStatusFilter('draft')}
-										className={cn('px-3 py-1.5 text-sm rounded-lg transition-colors', statusFilter === 'draft' ? 'bg-white shadow-sm font-medium text-neutral-900' : 'text-neutral-500 hover:text-neutral-700')}
-									>
-										草稿箱
-									</button>
-								</div>
-								
-								<div className='flex items-center gap-2'>
-								<button 
-									onClick={() => setViewLayout('grid')}
-									className={cn(
-										'p-2.5 rounded-xl transition-all',
-										viewLayout === 'grid' ? 'bg-neutral-900 text-white shadow-md' : 'bg-white text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900 border border-neutral-200'
-									)}
-								>
-									<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
-								</button>
-								<button 
-									onClick={() => setViewLayout('timeline')}
-									className={cn(
-										'p-2.5 rounded-xl transition-all',
-										viewLayout === 'timeline' ? 'bg-neutral-900 text-white shadow-md' : 'bg-white text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900 border border-neutral-200'
-									)}
-								>
-									<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
-								</button>
-								</div>
+								)}
 							</div>
-						)}
+							<div className='flex items-center gap-2 flex-wrap'>
+								{enableCategories && (
+									<button
+										onClick={() => setCategoryModalOpen(true)}
+										disabled={saving}
+										className='inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-xs transition-colors hover:bg-[var(--color-bg)] text-[var(--color-primary)]'>
+										<FolderOpen className='h-3.5 w-3.5' />
+										分类
+									</button>
+								)}
+								<button
+									onClick={() => setStatusModalOpen(true)}
+									disabled={saving}
+									className='inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-xs transition-colors hover:bg-[var(--color-bg)] text-[var(--color-primary)]'>
+									<Activity className='h-3.5 w-3.5' />
+									状态
+								</button>
+								<button
+									onClick={selectedCount === editableItems.length ? handleDeselectAll : handleSelectAll}
+									className='inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-xs transition-colors hover:bg-[var(--color-bg)] text-[var(--color-primary)]'>
+									<SquareCheck className='h-3.5 w-3.5' />
+									{selectedCount === editableItems.length ? '取消全选' : '全选'}
+								</button>
+								<button
+									onClick={handleDeleteSelected}
+									disabled={selectedCount === 0}
+									className='inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/20 px-3 py-1.5 text-xs text-red-600 dark:text-red-400 transition-colors disabled:opacity-40'>
+									<Trash2 className='h-3.5 w-3.5' />
+									删除
+								</button>
+								<div className='h-4 w-px bg-[var(--color-border)] mx-1' />
+								<button
+									onClick={handleCancel}
+									disabled={saving}
+									className='inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-xs transition-colors hover:bg-[var(--color-bg)] text-[var(--color-primary)]'>
+									<X className='h-3.5 w-3.5' />
+									取消
+								</button>
+								<button
+									onClick={handleSaveLocal}
+									disabled={saving}
+									className='inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-xs transition-colors hover:bg-[var(--color-bg)] text-[var(--color-primary)]'>
+									<Save className='h-3.5 w-3.5' />
+									{saving ? '保存中...' : '本地保存'}
+								</button>
+								<button
+									onClick={handleSaveClick}
+									disabled={saving}
+									className='brand-btn inline-flex items-center gap-1.5 px-3 py-1.5 text-xs'>
+									<Upload className='h-3.5 w-3.5' />
+									{saving ? '保存中...' : '推送到 GitHub'}
+								</button>
+							</div>
+						</div>
 					</div>
-				</div>
+				</motion.div>
+			)}
+
+			<div className='min-h-screen relative pb-32'>
+				{(() => {
+					const blogHeaderActions = isAuth ? (
+						<div className="flex items-center gap-2">
+							<Link href="/write/new">
+								<button className='px-4 py-2 text-xs font-medium rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-sm'>
+									+ 写博客
+								</button>
+							</Link>
+							{!hideEditButton && (
+								<button
+									onClick={toggleEditMode}
+									className='px-4 py-2 text-xs font-medium rounded-xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors'
+								>
+									{editMode ? '退出编辑' : '编辑模式'}
+								</button>
+							)}
+						</div>
+					) : undefined
+
+					const blogStatusTabs = isAuth ? [
+						{ label: 'All', value: 'all' },
+						{ label: 'Published', value: 'published' },
+						{ label: 'Drafts', value: 'draft' },
+					] : undefined
+
+					return (
+						<>
+							<StandardPageHeader
+								title="Writings & Thoughts"
+								badge={`${items.length} ARTICLES`}
+								subtitle="A collection of essays, technical explorations, and creative experiments."
+								actions={blogHeaderActions}
+							/>
+
+							<StandardToolbar
+								statusTabs={blogStatusTabs}
+								selectedStatus={statusFilter}
+								onSelectStatus={(s) => setStatusFilter(s as any)}
+								tags={allTags.map(t => ({ label: t, value: t, count: tagCounts[t] }))}
+								selectedTag={selectedTag}
+								onSelectTag={setSelectedTag}
+								viewMode={viewLayout === 'grid' ? 'grid' : 'list'}
+								onViewModeChange={(m) => setViewLayout(m === 'list' ? 'timeline' : 'grid')}
+								extraRightActions={<BlogSearch items={items} />}
+							/>
+						</>
+					)
+				})()}
 
 				<div className='mx-auto w-full max-w-7xl px-6'>
 					{viewLayout === 'grid' ? (
 						<div className="flex flex-col gap-8">
-							{allTags.length > 0 && (
-								<div>
-									<TagFilter tags={allTags} selectedTag={selectedTag} tagCounts={tagCounts} onSelectTag={setSelectedTag} />
-								</div>
-							)}
-							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative">
-								{gridFilteredItems.map((blog, index) => (
-									<BlogGridCard
-										key={blog.slug}
-										slug={blog.slug}
-										title={blog.title || blog.slug}
-										date={dayjs(blog.date).format('MMMM DD, YYYY')}
-										cover={blog.cover}
-										showRightBorder={true}
-										editMode={editMode}
-										isSelected={selectedSlugs.has(blog.slug)}
-										onClick={(e) => handleItemClick(e, blog.slug)}
-										status={blog.status as any}
-									/>
-								))}
-							</div>
+							{gridFilteredItems.length === 0 ? (
+					<EmptyState type="blog" />
+				) : (
+						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 relative">
+							{gridFilteredItems.map((blog) => {
+								const isSelected = selectedSlugs.has(blog.slug);
+								return (
+									<div key={blog.slug} className={cn("group relative", editMode && "cursor-pointer")}>
+										{editMode && (
+											<button
+												onClick={(e) => {
+													e.preventDefault();
+													e.stopPropagation();
+													toggleSelect(blog.slug);
+												}}
+												className={cn(
+													'absolute top-3 left-3 z-10 flex h-6 w-6 items-center justify-center rounded-full border transition-all',
+													isSelected
+														? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-bg)]'
+														: 'border-[var(--color-border)] bg-[var(--color-card)]/80 backdrop-blur-sm text-transparent hover:border-[var(--color-primary)]'
+												)}>
+												<Check className="h-3.5 w-3.5" />
+											</button>
+										)}
+										<Link href={`/blog/${blog.slug}`} onClick={(e) => handleItemClick(e, blog.slug)}>
+											<article className={cn(
+												"h-full flex flex-col overflow-hidden rounded-xl border transition-all",
+												isSelected
+													? "border-[var(--color-primary)]/40 bg-[var(--color-card)] ring-1 ring-[var(--color-primary)]/10"
+													: "border-[var(--color-border)] bg-[var(--color-card)] hover:border-[var(--color-primary)]/20"
+											)}>
+												{blog.cover ? (
+															<div className="overflow-hidden aspect-[16/10] relative">
+																{!imageLoaded[blog.slug] && (
+																	<div className="absolute inset-0 bg-[var(--color-bg)] animate-pulse" />
+																)}
+																<img
+																	src={blog.cover}
+																	alt={blog.title}
+																	loading="lazy"
+																	onLoad={() => setImageLoaded(prev => ({ ...prev, [blog.slug]: true }))}
+																	onError={(e) => {
+																		setImageLoaded(prev => ({ ...prev, [blog.slug]: true }));
+																		const target = e.target as HTMLImageElement;
+																		target.style.display = 'none';
+																		target.parentElement?.classList.add('bg-[var(--color-bg)]', 'flex', 'items-center', 'justify-center');
+																		const icon = document.createElement('div');
+																		icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>';
+																		icon.className = 'text-[var(--color-secondary)] opacity-30';
+																		target.parentElement?.appendChild(icon);
+																	}}
+																	className={cn(
+																		"w-full h-full object-cover img-curated group-hover:scale-105 transition-all duration-500",
+																		!imageLoaded[blog.slug] && "opacity-0"
+																	)}
+																/>
+															</div>
+														) : (
+															<div className="bg-[var(--color-bg)] flex items-center justify-center aspect-[16/10]">
+																<BookIcon className="h-8 w-8 text-[var(--color-secondary)] opacity-30" />
+															</div>
+														)}
+												<div className="p-5 flex flex-col flex-grow">
+													<div className="flex items-center gap-2 mb-3 flex-wrap">
+														{(blog.status === 'draft' || !blog.status) && (
+															<span className="text-[10px] uppercase tracking-[0.1em] font-medium px-2 py-0.5 rounded-full bg-[var(--color-bg)] text-[var(--color-secondary)] border border-[var(--color-border)]">
+																Draft
+															</span>
+														)}
+														{blog.status === 'published' && (
+															<span className="text-[10px] uppercase tracking-[0.1em] font-medium px-2 py-0.5 rounded-full bg-[var(--color-bg)] text-[var(--color-secondary)] border border-[var(--color-border)]">
+																Published
+															</span>
+														)}
+														<span className="text-[10px] text-[var(--color-secondary)]">{blog.category || 'Blog'}</span>
+														<span className="text-[10px] text-[var(--color-secondary)]">·</span>
+														<span className="text-[10px] text-[var(--color-secondary)]">{dayjs(blog.date).format('MMM DD, YYYY')}</span>
+													</div>
+													<h3 className="font-serif text-lg font-medium text-[var(--color-primary)] mb-2 group-hover:text-[var(--color-brand)] transition-colors line-clamp-2 leading-snug">
+														{blog.title || blog.slug}
+													</h3>
+													{blog.summary && blog.summary !== '暂无描述' && (
+														<p className="text-sm text-[var(--color-secondary)] line-clamp-2 leading-relaxed mb-4">
+															{blog.summary}
+														</p>
+													)}
+													<div className="mt-auto">
+														<span className="inline-flex items-center gap-1 text-xs text-[var(--color-primary)] group-hover:text-[var(--color-brand)] transition-colors">
+															Read essay
+															<ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+														</span>
+													</div>
+												</div>
+											</article>
+										</Link>
+									</div>
+								);
+							})}
+						</div>
+					)}
 						</div>
 					) : (
 						<div className='flex flex-col items-center justify-center gap-6 pt-4'>
@@ -517,16 +730,15 @@ export default function BlogPage() {
 							...(enableCategories ? ([{ value: 'category', label: '分类' }] as const) : [])
 						].map(option => (
 							<motion.button
-								key={option.value}
-								whileHover={{ scale: 1.05 }}
-								whileTap={{ scale: 0.95 }}
-								onClick={() => setDisplayMode(option.value as DisplayMode)}
-								className={cn(
-									'btn-rounded px-3 py-1.5 text-xs font-medium transition-all',
-									displayMode === option.value ? 'bg-neutral-900 text-white shadow-sm' : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100'
-								)}>
-								{option.label}
-							</motion.button>
+							key={option.value}
+							onClick={() => setDisplayMode(option.value as DisplayMode)}
+							className={cn(
+								'btn-rounded px-3 py-1.5 text-xs font-medium transition-all',
+								displayMode === option.value ? 'bg-[var(--color-primary)] text-[var(--color-bg)] shadow-sm' : 'text-[var(--color-secondary)] hover:text-[var(--color-primary)] hover:bg-[var(--color-card)]'
+							)}
+						>
+							{option.label}
+						</motion.button>
 						))}
 					</motion.div>
 				)}
@@ -545,26 +757,25 @@ export default function BlogPage() {
 							className='card relative w-full max-w-[840px] space-y-6'>
 							<div className='mb-3 flex items-center justify-between gap-3 text-base'>
 								<div className='flex items-center gap-3'>
-									<div className='font-bold text-neutral-900'>{getGroupLabel(groupKey)}</div>
-									<div className='h-2 w-2 rounded-full bg-neutral-200'></div>
-									<div className='text-neutral-500 text-sm'>{group.items.length} 篇文章</div>
+									<div className='font-medium text-[var(--color-primary)]'>{getGroupLabel(groupKey)}</div>
+									<div className='h-2 w-2 rounded-full bg-[var(--color-border)]'></div>
+									<div className='text-[var(--color-secondary)] text-sm'>{group.items.length} 篇文章</div>
 								</div>
 								{editMode &&
 									(() => {
 										const groupAllSelected = group.items.every(item => selectedSlugs.has(item.slug))
 										return (
 											<motion.button
-												whileHover={{ scale: 1.05 }}
-												whileTap={{ scale: 0.95 }}
-												onClick={() => handleSelectGroup(groupKey)}
-												className={cn(
-													'rounded-lg border px-3 py-1 text-xs transition-colors',
-													groupAllSelected
-														? 'border-neutral-400 bg-neutral-100 text-neutral-900 hover:bg-neutral-200'
-														: 'text-neutral-500 hover:border-neutral-400 hover:text-neutral-900 border-transparent bg-white hover:bg-neutral-50'
-												)}>
-												{groupAllSelected ? '取消全选' : '全选该分组'}
-											</motion.button>
+										onClick={() => handleSelectGroup(groupKey)}
+										className={cn(
+											'rounded-lg border px-3 py-1 text-xs transition-colors',
+											groupAllSelected
+												? 'border-[var(--color-secondary)] bg-[var(--color-card)] text-[var(--color-primary)] hover:bg-[var(--color-border)]'
+												: 'text-[var(--color-secondary)] hover:border-[var(--color-secondary)] hover:text-[var(--color-primary)] border-transparent bg-[var(--color-bg)] hover:bg-[var(--color-card)]'
+										)}
+									>
+										{groupAllSelected ? '取消全选' : '全选该分组'}
+									</motion.button>
 										)
 									})()}
 							</div>
@@ -583,31 +794,31 @@ export default function BlogPage() {
 												'group flex min-h-10 items-center gap-3 py-3 transition-all',
 												editMode
 													? cn(
-															'rounded-lg border px-3',
-															isSelected ? 'border-neutral-600 bg-neutral-50' : 'hover:border-neutral-400 border-transparent hover:bg-neutral-50'
+																'rounded-lg border px-3',
+																isSelected ? 'border-[var(--color-secondary)] bg-[var(--color-card)]' : 'hover:border-[var(--color-secondary)] border-transparent hover:bg-[var(--color-card)]'
 														)
-													: 'cursor-pointer'
-											)}>
-											{editMode && (
-												<span
-													className={cn(
-														'flex h-4 w-4 items-center justify-center rounded-full border text-[10px] font-semibold',
-														isSelected ? 'border-neutral-900 bg-neutral-900 text-white' : 'border-[#D9D9D9] text-transparent'
+														: 'cursor-pointer'
 													)}>
-													<Check />
-												</span>
-											)}
-											<span className='text-neutral-500 w-[44px] shrink-0 text-sm font-medium'>{dayjs(it.date).format('MM-DD')}</span>
+													{editMode && (
+														<span
+															className={cn(
+																'flex h-4 w-4 items-center justify-center rounded-full border text-[10px] font-semibold',
+																isSelected ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-bg)]' : 'border-[var(--color-border)] text-transparent'
+															)}>
+															<Check />
+														</span>
+													)}
+													<span className='text-[var(--color-secondary)] w-[44px] shrink-0 text-sm font-medium'>{dayjs(it.date).format('MM-DD')}</span>
 
-											<div className='relative flex h-2 w-2 items-center justify-center'>
-												<div className='bg-neutral-300 group-hover:bg-neutral-900 h-1.5 w-1.5 rounded-full transition-all group-hover:scale-150'></div>
-												<ShortLineSVG className='absolute bottom-4' />
-											</div>
-											<div
-												className={cn(
-													'flex-1 truncate text-sm font-medium transition-all text-neutral-700 flex items-center gap-2',
-													editMode ? null : 'group-hover:text-neutral-900 group-hover:translate-x-2'
-												)}>
+													<div className='relative flex h-2 w-2 items-center justify-center'>
+														<div className='bg-[var(--color-border)] group-hover:bg-[var(--color-primary)] h-1.5 w-1.5 rounded-full transition-all group-hover:scale-150'></div>
+														<ShortLineSVG className='absolute bottom-4' />
+													</div>
+													<div
+														className={cn(
+															'flex-1 truncate text-sm font-medium transition-all text-[var(--color-secondary)] flex items-center gap-2',
+															editMode ? null : 'group-hover:text-[var(--color-primary)] group-hover:translate-x-2'
+														)}>
 												{it.title || it.slug}
 												{hasRead && <span className='text-secondary ml-2 text-xs'>[已阅读]</span>}
 												{it.status === 'draft' && <span className="text-[10px] bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded font-bold tracking-wide">草稿</span>}
@@ -631,8 +842,7 @@ export default function BlogPage() {
 						<motion.a
 							initial={{ opacity: 0, scale: 0.6 }}
 							animate={{ opacity: 1, scale: 1 }}
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
+							
 							href='https://juejin.cn/user/2427311675422382/posts'
 							target='_blank'
 							className='card text-secondary static inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs'>
@@ -647,78 +857,19 @@ export default function BlogPage() {
 			</div>
 
 			<div className='pt-12'>
-				{!loading && items.length === 0 && <div className='text-secondary py-6 text-center text-sm'>暂无文章</div>}
-				{loading && <div className='text-secondary py-6 text-center text-sm'>加载中...</div>}
+				{!loading && items.length === 0 && (
+				<div className='flex flex-col items-center justify-center py-20 text-[var(--color-secondary)]'>
+					<p className='text-lg'>暂无内容</p>
+				</div>
+			)}
+			{loading && (
+				<div className='flex flex-col items-center justify-center py-20 text-[var(--color-secondary)]'>
+					<p className='text-lg'>加载中...</p>
+				</div>
+			)}
 			</div>
 
-			<motion.div
-				initial={{ opacity: 0, scale: 0.6 }}
-				animate={{ opacity: 1, scale: 1 }}
-				className='absolute right-6 flex items-center gap-3 max-sm:hidden z-40' style={{ top: '6rem' }}>
-				{editMode ? (
-					<>
-						{enableCategories && (
-							<motion.button
-								whileHover={{ scale: 1.05 }}
-								whileTap={{ scale: 0.95 }}
-								onClick={() => setCategoryModalOpen(true)}
-								disabled={saving}
-								className='rounded-xl border bg-white/60 px-4 py-2 text-sm transition-colors hover:bg-white/80'>
-								分类
-							</motion.button>
-						)}
-						<motion.button
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
-							onClick={handleCancel}
-							disabled={saving}
-							className='rounded-xl border bg-white/60 px-6 py-2 text-sm'>
-							取消
-						</motion.button>
-						<motion.button
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
-							onClick={selectedCount === editableItems.length ? handleDeselectAll : handleSelectAll}
-							className='rounded-xl border bg-white/60 px-4 py-2 text-sm transition-colors hover:bg-white/80'>
-							{selectedCount === editableItems.length ? '取消全选' : '全选'}
-						</motion.button>
-						<motion.button
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
-							onClick={handleDeleteSelected}
-							disabled={selectedCount === 0}
-							className='rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-600 transition-colors disabled:opacity-60'>
-							删除(已选:{selectedCount}篇)
-						</motion.button>
-						<motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleSaveLocal} disabled={saving} className='rounded-xl border bg-white/60 px-6 py-2 text-sm'>
-							本地保存
-						</motion.button>
-						<motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleSaveClick} disabled={saving} className='brand-btn px-6'>
-							{saving ? '保存中...' : buttonText}
-						</motion.button>
-					</>
-				) : (
-					<>
-						<Link href="/write/new">
-							<motion.button
-								whileHover={{ scale: 1.05 }}
-								whileTap={{ scale: 0.95 }}
-								className='brand-btn px-6 py-2 text-sm'>
-								写博客
-							</motion.button>
-						</Link>
-						{!hideEditButton && (
-							<motion.button
-								whileHover={{ scale: 1.05 }}
-								whileTap={{ scale: 0.95 }}
-								onClick={toggleEditMode}
-								className='bg-card rounded-xl border px-6 py-2 text-sm backdrop-blur-sm transition-colors hover:bg-white/80'>
-								编辑
-							</motion.button>
-						)}
-					</>
-				)}
-			</motion.div>
+
 
 			<BlogCoverHoverPreview preview={hoverCoverPreview} position={mousePosition} />
 
@@ -733,6 +884,13 @@ export default function BlogPage() {
 				onReorderCategories={handleReorderCategories}
 				editableItems={editableItems}
 				onAssignCategory={handleAssignCategory}
+			/>
+
+			<DeleteConfirmDialog
+				open={deleteDialogOpen}
+				count={selectedCount}
+				onConfirm={confirmDelete}
+				onCancel={() => setDeleteDialogOpen(false)}
 			/>
 		</>
 	)

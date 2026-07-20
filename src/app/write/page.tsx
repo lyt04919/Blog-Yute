@@ -7,11 +7,28 @@ import { WriteSidebar } from './components/sidebar'
 import { WriteActions } from './components/actions'
 import { WritePreview } from './components/preview'
 import { useEffect } from 'react'
+import { useAuthStore } from '@/hooks/use-auth'
+import Link from 'next/link'
 
 export default function WritePage() {
+	const { isAuth } = useAuthStore()
 	const { form, cover, reset, isZenMode, isSplitMode } = useWriteStore()
 	useEffect(() => reset(), [])
 	const { isPreview, closePreview } = usePreviewStore()
+
+	if (!isAuth) {
+		return (
+			<div className="min-h-screen flex items-center justify-center bg-[var(--color-bg)] text-[var(--color-primary)]">
+				<div className="text-center p-8 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] max-w-md mx-6">
+					<h2 className="text-xl font-bold mb-2">未授权访问</h2>
+					<p className="text-sm text-[var(--color-secondary)] mb-4">此页面是写博客页面，请先在右上角输入密码切换为作者模式。</p>
+					<Link href="/blog" className="brand-btn px-4 py-2 rounded-full text-sm inline-block">
+						返回博客页
+					</Link>
+				</div>
+			</div>
+		)
+	}
 
 	const coverPreviewUrl = cover ? (cover.type === 'url' ? cover.url : cover.previewUrl) : null
 

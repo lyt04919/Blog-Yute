@@ -268,7 +268,7 @@ export function ColorPickerPanel({ value, onChange, style, className }: ColorPic
 					style={{
 						background: `linear-gradient(to right, hsl(${hsl.h} ${hsl.s * 100}% ${hsl.l * 100}% / 0%), hsl(${hsl.h} ${hsl.s * 100}% ${hsl.l * 100}% / 100%))`
 					}}>
-					<div style={{ left: alphaOffset }} className='absolute h-4 w-4 -translate-x-1/2 cursor-pointer rounded-full border-2 border-white bg-white shadow-md'>
+					<div style={{ left: alphaOffset }} className='absolute h-4 w-4 -translate-x-1/2 cursor-pointer rounded-full border-2 border-white bg-white dark:bg-[#27272a] shadow-md'>
 						<div className='h-full w-full rounded-full' style={{ backgroundColor: `hsl(${hsl.h} ${hsl.s * 100}% ${hsl.l * 100}% / ${alpha * 100}%)` }} />
 					</div>
 				</div>

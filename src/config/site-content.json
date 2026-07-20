@@ -14,6 +14,36 @@
 		"colorCard": "#D9D9D999",
 		"colorArticle": "#E5E5E5cc"
 	},
+	"bentoConfig": {
+		"location": "New Zealand",
+		"uptime": "99.9%",
+		"currentResearch": "Cryptography & Web3",
+		"mapZoom": 1.8,
+		"mapCenterLat": 17.856282422163652,
+		"mapCenterLng": 131.8701841178942,
+		"buildingName": "数字花园 & 全栈 UI 重构",
+		"buildingTech": "Next.js 15 / React / Tailwind",
+		"buildingProgress": 78,
+		"articleTitle": "",
+		"articleDate": "",
+		"articleSummary": "",
+		"articleCover": "",
+		"articleLink": "",
+		"bookName": "穷爸爸富爸爸",
+		"bookAuthor": "罗勃特·T·清崎",
+		"bookCover": "https://is1-ssl.mzstatic.com/image/thumb/Publication118/v4/90/b6/67/90b667cd-1a6c-f9de-6921-7cfb387c7164/cover.jpg/600x600bb.jpg",
+		"movieName": "绿皮书",
+		"movieDirector": "彼得·法雷里",
+		"movieDescription": "托尼（维果·莫腾森 Viggo Mortensen 饰）是一个吊儿郎当游手好闲的混混，在一家夜总会做侍者。这间夜总会因故要停业几个月，可托尼所要支付的房租和生活费不会因此取消，所以他的当务之急是去寻找另一份工作来填补这几个月的空缺。在这个节骨眼上，一位名叫唐雪莉（马赫沙拉·阿里 Mahershala Ali 饰）的黑人钢琴家提出雇佣托尼。\n唐雪莉即将开始为期八个星期的南下巡回演出，可是，那个时候南方对黑人的歧视非常的严重，于是托尼便成为了唐雪莉的司机兼保镖。一路上，两人迥异的性格使得他们之间产生了很多的矛盾，与此同时，唐雪莉在南方所遭受的种种不公平的对待也让托尼对种族歧视感到深恶痛绝。",
+		"moviePoster": "/api/image-proxy?url=https%3A%2F%2Fimg9.doubanio.com%2Fview%2Fphoto%2Flarge%2Fpublic%2Fp2531065411.jpg",
+		"bookProgress": 70,
+		"wishlist": [
+			{
+				"name": "Los Angeles",
+				"status": "WISHLIST"
+			}
+		]
+	},
 	"backgroundColors": [
 		"#F0F0F087",
 		"#E5E5E5",
@@ -73,7 +103,7 @@
 	],
 	"clockShowSeconds": false,
 	"summaryInContent": false,
-	"isCachePem": false,
+	"isCachePem": true,
 	"hideEditButton": false,
 	"enableCategories": true,
 	"currentHatIndex": 3,
@@ -82,5 +112,16 @@
 	"beian": {
 		"text": "",
 		"link": ""
-	}
+	},
+	"featuredProjects": [
+		"Pixel Motion",
+		"Path Motion",
+		"JSON Viewer",
+		"箭头生成小工具"
+	],
+	"featuredBlogs": [
+		"yh-fish",
+		"zzz-proxy",
+		"curve-arrow"
+	]
 }

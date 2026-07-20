@@ -6,6 +6,9 @@ import { Plus } from 'lucide-react'
 import LogoUploadDialog, { type LogoItem } from './logo-upload-dialog'
 import type { Share } from './share-card'
 import { DialogModal } from '@/components/dialog-modal'
+import { TagSelector } from '@/components/ui/tag-selector'
+
+const BOOKMARK_TAG_OPTIONS = ['工具', '设计', '开发', 'AI', '灵感', '社区', '资源']
 
 interface CreateDialogProps {
 	share: Share | null
@@ -23,12 +26,44 @@ export default function CreateDialog({ share, onClose, onSave }: CreateDialogPro
 		stars: 3
 	})
 	const [showLogoDialog, setShowLogoDialog] = useState(false)
-	const [tagsInput, setTagsInput] = useState('')
+	const [isParsing, setIsParsing] = useState(false)
+	const [autoUrl, setAutoUrl] = useState('')
+
+	const handleAutoParse = async (inputUrl?: string | React.MouseEvent) => {
+		const targetUrl = typeof inputUrl === 'string' ? inputUrl : autoUrl;
+		if (!targetUrl.trim()) {
+			toast.error('请输入有效的链接')
+			return
+		}
+		try {
+			setIsParsing(true)
+			const res = await fetch(`/api/og?url=${encodeURIComponent(targetUrl.trim())}`)
+			if (!res.ok) {
+				throw new Error('解析失败')
+			}
+			const data = await res.json()
+			if (data.error) {
+				throw new Error(data.error)
+			}
+			
+			setFormData(prev => ({
+				...prev,
+				name: data.title || prev.name,
+				description: data.description || data.desc || prev.description,
+				logo: data.image || data.logo || prev.logo,
+				url: targetUrl || prev.url
+			}))
+			toast.success('解析成功，已自动填充！')
+		} catch (err: any) {
+			toast.error(`解析失败: ${err.message || '未知错误'}`)
+		} finally {
+			setIsParsing(false)
+		}
+	}
 
 	useEffect(() => {
 		if (share) {
 			setFormData(share)
-			setTagsInput(share.tags.join(', '))
 		} else {
 			setFormData({
 				name: '',
@@ -38,22 +73,12 @@ export default function CreateDialog({ share, onClose, onSave }: CreateDialogPro
 				tags: [],
 				stars: 3
 			})
-			setTagsInput('')
 		}
 	}, [share])
 
 	const handleLogoSubmit = (logo: LogoItem) => {
 		const logoUrl = logo.type === 'url' ? logo.url : logo.previewUrl
 		setFormData({ ...formData, logo: logoUrl })
-	}
-
-	const handleTagsChange = (value: string) => {
-		setTagsInput(value)
-		const tags = value
-			.split(',')
-			.map(t => t.trim())
-			.filter(t => t)
-		setFormData({ ...formData, tags })
 	}
 
 	const handleSubmit = () => {
@@ -63,7 +88,7 @@ export default function CreateDialog({ share, onClose, onSave }: CreateDialogPro
 		}
 
 		if (formData.tags.length === 0) {
-			toast.error('请至少添加一个标签')
+			toast.error('请至少选择一个标签')
 			return
 		}
 
@@ -73,25 +98,55 @@ export default function CreateDialog({ share, onClose, onSave }: CreateDialogPro
 	}
 
 	return (
-		<DialogModal open onClose={onClose} className='card max-h-[90vh] w-sm overflow-y-auto'>
+		<DialogModal open onClose={onClose} className='card max-h-[90vh] w-sm overflow-y-auto max-w-lg'>
 			{/* 卡片样式的内容 */}
-			<div>
-				<div className='mb-4 flex items-center gap-4'>
-					<div className='group relative cursor-pointer' onClick={() => setShowLogoDialog(true)}>
+			<div className='flex flex-col p-2'>
+				{/* URL Auto-parse helper (Hero Action) */}
+				<div className='mb-6 p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 flex flex-col gap-3'>
+					<label className='text-[11px] text-purple-600 dark:text-purple-400 font-bold uppercase flex items-center gap-1.5 tracking-wider'>
+						<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>
+						书签链接智能解析
+					</label>
+					<div className='flex gap-2'>
+						<input
+							type='url'
+							value={autoUrl}
+							onChange={e => setAutoUrl(e.target.value)}
+							onPaste={e => {
+								const pastedText = e.clipboardData.getData('text')
+								if (pastedText.startsWith('http')) {
+									setAutoUrl(pastedText)
+									handleAutoParse(pastedText)
+								}
+							}}
+							placeholder='粘贴网址例如：https://example.com'
+							className='flex-1 rounded-lg border border-purple-500/30 bg-white/80 dark:bg-black/40 px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 transition-colors'
+						/>
+						<button
+							onClick={handleAutoParse}
+							disabled={isParsing}
+							className='px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-medium transition-colors shrink-0 flex items-center gap-1 shadow-sm'
+						>
+							{isParsing ? '解析中...' : '一键抓取'}
+						</button>
+					</div>
+				</div>
+
+				{/* 顶部图片和基本信息 */}
+				<div className='mb-4 flex gap-4'>
+					<div className='group relative shrink-0 cursor-pointer' onClick={() => setShowLogoDialog(true)}>
 						{formData.logo ? (
-							<>
-								<img src={formData.logo} alt={formData.name} className='h-16 w-16 rounded-xl object-cover' />
-								<div className='pointer-events-none absolute inset-0 flex items-center justify-center rounded-xl bg-black/40 opacity-0 transition-opacity group-hover:opacity-100'>
-									<span className='text-xs text-white'>更换</span>
-								</div>
-							</>
+							<img src={formData.logo} alt={formData.name} className='h-16 w-16 rounded-xl object-cover border border-gray-200' />
 						) : (
-							<div className='flex h-16 w-16 items-center justify-center rounded-xl bg-gray-200'>
-								<Plus className='h-6 w-6 text-gray-500' />
+							<div className='flex h-16 w-16 items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 text-gray-400'>
+								<Plus className='h-6 w-6' />
 							</div>
 						)}
+						<div className='pointer-events-none absolute inset-0 flex items-center justify-center rounded-xl bg-black/40 opacity-0 transition-opacity group-hover:opacity-100'>
+							<span className='text-xs text-white'>更换</span>
+						</div>
 					</div>
-					<div className='flex-1'>
+					<div className='flex-1 min-w-0'>
 						<input
 							type='text'
 							value={formData.name}
@@ -110,7 +165,7 @@ export default function CreateDialog({ share, onClose, onSave }: CreateDialogPro
 				</div>
 
 				{/* 星级评分 */}
-				<div className='flex items-center gap-0.5'>
+				<div className='flex items-center gap-0.5 mb-3'>
 					{[1, 2, 3, 4, 5].map(index => (
 						<div key={index} onClick={() => setFormData({ ...formData, stars: index })} className='cursor-pointer'>
 							<svg width='16' height='16' viewBox='0 0 24 24' className={index <= formData.stars ? 'fill-yellow-400' : 'fill-gray-300'}>
@@ -120,36 +175,28 @@ export default function CreateDialog({ share, onClose, onSave }: CreateDialogPro
 					))}
 				</div>
 
-				{/* 标签输入 */}
-				<div className='mt-3'>
-					<input
-						type='text'
-						value={tagsInput}
-						onChange={e => handleTagsChange(e.target.value)}
-						placeholder='标签，用逗号分隔（如：图片, 工具）'
-						className='w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-sm focus:outline-none'
+				{/* 标签选择器 */}
+				<div className='mt-2 mb-3'>
+					<span className='text-slate-500 dark:text-slate-400 text-[11px] font-medium block mb-1.5'>选择分类标签</span>
+					<TagSelector
+						options={BOOKMARK_TAG_OPTIONS}
+						selectedTags={formData.tags}
+						onChange={tags => setFormData({ ...formData, tags })}
 					/>
-					<div className='mt-2 flex flex-wrap gap-1.5'>
-						{formData.tags.map(tag => (
-							<span key={tag} className='rounded-full bg-secondary/10 px-2.5 py-0.5 text-xs text-gray-600'>
-								{tag}
-							</span>
-						))}
-					</div>
 				</div>
 
 				<textarea
 					value={formData.description}
 					onChange={e => setFormData({ ...formData, description: e.target.value })}
 					placeholder='资源介绍...'
-					className='mt-3 w-full resize-none text-sm leading-relaxed focus:outline-none'
+					className='mt-2 w-full resize-none text-sm leading-relaxed focus:outline-none border-t border-gray-100 pt-3'
 					rows={4}
 				/>
 			</div>
 
 			{/* 操作按钮 */}
 			<div className='mt-6 flex gap-3'>
-				<button onClick={onClose} className='flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm transition-colors hover:bg-gray-50'>
+				<button onClick={onClose} className='flex-1 rounded-lg border border-gray-300 bg-white dark:bg-[#27272a] px-4 py-2 text-sm transition-colors hover:bg-gray-50'>
 					取消
 				</button>
 				<button onClick={handleSubmit} className='brand-btn flex-1 justify-center px-4'>

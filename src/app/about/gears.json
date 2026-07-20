@@ -1,0 +1,84 @@
+[
+	{
+		"name": "Rog 魔霸新锐2023 （RTX4060）",
+		"cover": "/images/uploads/fdc1d82758461f8c.webp",
+		"subtitle": "",
+		"desc": "",
+		"review": "",
+		"link": "",
+		"isPinned": false,
+		"isShow": true,
+		"category": ""
+	},
+	{
+		"name": "Macbook Air M4",
+		"cover": "/images/uploads/bfbd7c180b9eed0a.png",
+		"subtitle": "",
+		"desc": "",
+		"review": "",
+		"link": "",
+		"isPinned": false,
+		"isShow": true,
+		"category": "笔记本"
+	},
+	{
+		"name": "AirPods Pro 2",
+		"category": "耳机",
+		"desc": "H2 芯片，主动降噪效果翻倍，自适应通透模式，个性化空间音频。",
+		"cover": "/images/uploads/ecf4627de3e54e6a.webp",
+		"link": "https://www.apple.com/airpods-pro/",
+		"review": "通勤与专注的必备，降噪一开，世界瞬间安静。",
+		"isShow": true,
+		"isPinned": true
+	},
+	{
+		"name": "iPad Pro 2021",
+		"category": "平板",
+		"desc": "M1 芯片，12.9 英寸 Liquid 视网膜 XDR 显示屏，支持 Apple Pencil 二代。",
+		"cover": "/images/uploads/afa654a7294bcc13.jpg",
+		"link": "https://www.apple.com/ipad-pro/",
+		"review": "随身的第二块屏幕，绘图与阅读的最佳伴侣。",
+		"isShow": true,
+		"isPinned": false
+	},
+	{
+		"name": "Apple Watch Series 11",
+		"category": "手表",
+		"desc": "健康监测、运动追踪、通知提醒，腕上的智能助理。",
+		"cover": "/images/uploads/8568a1642b1991dc.jpg",
+		"link": "https://www.apple.com/apple-watch/",
+		"review": "每天佩戴，健康数据一手掌握，运动闭环的动力来源。",
+		"isShow": true,
+		"isPinned": false
+	},
+	{
+		"name": "蝰蛇 V3 Pro",
+		"category": "鼠标",
+		"desc": "雷蛇旗舰无线游戏鼠标，Focus Pro 30K 光学传感器，HyperSpeed 无线技术，轻量化设计。",
+		"cover": "/images/uploads/1609fece430badb0.jpg",
+		"link": "https://www.razer.com/gaming-mice/razer-deathadder-v3-pro",
+		"review": "握感舒适，响应迅速，游戏与办公的双重利器。",
+		"isShow": true,
+		"isPinned": false
+	},
+	{
+		"name": "狼蛛 F99",
+		"category": "键盘",
+		"desc": "三模机械键盘，Gasket 结构，全键热插拔，RGB 背光，性价比之选。",
+		"cover": "https://images.unsplash.com/photo-1595225476474-87563907a212?q=80&w=800&auto=format&fit=crop",
+		"link": "",
+		"review": "入门机械键盘的标杆，手感扎实，功能全面。",
+		"isShow": true,
+		"isPinned": false
+	},
+	{
+		"name": "声阔 S1",
+		"category": "耳机",
+		"desc": "Soundcore 头戴式降噪耳机，LDAC 高清音频，超长续航，舒适佩戴。",
+		"cover": "/images/uploads/14aa764ae7811518.png",
+		"link": "https://www.soundcore.com/",
+		"review": "音质与降噪的双重惊喜，长时间佩戴也不累。",
+		"isShow": true,
+		"isPinned": false
+	}
+]

@@ -1,15 +1,17 @@
 @theme {
-	--color-primary: #334f52;
-	--color-secondary: #7b888e;
-	--color-brand-secondary: #1fc9e7;
-	--color-bg: #eeeeee;
-	--color-border: #fff;
-	--color-brand: #35bfab;
-	--color-card: #ffffff66;
-	--color-article: #ffffffcc;
+	--color-primary: #0b0f19; /* Catalis Dark Navy */
+	--color-secondary: #5c6479;
+	--color-brand-secondary: #8c95a6;
+	--color-bg: #f8f9fa; /* Catalis Light Grey Background */
+	--color-border: #e5e7eb;
+	--color-brand: #0054f9; /* Catalis Royal Blue */
+	--color-card: #ffffff;
+	--color-article: #ffffff;
+	--color-accent: #0054f9;
 
-	--font-averia: 'Averia Gruesa Libre', sans-serif;
+	--font-averia: 'Playfair Display', Georgia, 'Times New Roman', serif;
 	--font-sans:
-		'PingFang SC', -apple-system, system-ui, 'Segoe UI', Roboto, Ubuntu, Cantarell, 'Noto Sans', sans-serif, BlinkMacSystemFont, 'Helvetica Neue',
+		'Outfit', 'PingFang SC', -apple-system, system-ui, 'Segoe UI', Roboto, Ubuntu, Cantarell, 'Noto Sans', sans-serif, BlinkMacSystemFont, 'Helvetica Neue',
 		'Hiragino Sans GB', 'Microsoft YaHei', Arial;
+	--font-mono: 'SF Mono', 'Fira Code', 'JetBrains Mono', 'Cascadia Code', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
 }

@@ -1,0 +1,301 @@
+[
+	{
+		"name": "星际穿越 (Interstellar)",
+		"director": "克里斯托弗·诺兰",
+		"description": "不要温和地走进那个良夜。关于爱、时间、黑洞的极致浪漫。",
+		"tags": [
+			"科幻",
+			"悬疑"
+		],
+		"stars": 5,
+		"poster": "/images/movies/interstellar.jpg",
+		"isShow": true,
+		"isPinned": true,
+		"status": "watched",
+		"recommendation": "一部改变我对时间与爱的认知的神作",
+		"watchDate": "2026-06-02"
+	},
+	{
+		"name": "变形金刚2 (Transformers: Revenge of the Fallen)",
+		"director": "迈克尔·贝",
+		"description": "汽车人与霸天虎在地球上的再次激战，带来无与伦比的视觉盛宴。",
+		"tags": [
+			"动作",
+			"科幻"
+		],
+		"stars": 5,
+		"poster": "/images/uploads/4e81d4e853b5eb4f.webp",
+		"isShow": true,
+		"status": "watched",
+		"recommendation": "视觉效果绝对震撼，机甲迷必看",
+		"myReview": "好看"
+	},
+	{
+		"name": "绿皮书",
+		"director": "彼得·法雷里",
+		"description": "托尼（维果·莫腾森 Viggo Mortensen 饰）是一个吊儿郎当游手好闲的混混，在一家夜总会做侍者。这间夜总会因故要停业几个月，可托尼所要支付的房租和生活费不会因此取消，所以他的当务之急是去寻找另一份工作来填补这几个月的空缺。在这个节骨眼上，一位名叫唐雪莉（马赫沙拉·阿里 Mahershala Ali 饰）的黑人钢琴家提出雇佣托尼。\n唐雪莉即将开始为期八个星期的南下巡回演出，可是，那个时候南方对黑人的歧视非常的严重，于是托尼便成为了唐雪莉的司机兼保镖。一路上，两人迥异的性格使得他们之间产生了很多的矛盾，与此同时，唐雪莉在南方所遭受的种种不公平的对待也让托尼对种族歧视感到深恶痛绝。",
+		"tags": [
+			"剧情",
+			"传记"
+		],
+		"stars": 5,
+		"poster": "/api/image-proxy?url=https%3A%2F%2Fimg9.doubanio.com%2Fview%2Fphoto%2Flarge%2Fpublic%2Fp2531065411.jpg",
+		"isShow": true,
+		"isPinned": true,
+		"status": "watched",
+		"doubanUrl": "https://movie.douban.com/subject/27060077/"
+	},
+	{
+		"name": "头号玩家",
+		"director": "史蒂文·斯皮尔伯格",
+		"description": "故事发生在2045年，虚拟现实技术已经渗透到了人类生活的每一个角落。詹姆斯哈利迪（马克·里朗斯 Mark Rylance 饰）一手建造了名为“绿洲”的虚拟现实游戏世界，临终前，他宣布自己在游戏中设置了一个彩蛋，找到这枚彩蛋的人即可成为绿洲的继承人。要找到这枚彩蛋，必须先获得三把钥匙，而寻找钥匙的线索就隐藏在詹姆斯的过往之中。\n韦德（泰尔·谢里丹 Tye Sheridan 饰）、艾奇（丽娜·维特 Lena Waithe 饰）、大东（森崎温 饰）和修（赵家正 饰）是游戏中的好友，和之后遇见的阿尔忒弥斯（奥利维亚·库克 Olivia Cooke 饰）一起，五人踏上了寻找彩蛋的征程。他们所要对抗的，是名为诺兰索伦托（本·门德尔森 Ben Mendelsohn 饰）的大资本家。",
+		"tags": [
+			"科幻",
+			"冒险"
+		],
+		"stars": 5,
+		"poster": "/api/image-proxy?url=https%3A%2F%2Fimg9.doubanio.com%2Fview%2Fphoto%2Flarge%2Fpublic%2Fp2516578307.jpg",
+		"isShow": true,
+		"status": "wishlist",
+		"doubanUrl": "https://movie.douban.com/subject/4920389/"
+	},
+	{
+		"name": "寻梦环游记 (Coco)",
+		"director": "李·昂克里奇",
+		"description": "死亡不是生命的终点，遗忘才是。感动无数人的亲情赞歌。",
+		"tags": [
+			"动画",
+			"奇幻"
+		],
+		"stars": 5,
+		"poster": "/images/movies/coco.jpg",
+		"isShow": true
+	},
+	{
+		"name": "爱在黎明破晓前",
+		"director": "理查德·林克莱特",
+		"poster": "https://image.tmdb.org/t/p/w500/5gisRHtmLULKXHthDvez9DxdlYm.jpg",
+		"description": "美国青年杰西（伊桑·霍克 饰）在火车上偶遇了法国女学生塞琳娜（朱莉·德尔佩 饰），两人在火车上交谈甚欢。当火车到达维也纳时，杰西盛情邀请塞琳娜一起在维也纳游览一番，即使杰西翌日便要坐飞机离开。与杰西一见钟情的塞琳娜接受了杰西的邀请。\r 他们一边游览城市，一边谈论着彼此的过去 ，彼此对生活的感想，两人了解越加深刻。他们非常珍惜这美妙的晚上，这对恋人一起经历了很多浪漫的经历因为他们约定在半年后再见，而此次约会将会在日出之间结束……",
+		"tags": [
+			"剧情",
+			"爱情"
+		],
+		"stars": 4,
+		"isPinned": false,
+		"isShow": false,
+		"doubanUrl": ""
+	},
+	{
+		"name": "赎罪",
+		"director": "乔·赖特",
+		"poster": "https://image.tmdb.org/t/p/w500/B2a5vjUKeerfX3oqERx3T7U32W.jpg",
+		"description": "影片时间跨度长达数十年。1935年，13岁的初露头角的作家布里奥妮·塔利斯与家人居住在一座巨大的庄园中，过着富裕优越的生活。在一年中最炎热的日子里，乡间庄园笼罩在一种令人不安的温室氛围中，催生了布里奥妮活跃的想象。管家的儿子、受过良好教育的罗比·特纳暗恋着布里奥妮倔强的姐姐塞西莉亚。他期望塞西莉亚怀有同样的感情，只需一点火花便能点燃这段关系。当火花终于迸发时，一直迷恋罗比的布里奥妮受冲动驱使横加干涉，甚至诬告罗比犯下他并未实施的罪行。塞西莉亚与罗比互诉爱意，但罗比却遭逮捕——由于布里奥妮作伪证，三个人的命运从此永远改变。布里奥妮终其一生都在为她儿时的过错寻求宽恕。通过一次痛苦而勇敢的想象，她找到了通往不确定的赎罪之路，也领悟到恒久之爱的力量。[焦点影业]",
+		"tags": [
+			"剧情",
+			"爱情",
+			"犯罪"
+		],
+		"stars": 5,
+		"isPinned": false,
+		"isShow": false,
+		"doubanUrl": ""
+	},
+	{
+		"name": "傲慢与偏见",
+		"director": "乔·赖特",
+		"poster": "https://image.tmdb.org/t/p/w500/2RD0e28s7IFPbxWkBUaPfvwcdWB.jpg",
+		"description": "根据简·奥斯汀同名小说改编。伊丽莎白·班纳特(凯拉·奈特丽 饰)出身于小地主家庭，有四个姐妹，母亲班纳特太太整天操心着为女儿物色称心如意的丈夫。新来的邻居宾格来先生和他的朋友达西（马修·麦克菲迪恩 饰）打破了她们一家人单调的乡村生活。宾格来和伊丽莎白的姐姐简·班纳特互生情愫；达西对善良聪明的伊丽莎白产生了好感，而伊丽莎白却对达西不可一世的傲慢心存偏见，不接受他的感情。然而，世事难料，宾格来和简·班纳特因为误会，关系危在旦夕；达西的种种作为，展示了性格中和伊丽莎白相同的善良一面，逐渐赢得了伊丽莎白的好感。两对有情人能否终成眷属？班纳特姐妹们能否得到自己想要的生活？\r 简·奥斯汀笔下十九世纪初英国乡村生活和社会风貌，重新展现在大银幕上。",
+		"tags": [
+			"剧情",
+			"爱情"
+		],
+		"stars": 4,
+		"isPinned": false,
+		"isShow": true,
+		"doubanUrl": ""
+	},
+	{
+		"name": "肖申克的救赎",
+		"director": "弗兰克·德拉邦特",
+		"poster": "https://image.tmdb.org/t/p/w500/Aqo8yM5S5ZEdlcyeBBxj7s0vkTf.jpg",
+		"description": "安迪·杜佛兰被错判谋杀妻子及其情人，在缅因州肖申克服刑，判处两项无期徒刑接连执行。影片背景设定于1940年代，展现安迪如何在残酷的监狱环境中艰难求生，甚至赢得狱友们的敬重——尤其是与老囚徒“瑞德”·雷丁之间深厚的友谊。",
+		"tags": [
+			"剧情",
+			"犯罪"
+		],
+		"stars": 5,
+		"isPinned": false,
+		"isShow": false,
+		"doubanUrl": "",
+		"isShowOnHome": true,
+		"releaseDate": "",
+		"status": "watched"
+	},
+	{
+		"name": "变形金刚3",
+		"director": "迈克尔·贝",
+		"poster": "/api/image-proxy?url=https%3A%2F%2Fimg9.doubanio.com%2Fview%2Fphoto%2Flarge%2Fpublic%2Fp1056093671.jpg",
+		"description": "距今50多年前，一艘来自赛博坦的飞船坠落月球，由此引发了美苏两国的太空竞赛。人类争相登上月球，只为一探飞船残骸中的秘密。时间回到21世纪初，经过几番征战，汽车人终于挫败霸天虎的入侵，继而与人类合作，共同保卫美丽的地球。然而发生在切尔诺贝利的事件却将尘封已久的月球计划重新摆到桌面。为了防止霸天虎找到能量柱为非作歹，擎天柱与战友飞赴月球，更从当年的飞船中救出了汽车人的先代领导者——御天敌。御天敌是能量柱的发明者，将上百根能量柱集合在一起便可制造太空桥，实现物质的瞬间传送。\n忙着找工作以及和女友卡莉（罗茜·汉丁顿-惠特莉Rosie Huntington-Whiteley 饰）经营爱情的山姆（希亚·拉博夫 Shia LaBeouf 饰）无可避免地卷入其中，他渐渐发现霸天虎的操纵一切的阴谋，却不知更大的阴谋和危机隐藏在那月影背后……",
+		"tags": [
+			"动作",
+			"科幻",
+			"冒险"
+		],
+		"stars": 5,
+		"isPinned": false,
+		"isShow": false,
+		"isShowOnHome": true,
+		"doubanUrl": "https://movie.douban.com/subject/3610047/",
+		"releaseDate": "2011-07-21",
+		"status": "watched"
+	},
+	{
+		"name": "玩具总动员5",
+		"director": "安德鲁·斯坦顿, 麦肯纳·哈里斯",
+		"poster": "/api/image-proxy?url=https%3A%2F%2Fimg9.doubanio.com%2Fview%2Fphoto%2Flarge%2Fpublic%2Fp2933391462.jpg",
+		"description": "本部续作中，胡迪、巴斯光年、翠斯等“元老级”玩具将跟随小主人邦妮的成长脚步，共同迎接数字时代下的全新挑战。随着无所不能的科技产品逐渐走进童年世界，一批充满科技感的崭新角色也随之重磅亮相：青蛙造型的智能平板小荷、憨态可掬的导航玩具小不丢、活力十足的抓拍好手小拍侠，以及自带笑点的臭屁小机灵。\n当身边的同龄朋友们开始沉浸在科技玩具带来的“电子陪伴”中，而玩具伙伴们也迎来了前所未有的生存难题：在屏幕占据注意力的时代，玩具的时代真的结束了吗？在“被取代”危机的当下，这群玩具伙伴还能否携手，帮助邦妮找回属于自己的真实友谊与快乐？",
+		"tags": [
+			"剧情",
+			"喜剧",
+			"动画"
+		],
+		"stars": 4,
+		"isPinned": false,
+		"isShow": false,
+		"isShowOnHome": true,
+		"doubanUrl": "https://movie.douban.com/subject/36238849/",
+		"releaseDate": "2026-06-19",
+		"watchDate": "2026-06-27",
+		"status": "watched"
+	},
+	{
+		"name": "玩具总动员4",
+		"director": "乔什·库雷",
+		"poster": "/api/image-proxy?url=https%3A%2F%2Fimg9.doubanio.com%2Fview%2Fphoto%2Flarge%2Fpublic%2Fp2551222752.jpg",
+		"description": "自从与小主人安迪告别后，胡迪（汤姆·汉克斯 Tom Hanks 配音）和他的伙伴们在小女孩邦妮家安顿下来，不仅成为了邦妮（玛德琳·麦格劳 Madeleine McGraw 配音）的心爱之物，还结识了一批新伙伴。转眼之间，邦妮也要进入幼儿园啦，她用灵巧的小手把一个餐叉做成了玩具带了回来，并且热爱有加。胡迪虽然稍感失落，却还能欣然接受。只不过叉叉（托尼·海尔 Tony Hale 配音）似乎认定自己只是垃圾，一次次逃走跳进垃圾桶里，这可给胡迪找了不少麻烦。不久，邦妮一家外出旅行。叉叉故技重施，想方设法逃走，结果在追逐他的过程中，胡迪和叉叉便与邦妮家失散了。\n在流浪途中，胡迪意外重逢久未谋面的牧羊女（安妮·波茨 Annie Potts 配音），与此同时，新的冒险也就此展开……",
+		"tags": [
+			"喜剧",
+			"动画",
+			"奇幻"
+		],
+		"stars": 3,
+		"isPinned": false,
+		"isShow": false,
+		"isShowOnHome": true,
+		"doubanUrl": "https://movie.douban.com/subject/6850547/",
+		"releaseDate": "2019-06-21",
+		"watchDate": "2026-06-26",
+		"status": "watched"
+	},
+	{
+		"name": "玩具总动员3",
+		"director": "李·昂克里奇",
+		"poster": "/api/image-proxy?url=https%3A%2F%2Fimg9.doubanio.com%2Fview%2Fphoto%2Flarge%2Fpublic%2Fp1283675359.jpg",
+		"description": "距上一次的冒险已经过去11个年头，转眼间安迪（约翰·莫里斯 John Morris 配音）变成了17岁的阳光男孩。这年夏天，安迪即将开始大学生活，他必须将自己的房间收拾整齐留给妹妹。此前，伍迪（汤姆·汉克斯 Tom Hanks 配音）与巴斯光年（蒂姆·艾伦 Tim Allen 配音）等玩具一直期待安迪再和他们玩耍，但是随着岁月的流逝，他们被冷落在箱子里很久了。安迪十分珍惜这些童年的玩伴，于是准备将他们收在阁楼。谁曾想，妈妈却把玩具们当作废物扔到街道上。玩具们误解了安迪，于是愤然出走，宁可被捐赠到阳光之家幼儿园。\n伍迪尽力劝解大家，却收效甚微，只得独自黯然离开。巴斯光年他们原本以为将重新回到往昔的快乐时光，不料却陷入一场阴谋之中……",
+		"tags": [
+			"喜剧",
+			"动画",
+			"奇幻"
+		],
+		"stars": 4,
+		"isPinned": false,
+		"isShow": false,
+		"isShowOnHome": true,
+		"doubanUrl": "https://movie.douban.com/subject/1858711/",
+		"releaseDate": "2010-06-16",
+		"watchDate": "2026-06-25",
+		"status": "watched"
+	},
+	{
+		"name": "玩具总动员2",
+		"director": "约翰·拉塞特, 艾什·布兰农, 李·昂克里奇",
+		"poster": "/api/image-proxy?url=https%3A%2F%2Fimg9.doubanio.com%2Fview%2Fphoto%2Flarge%2Fpublic%2Fp1283688673.jpg",
+		"description": "自从上一集牛仔伍迪救回巴斯光年之后，他一直和其他玩具一起快乐的生活在小主人家。一次，小主人参加夏令营去了，伍迪因为破旧而没被带去。留在家里的伍迪恰巧被一个玩具收藏家发现了，认为他是近代最具代表性的玩具。于是将伍迪被偷了出来放在颇富盛名的文化博物馆内展览。在家里所有的玩具 都很担心伍迪，因此巴斯光年自告奋勇去寻找伍迪，但是当他们发现伍迪在展览馆时， 伍迪却似乎不再愿意回去过那平凡的生活……",
+		"tags": [
+			"喜剧",
+			"动画",
+			"奇幻"
+		],
+		"stars": 3,
+		"isPinned": false,
+		"isShow": false,
+		"isShowOnHome": true,
+		"doubanUrl": "https://movie.douban.com/subject/1291574/",
+		"releaseDate": "1999-11-24",
+		"watchDate": "2026-06-24",
+		"status": "watched"
+	},
+	{
+		"name": "玩具总动员",
+		"director": "约翰·拉塞特",
+		"poster": "/api/image-proxy?url=https%3A%2F%2Fimg9.doubanio.com%2Fview%2Fphoto%2Flarge%2Fpublic%2Fp2565956404.jpg",
+		"description": "小主人家境富裕，拥有一屋的玩具。其中他最爱的是牛仔玩偶胡迪，胡迪因此成为众玩具的“老大”。当小主人出门在外时，一屋的玩具自成世界，过着自己的生活。一天，小主人带回了一个新的玩意：太空战警巴斯光年。巴斯光年长相新奇，功能先进，令小主人爱不释手，威胁到了胡迪的地位。胡迪千方百计要赶走巴斯，一不小心二人一起掉出了房间窗口外，邻居的恶狗在狂吠，邻居的小孩是一个玩具虐待狂，胡迪巴斯能不能化敌为友，消灾解难？",
+		"tags": [
+			"喜剧",
+			"动画",
+			"家庭"
+		],
+		"stars": 3,
+		"isPinned": false,
+		"isShow": false,
+		"isShowOnHome": true,
+		"doubanUrl": "https://movie.douban.com/subject/1291575/",
+		"releaseDate": "1995-11-22",
+		"watchDate": "2026-06-23",
+		"status": "watched"
+	},
+	{
+		"name": "小黄人与大怪兽",
+		"director": "皮埃尔·柯芬",
+		"poster": "/api/image-proxy?url=https%3A%2F%2Fimg9.doubanio.com%2Fview%2Fphoto%2Flarge%2Fpublic%2Fp2933539994.jpg",
+		"description": "为了拍摄心中理想的怪兽电影，小黄人（皮埃尔·柯芬 Pierre Coffin 配音）这群萌趣活宝四处物色演员，竟然真的集齐了各式怪兽，上演疯狂大乱斗！",
+		"tags": [
+			"喜剧",
+			"科幻",
+			"动画"
+		],
+		"stars": 3,
+		"isPinned": false,
+		"isShow": false,
+		"isShowOnHome": true,
+		"doubanUrl": "https://movie.douban.com/subject/36962219/",
+		"releaseDate": "2026-07-03",
+		"watchDate": "2026-07-05"
+	},
+	{
+		"name": "神偷奶爸",
+		"director": "皮埃尔·柯芬, 克里斯·雷纳德",
+		"poster": "/api/image-proxy?url=https%3A%2F%2Fimg9.doubanio.com%2Fview%2Fphoto%2Flarge%2Fpublic%2Fp792776858.jpg",
+		"description": "超级坏蛋格鲁（史蒂夫·卡瑞尔 Steve Carell 配音）在听说埃及金字塔被盗的新闻后不满市面上新贼辈出，决定在纳法利欧博士（拉塞尔·布兰德 Russell Brand 配音）的帮助下建造火箭升空盗取月亮。在向坏蛋银行贷款的过程中，格鲁盗取的收缩射线枪被新贼维克托（杰森·席格尔 Jason Segel 配音）抢走。为了夺回收缩射线枪，格鲁决定领养三位孤儿——玛戈（米兰达·卡斯格拉夫 Miranda Cosgrove 配音）、伊迪丝（达娜·盖伊 Dana Gaier 配音）和阿格蕾丝（埃尔希·费舍 Elsie Fisher 配音），利用她们进入维克托的城堡兜售饼干的机会实施偷盗，计划成功后再偷偷处理掉三个小孩。然而在平凡的日常相处中，格鲁却发现自己越来越离不开这三个小鬼，但这样的感情用事却将严重影响周密的盗月计划……",
+		"tags": [
+			"喜剧",
+			"动画",
+			"冒险"
+		],
+		"stars": 3,
+		"isPinned": false,
+		"isShow": false,
+		"isShowOnHome": true,
+		"doubanUrl": "https://movie.douban.com/subject/3287562/",
+		"releaseDate": "2010-06-20",
+		"watchDate": "2026-07-01"
+	},
+	{
+		"name": "神偷奶爸2",
+		"director": "皮埃尔·柯芬, 克里斯·雷纳德",
+		"poster": "/api/image-proxy?url=https%3A%2F%2Fimg9.doubanio.com%2Fview%2Fphoto%2Flarge%2Fpublic%2Fp2164225595.jpg",
+		"description": "自从与玛戈（米兰达·卡斯格拉夫 Miranda Cosgrove 配音）、伊迪丝（达娜·盖伊 Dana Gaier 配音）和阿格蕾丝（埃尔希·费舍 Elsie Fisher 配音）三个可爱的小女孩实现宿命的邂逅，曾经的大坏蛋格鲁（史蒂夫·卡瑞尔 Steve Carell 配音）可真彻底转型了，他金盆洗手，转而化身为慈祥可亲的爸爸和做得一手烂口味布丁果冻的商人。当然凡事没有尽善尽美的，在此期间，憧憬大坏蛋传奇人生的老搭档纳法利欧博士（拉塞尔·布兰德 Russell Brand 配音）离他而去，另谋高就。某天，格鲁被身怀绝技却鲁莽的特工露西·王尔德（克里斯汀·韦格 Kristen Wiig 配音）绑架，原来露西所在的集团研制出可以改变生物基因的药物，可他们位于北极圈的实验室被神秘窃贼偷走，因此才委托有过坏蛋经验的格鲁做卧底。\n经过一番考虑，格鲁接受了这项任务，带着超萌的小黄人们，和露西组成了爆笑连连的追凶搭档……",
+		"tags": [
+			"喜剧",
+			"动画",
+			"冒险"
+		],
+		"stars": 3,
+		"isPinned": false,
+		"isShow": false,
+		"isShowOnHome": true,
+		"doubanUrl": "http://movie.douban.com/subject/4915857/",
+		"releaseDate": "2014-01-10",
+		"watchDate": "2026-07-03"
+	}
+]

@@ -1,9 +1,28 @@
 @import 'tailwindcss';
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+@font-face {
+	font-family: 'Libre Caslon Condensed';
+	src: url('https://cdn.prod.website-files.com/690a3d4b70be67fbdfcdc08a/690a46222eb208f76a5eae11_LibreCaslonCondensed-Regular.otf') format('opentype');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'Libre Caslon Condensed';
+	src: url('https://cdn.prod.website-files.com/690a3d4b70be67fbdfcdc08a/690a4622b7eccf7742492161_LibreCaslonCondensed-Italic.otf') format('opentype');
+	font-weight: 400;
+	font-style: italic;
+	font-display: swap;
+}
 @import 'katex/dist/katex.min.css';
 @import './theme.css';
 @import './article.css';
 
 @plugin 'tailwindcss-animate';
+
+/* Configure dark mode to use class strategy */
+@custom-variant dark (&:where(.dark, .dark *));
 
 @utility scrollbar-none {
 	scrollbar-width: none;
@@ -15,7 +34,36 @@
 @layer base {
 	html {
 		@apply text-primary bg-bg min-h-full leading-tight;
+	}
+}
+
+@utility accentLightBg {
+	@apply bg-white/70 backdrop-blur-xl shadow-2xl border border-white/40 dark:bg-black/40 dark:border-white/10;
+}
+
+@utility font-fantasy {
+	font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+@layer base {
+	html {
+		@apply text-primary bg-bg min-h-full leading-tight;
 		scroll-behavior: smooth;
+		transition: background-color 0.3s ease, color 0.3s ease;
+	}
+
+	/* Theme transition for all color-related properties */
+	*, *::before, *::after {
+		transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+	}
+
+	/* Respect prefers-reduced-motion */
+	@media (prefers-reduced-motion: reduce) {
+		html, *, *::before, *::after {
+			transition-duration: 0.01ms !important;
+			animation-duration: 0.01ms !important;
+			animation-iteration-count: 1 !important;
+		}
 	}
 
 	body {
@@ -23,6 +71,68 @@
 	}
 	* {
 		@apply border-border;
+	}
+
+	/* Elegant serif font for headings */
+	.font-serif {
+		font-family: 'Libre Caslon Condensed', 'Playfair Display', Georgia, 'Times New Roman', serif;
+	}
+
+	/* Image filter removed - back to original colors */
+	.img-curated {
+		transition: transform 0.5s ease;
+	}
+
+	/* Dark mode color overrides - Catalis Noir */
+	.dark {
+		--color-primary: #f3f4f6;
+		--color-secondary: #9ca3af;
+		--color-brand-secondary: #374151;
+		--color-bg: #0b0f19; /* Catalis Deep Navy Background */
+		--color-border: #1f2937;
+		--color-brand: #0054f9; /* Catalis Royal Blue */
+		--color-card: rgba(17, 24, 39, 0.65);
+		--color-article: #111827;
+		--color-accent: #0054f9;
+	}
+
+	.text-gradient-silver {
+		background: linear-gradient(135deg, #111111 0%, #3f3f46 50%, #71717a 100%);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-clip: text;
+	}
+
+	.dark .text-gradient-silver {
+		background: linear-gradient(135deg, #ffffff 0%, #d4d4d8 50%, #52525b 100%);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-clip: text;
+	}
+
+	.text-gradient-cyber {
+		background: linear-gradient(135deg, #00ff41 0%, #00f0ff 100%);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-clip: text;
+	}
+
+	@keyframes shimmer {
+		0% {
+			background-position: -200% 0;
+		}
+		100% {
+			background-position: 200% 0;
+		}
+	}
+
+	.shimmer-text {
+		background: linear-gradient(90deg, var(--color-primary) 0%, color-mix(in srgb, var(--color-primary) 40%, white) 50%, var(--color-primary) 100%);
+		background-size: 200% auto;
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-clip: text;
+		animation: shimmer 6s linear infinite;
 	}
 
 	@media (min-width: 640px) {
@@ -95,24 +205,46 @@
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
 		@apply bg-white/40! backdrop-blur;
 	}
+
+	/* Dark mode Sonner Toaster */
+	.dark html li[data-sonner-toast][data-styled='true'] {
+		@apply bg-[#1c1c1f]/60!;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+	}
+}
+
+@utility bg-dashed-grid {
+	background-image: 
+		linear-gradient(to right, color-mix(in srgb, var(--color-border) 35%, transparent) 1px, transparent 1px),
+		linear-gradient(to bottom, color-mix(in srgb, var(--color-border) 35%, transparent) 1px, transparent 1px);
+	background-size: 64px 64px;
+}
+
+@utility mask-fade-radial {
+	mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+	-webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
 }
 
 @utility card {
-	@apply bg-card rounded-[40px] border p-6;
-	border-color: rgba(255, 255, 255, 0.5);
-	box-shadow:
-		0 30px 60px -20px rgba(0, 0, 0, 0.08),
-		0 10px 20px -5px rgba(0, 0, 0, 0.04),
-		inset 0 0 0 1px rgba(255, 255, 255, 0.3),
-		inset 0 4px 24px rgba(255, 255, 255, 0.4);
+	@apply bg-card rounded-3xl border p-6;
+	border-color: var(--color-border);
+	box-shadow: 0 8px 30px 0 rgba(0, 0, 0, 0.02);
 	backdrop-filter: blur(16px);
+	-webkit-backdrop-filter: blur(16px);
+	transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 
 	&.squircle {
-		@supports (corner-shape: squircle) {
-			corner-shape: squircle;
-			@apply rounded-[64px];
-		}
+		@apply rounded-3xl;
 	}
+}
+
+.dark .card {
+	@apply bg-card rounded-3xl;
+	border-color: var(--color-border);
+	box-shadow: 0 8px 30px 0 rgba(0, 0, 0, 0.2);
+	backdrop-filter: blur(16px);
+	-webkit-backdrop-filter: blur(16px);
+	transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @utility card-rounded {
@@ -149,6 +281,12 @@
 @utility brand-btn {
 	@apply bg-brand btn-rounded flex items-center gap-2 border-[1.5px] px-4 py-2 text-sm font-medium text-white;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+	transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.brand-btn:hover {
+	background-color: var(--color-accent);
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 @utility no-spinner {
@@ -161,30 +299,28 @@
 	-moz-appearance: textfield;
 }
 
-@keyframes heartbeat-frame {
-	0%,
-	100% {
-		transform: scale(1);
+	@keyframes pulse-pulse {
+		50% {
+			opacity: 0.5;
+		}
 	}
-	20% {
-		transform: scale(1.15);
+	@keyframes grid {
+		0% { transform: translateY(-50%); }
+		100% { transform: translateY(0); }
 	}
-	40% {
-		transform: scale(1);
+	@keyframes meteor {
+		0% { transform: rotate(215deg) translateX(0); opacity: 1; }
+		70% { opacity: 1; }
+		100% {
+			transform: rotate(215deg) translateX(-500px);
+			opacity: 0;
+		}
 	}
-	60% {
-		transform: scale(1.15);
+	@keyframes border-beam {
+		100% {
+			offset-distance: 100%;
+		}
 	}
-	80% {
-		transform: scale(1);
-	}
-}
-
-.heartbeat-container:hover {
-	.heartbeat {
-		animation: heartbeat-frame 0.8s ease-in-out;
-	}
-}
 
 @keyframes marquee {
 	from { transform: translateX(0); }
@@ -212,6 +348,15 @@
 
 .animate-marquee-vertical {
 	animation: marquee-vertical var(--duration) linear infinite;
+}
+
+@keyframes orbit {
+	0% { transform: rotate(0deg) translateY(calc(var(--radius) * 1px)) rotate(0deg); }
+	100% { transform: rotate(360deg) translateY(calc(var(--radius) * 1px)) rotate(-360deg); }
+}
+
+.animate-orbit {
+	animation: orbit calc(var(--duration) * 1s) linear infinite;
 }
 
 /* 3D Book Layout */
@@ -243,10 +388,10 @@
 
 	@media (min-width: 1024px) {
 	.group:hover .book-3d {
-		transform: rotateX(80deg) rotate(45deg) scale(0.75);
+		transform: rotateX(80deg) rotate(45deg) scale(0.6);
 	}
 	.group:hover .ambient-shadow-book {
-		transform: rotateX(80deg) rotate(45deg) scale(0.75) translateZ(-10px);
+		transform: rotateX(80deg) rotate(45deg) scale(0.6) translateZ(-10px);
 	}
 
 	/* Right edge pages (thickness) */

@@ -151,7 +151,7 @@ export default function ClockPage() {
 						}}
 						className={cn(
 							`flex-1 rounded-xl px-4 py-3 text-sm font-medium transition-all`,
-							mode === 'stopwatch' ? 'bg-brand text-white shadow-sm' : 'text-secondary hover:text-brand'
+							mode === 'stopwatch' ? 'bg-brand text-white shadow-sm' : 'text-[var(--color-secondary)] hover:text-brand'
 						)}>
 						秒表
 					</motion.button>
@@ -169,14 +169,14 @@ export default function ClockPage() {
 						}}
 						className={cn(
 							`flex-1 rounded-xl px-4 py-3 text-sm font-medium transition-all`,
-							mode === 'timer' ? 'bg-brand text-white shadow-sm' : 'text-secondary hover:text-brand'
+							mode === 'timer' ? 'bg-brand text-white shadow-sm' : 'text-[var(--color-secondary)] hover:text-brand'
 						)}>
 						计时器
 					</motion.button>
 				</div>
 
 				<motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className='card relative p-4'>
-					<div className='bg-secondary/20 flex items-center justify-center rounded-4xl p-8'>
+					<div className='bg-[var(--color-secondary)]/20 flex items-center justify-center rounded-4xl p-8'>
 						<TimeDisplay time={displayTime} key={mode} />
 					</div>
 				</motion.div>
@@ -186,38 +186,38 @@ export default function ClockPage() {
 					<motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className='card relative space-y-4'>
 						<div className='flex items-center justify-center gap-4'>
 							<div className='flex flex-col items-center gap-2'>
-								<label className='text-secondary text-xs'>时</label>
-								<input
-									type='number'
-									min='0'
-									max='23'
-									value={timerInput.hours}
-									onChange={e => setTimerInput({ ...timerInput, hours: Math.max(0, Math.min(23, parseInt(e.target.value) || 0)) })}
-									className='no-spinner w-20 rounded-xl border bg-white/60 px-4 py-3 text-center text-2xl font-bold backdrop-blur-sm focus:bg-white/80'
-								/>
+								<label className='text-[var(--color-secondary)] text-xs'>时</label>
+							<input
+								type='number'
+								min='0'
+								max='23'
+								value={timerInput.hours}
+								onChange={e => setTimerInput({ ...timerInput, hours: Math.max(0, Math.min(23, parseInt(e.target.value) || 0)) })}
+								className='no-spinner w-20 rounded-xl border bg-[var(--color-bg)]/60 dark:bg-[var(--color-card)]/60 px-4 py-3 text-center text-2xl font-bold backdrop-blur-sm focus:bg-[var(--color-bg)] dark:focus:bg-[var(--color-card)]/80'
+							/>
 							</div>
-							<div className='text-secondary mt-8 text-2xl font-bold'>:</div>
+							<div className='text-[var(--color-secondary)] mt-8 text-2xl font-bold'>:</div>
 							<div className='flex flex-col items-center gap-2'>
-								<label className='text-secondary text-xs'>分</label>
+								<label className='text-[var(--color-secondary)] text-xs'>分</label>
 								<input
 									type='number'
 									min='0'
 									max='59'
 									value={timerInput.minutes}
 									onChange={e => setTimerInput({ ...timerInput, minutes: Math.max(0, Math.min(59, parseInt(e.target.value) || 0)) })}
-									className='no-spinner w-20 rounded-xl border bg-white/60 px-4 py-3 text-center text-2xl font-bold backdrop-blur-sm focus:bg-white/80'
+									className='no-spinner w-20 rounded-xl border bg-[var(--color-bg)]/60 dark:bg-[var(--color-card)]/60 px-4 py-3 text-center text-2xl font-bold backdrop-blur-sm focus:bg-[var(--color-bg)] dark:focus:bg-[var(--color-card)]/80'
 								/>
 							</div>
-							<div className='text-secondary mt-8 text-2xl font-bold'>:</div>
+							<div className='text-[var(--color-secondary)] mt-8 text-2xl font-bold'>:</div>
 							<div className='flex flex-col items-center gap-2'>
-								<label className='text-secondary text-xs'>秒</label>
+								<label className='text-[var(--color-secondary)] text-xs'>秒</label>
 								<input
 									type='number'
 									min='0'
 									max='59'
 									value={timerInput.seconds}
 									onChange={e => setTimerInput({ ...timerInput, seconds: Math.max(0, Math.min(59, parseInt(e.target.value) || 0)) })}
-									className='no-spinner w-20 rounded-xl border bg-white/60 px-4 py-3 text-center text-2xl font-bold backdrop-blur-sm focus:bg-white/80'
+									className='no-spinner w-20 rounded-xl border bg-[var(--color-bg)]/60 dark:bg-[var(--color-card)]/60 px-4 py-3 text-center text-2xl font-bold backdrop-blur-sm focus:bg-[var(--color-bg)] dark:focus:bg-[var(--color-card)]/80'
 								/>
 							</div>
 						</div>
@@ -232,7 +232,7 @@ export default function ClockPage() {
 							whileTap={{ scale: 0.95 }}
 							onClick={handleLap}
 							disabled={!isRunning}
-							className='flex h-16 w-16 items-center justify-center rounded-full border bg-white/60 text-sm font-medium backdrop-blur-sm transition-all hover:bg-white/80 disabled:cursor-not-allowed disabled:opacity-50'>
+							className='flex h-16 w-16 items-center justify-center rounded-full border bg-[var(--color-bg)]/60 dark:bg-[var(--color-card)]/60 text-sm font-medium backdrop-blur-sm transition-all hover:bg-[var(--color-bg)] dark:hover:bg-[var(--color-card)]/80 disabled:cursor-not-allowed disabled:opacity-50'>
 							计次
 						</motion.button>
 					)}
@@ -251,7 +251,7 @@ export default function ClockPage() {
 						whileTap={{ scale: 0.95 }}
 						onClick={handleReset}
 						disabled={isRunning && mode === 'stopwatch'}
-						className='flex h-16 w-16 items-center justify-center rounded-full border bg-white/60 backdrop-blur-sm transition-all hover:bg-white/80 disabled:cursor-not-allowed disabled:opacity-50'>
+						className='flex h-16 w-16 items-center justify-center rounded-full border bg-[var(--color-bg)]/60 dark:bg-[var(--color-card)]/60 backdrop-blur-sm transition-all hover:bg-[var(--color-bg)] dark:hover:bg-[var(--color-card)]/80 disabled:cursor-not-allowed disabled:opacity-50'>
 						<RotateCcw className='h-5 w-5' />
 					</motion.button>
 				</div>
@@ -266,8 +266,8 @@ export default function ClockPage() {
 								key={lap}
 								className='bg-card flex items-center justify-center rounded-2xl px-6 py-4'>
 								<span className='font-mono text-sm font-medium'>
-									<span className='text-secondary'>{laps.length - index}.</span> {formatTime(lap)}
-								</span>
+								<span className='text-[var(--color-secondary)]'>{laps.length - index}.</span> {formatTime(lap)}
+							</span>
 							</motion.div>
 						))}
 					</div>

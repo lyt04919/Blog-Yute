@@ -109,7 +109,7 @@ export default function UploadDialog({ onClose, onSubmit }: UploadDialogProps) {
 								<button
 									type='button'
 									onClick={() => fileInputRef.current?.click()}
-									className='rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs text-gray-700 transition-colors hover:bg-gray-50'>
+									className='rounded-lg border border-gray-300 bg-white dark:bg-[#27272a] px-3 py-1.5 text-xs text-gray-700 transition-colors hover:bg-gray-50'>
 									继续添加
 								</button>
 							</div>
@@ -132,7 +132,7 @@ export default function UploadDialog({ onClose, onSubmit }: UploadDialogProps) {
 					<button
 						type='button'
 						onClick={handleClose}
-						className='flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm transition-colors hover:bg-gray-50'>
+						className='flex-1 rounded-lg border border-gray-300 bg-white dark:bg-[#27272a] px-4 py-2 text-sm transition-colors hover:bg-gray-50'>
 						取消
 					</button>
 					<button type='button' onClick={handleSubmit} className='brand-btn flex-1 justify-center px-4'>

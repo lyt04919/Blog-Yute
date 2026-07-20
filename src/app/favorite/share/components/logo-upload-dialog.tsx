@@ -110,7 +110,7 @@ export default function LogoUploadDialog({ currentLogo, onClose, onSubmit }: Log
 					<button
 						type='button'
 						onClick={handleClose}
-						className='flex-1 rounded-lg border border-gray-300 bg-white px-6 py-2.5 transition-colors hover:bg-gray-50'>
+						className='flex-1 rounded-lg border border-gray-300 bg-white dark:bg-[#27272a] px-6 py-2.5 transition-colors hover:bg-gray-50'>
 						取消
 					</button>
 				</div>

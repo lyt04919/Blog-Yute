@@ -60,7 +60,7 @@ export function WriteEditorToc({ markdown, activeLine, onHeadingClick }: WriteEd
 					type="button"
 					onClick={() => setIsOpen(!isOpen)}
 					className={clsx(
-						"flex h-10 w-10 items-center justify-center rounded-xl border bg-card/65 text-secondary backdrop-blur-md transition-all hover:text-brand hover:scale-105 active:scale-95",
+						"flex h-10 w-10 items-center justify-center rounded-xl border bg-card/65 text-secondary backdrop-blur-md transition-all hover:text-brand",
 						isOpen ? "border-brand text-brand shadow" : "shadow-sm"
 					)}
 					title="文章目录大纲"
@@ -88,7 +88,7 @@ export function WriteEditorToc({ markdown, activeLine, onHeadingClick }: WriteEd
 							
 							<div className="scrollbar-none flex-1 overflow-y-auto space-y-1 pr-1 max-h-[400px]">
 								{headings.length === 0 ? (
-									<p className="text-xs text-neutral-400 italic text-center py-4">暂无标题</p>
+									<p className="text-xs text-[#a1a1aa] italic text-center py-4">暂无标题</p>
 								) : (
 									headings.map((item, idx) => {
 										const isActive = idx === activeIndex
@@ -101,7 +101,7 @@ export function WriteEditorToc({ markdown, activeLine, onHeadingClick }: WriteEd
 													"text-left text-xs transition-all block w-full truncate py-1.5 rounded-lg pr-2 border-l-2",
 													isActive 
 														? "text-brand font-medium border-brand bg-brand/5 pl-2" 
-														: "text-secondary border-transparent hover:bg-neutral-100/35 hover:text-primary pl-3"
+														: "text-secondary border-transparent hover:bg-[#f4f4f5]/35 hover:text-primary pl-3"
 												)}
 												style={{ 
 													paddingLeft: isActive 

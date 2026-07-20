@@ -2,10 +2,13 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
-import { X, UploadCloud } from 'lucide-react'
+import { X, UploadCloud, Save, Sparkles } from 'lucide-react'
 import { DialogModal } from '@/components/dialog-modal'
+import { TagSelector } from '@/components/ui/tag-selector'
 import EditableStarRating from '@/components/editable-star-rating'
 import type { Movie } from './movie-card'
+
+const MOVIE_TAG_OPTIONS = ['科幻', '文艺', '剧情', '动作', '动画', '悬疑', '纪录片', '喜剧', '奇幻', '犯罪', 'AI', 'Coding', 'Hacker']
 
 interface CreateDialogProps {
 	movieList: Movie[]
@@ -24,15 +27,21 @@ export default function CreateDialog({ movieList, movies, onClose, onSave }: Cre
 		stars: 3,
 		isPinned: movies?.isPinned || false,
 		isShow: movies?.isShow || false,
-		doubanUrl: movies?.doubanUrl || ''
+		isShowOnHome: movies?.isShowOnHome !== false,
+		doubanUrl: movies?.doubanUrl || '',
+		releaseDate: movies?.releaseDate || ''
 	})
 	
 	const [isUploadingPoster, setIsUploadingPoster] = useState(false)
+	const [isFetching, setIsFetching] = useState(false)
 	const posterInputRef = useRef<HTMLInputElement>(null)
 
 	useEffect(() => {
 		if (movies) {
-			setFormData(movies)
+			setFormData({
+				...movies,
+				isShowOnHome: movies.isShowOnHome !== false
+			})
 		} else {
 			setFormData({
 				name: '',
@@ -43,7 +52,9 @@ export default function CreateDialog({ movieList, movies, onClose, onSave }: Cre
 				stars: 3,
 				isPinned: false,
 				isShow: false,
-				doubanUrl: ''
+				isShowOnHome: true,
+				doubanUrl: '',
+				releaseDate: ''
 			})
 		}
 	}, [movies])
@@ -97,11 +108,9 @@ export default function CreateDialog({ movieList, movies, onClose, onSave }: Cre
 		toast.success(movies ? '更新成功' : '添加成功')
 	}
 
-	const [isFetching, setIsFetching] = useState(false)
-
 	const handleAutoFetch = async () => {
 		if (!formData.name.trim()) {
-			toast.error('请先输入电影名')
+			toast.error('请先输入影视名称再解析')
 			return
 		}
 		setIsFetching(true)
@@ -144,11 +153,12 @@ export default function CreateDialog({ movieList, movies, onClose, onSave }: Cre
 					description: movieInfo.overview || prev.description,
 					poster: movieInfo.poster_path ? `https://image.tmdb.org/t/p/w500${movieInfo.poster_path}` : prev.poster,
 					director: directorName,
-					tags: newTags
+					tags: newTags,
+					releaseDate: movieInfo.release_date || prev.releaseDate
 				}))
 				toast.success('已自动获取电影信息与标签')
 			} else {
-				toast.error('未找到相关电影')
+				toast.error('未找到相关电影，请检查名称')
 			}
 		} catch (error) {
 			toast.error('请求出错，请重试')
@@ -158,144 +168,317 @@ export default function CreateDialog({ movieList, movies, onClose, onSave }: Cre
 	}
 
 	return (
-		<DialogModal open onClose={onClose} className='card max-w-3xl w-full max-h-[90vh] p-8 md:p-10 relative bg-white flex flex-col shadow-2xl'>
-			<div className='absolute top-6 right-6 sm:top-[27px] sm:right-8 md:top-[35px] md:right-10 z-20 flex items-center gap-3 bg-white/80 rounded-full px-2 py-1'>
-				<button onClick={onClose} className='p-1.5 text-neutral-400 hover:text-neutral-900 transition-colors'>
+		<DialogModal open onClose={onClose} className='max-w-4xl w-full max-h-[90vh] p-6 md:p-8 relative flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.8)]' style={{ backgroundColor: '#161B22', color: '#ffffff', border: '1px solid #30363D', borderRadius: '1.5rem' }}>
+			{/* Mobile-only Absolute Close/Save Buttons */}
+			<div className='sm:hidden absolute top-4 right-4 z-20 flex items-center gap-3 bg-black/40 rounded-full px-2 py-1 border border-white/10'>
+				<button 
+					onClick={handleSubmit} 
+					className='flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-full hover:bg-blue-500 transition-colors shadow-[0_0_15px_rgba(37,99,235,0.4)]'
+				>
+					<Save className='w-3.5 h-3.5' /> 保存
+				</button>
+				<button onClick={onClose} className='p-1.5 text-slate-400 hover:text-white transition-colors'>
 					<X className='w-5 h-5' />
 				</button>
 			</div>
 
-			<div className='flex flex-col sm:flex-row gap-8 md:gap-12'>
+			{/* Desktop-only Close Button */}
+			<button 
+				onClick={onClose} 
+				className='hidden sm:flex absolute top-6 right-6 z-20 p-2 rounded-full bg-black/40 text-slate-400 hover:text-white hover:bg-black/60 transition-all border border-white/10'
+			>
+				<X className='w-5 h-5' />
+			</button>
+
+			<div className='flex flex-col sm:flex-row gap-6 md:gap-8 h-full min-h-0 pt-4 sm:pt-0'>
 				{/* Top Left: Poster Image (Uploadable) */}
-				<div className='shrink-0 w-[140px] sm:w-[200px] mt-2'>
+				<div className='shrink-0 w-[140px] sm:w-[220px] mt-4 flex flex-col gap-4'>
 					<input type="file" accept="image/*" className="hidden" ref={posterInputRef} onChange={onPosterChange} />
 					<div 
-						className='group relative w-full aspect-[2/3] cursor-pointer rounded shadow-2xl shadow-black/15 ring-1 ring-black/5 overflow-hidden'
+						className='group relative w-full aspect-[2/3] cursor-pointer rounded-xl shadow-2xl ring-1 ring-white/10 overflow-hidden bg-[#0D1117] flex items-center justify-center transition-transform hover:scale-[1.02]'
 						onClick={() => posterInputRef.current?.click()}
 					>
 						{formData.poster ? (
 							<img src={formData.poster} alt="Poster" className='w-full h-full object-cover' />
 						) : (
-							<div className='w-full h-full bg-neutral-100 flex items-center justify-center text-neutral-400 text-sm'>
+							<div className='w-full h-full p-4 flex flex-col items-center justify-center text-slate-500 text-xs text-center gap-2'>
+								<UploadCloud className="w-6 h-6"/>
 								点击上传海报
 							</div>
 						)}
-						<div className='absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity'>
-							<span className='text-white text-sm font-medium flex items-center gap-1'>
-								<UploadCloud className="w-4 h-4"/> {isUploadingPoster ? '上传中...' : '更换海报'}
+						<div className='absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity'>
+							<span className='text-white text-sm font-medium flex items-center gap-1.5'>
+								<UploadCloud className="w-4 h-4"/> {isUploadingPoster ? '上传中...' : '上传海报'}
 							</span>
 						</div>
 					</div>
+					
+					{/* Desktop-only Save Button */}
+					<div className='hidden sm:flex mt-auto'>
+						<button 
+							onClick={handleSubmit} 
+							className='w-full flex items-center justify-center gap-2 px-4 py-3.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-500 hover:shadow-[0_0_20px_rgba(37,99,235,0.4)] active:scale-[0.98] transition-all'
+						>
+							<Save className='w-4 h-4' /> {movies ? '保存更改' : '立即添加电影'}
+						</button>
+					</div>
 				</div>
 
-				{/* Right: Details */}
-				<div className='flex-1 flex flex-col min-w-0'>
-					{/* Header Info */}
-					<div className='shrink-0 mb-6' style={{ paddingRight: '7rem' }}>
-						<div className='mb-3'>
-							<input
-								type='text'
-								value={formData.tags.join(', ')}
-								onChange={e => handleTagsChange(e.target.value)}
-								placeholder='输入标签，用逗号分隔'
-								className='w-full bg-neutral-50 px-3 py-1.5 rounded border border-neutral-200 text-xs text-neutral-600 focus:outline-none focus:border-neutral-400 transition-colors'
-							/>
-						</div>
-
-						<div className="relative mb-2">
+				{/* Right: Form Sections */}
+				<div className='flex-1 flex flex-col min-w-0 pr-2 overflow-y-auto custom-scrollbar pb-6'>
+					
+					{/* HERO ACTION: TMDB Fetch */}
+					<div className='mb-6 p-4 rounded-2xl flex flex-col gap-3 shrink-0' style={{ backgroundColor: 'rgba(37, 99, 235, 0.1)', border: '1px solid rgba(37, 99, 235, 0.2)' }}>
+						<label className='text-[11px] text-blue-400 font-bold uppercase flex items-center gap-1.5 tracking-wider'>
+							<Sparkles className='w-3.5 h-3.5 animate-pulse' />
+							TMDB 智能数据补全
+						</label>
+						<div className='flex gap-2'>
 							<input
 								type='text'
 								value={formData.name}
 								onChange={e => handleFieldChange('name', e.target.value)}
-								placeholder='输入电影名 (必填)'
-								className='w-full text-2xl sm:text-3xl lg:text-4xl font-extrabold text-neutral-900 leading-tight tracking-tight bg-transparent border-b border-transparent focus:border-neutral-200 focus:outline-none transition-colors pb-1 pr-12'
+								onKeyDown={e => {
+									if (e.key === 'Enter') {
+										e.preventDefault();
+										handleAutoFetch();
+									}
+								}}
+								placeholder='输入影视名称，例如: 星际穿越'
+								className='flex-1 px-4 py-2.5 rounded-xl border text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all placeholder:font-normal'
+								style={{ backgroundColor: '#0D1117', borderColor: '#30363D', color: '#ffffff' }}
 							/>
 							<button
-								onClick={handleAutoFetch}
+								type='button'
 								disabled={isFetching}
-								title="自动获取电影信息"
-								className='absolute right-2 top-1/2 -translate-y-1/2 p-2 text-neutral-400 hover:text-brand transition-colors disabled:opacity-50'
+								onClick={handleAutoFetch}
+								className='px-5 py-2.5 text-sm font-bold bg-blue-600 hover:bg-blue-500 text-white rounded-xl active:scale-95 transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] disabled:opacity-50 shrink-0'
 							>
-								{isFetching ? (
-									<div className="w-5 h-5 border-2 border-brand border-t-transparent rounded-full animate-spin" />
-								) : (
-									<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
-								)}
+								{isFetching ? '搜索中...' : '智能提取'}
 							</button>
 						</div>
-						
-						<div className='flex items-center gap-2 mb-4'>
-							<span className='text-neutral-500 font-medium text-[15px]'>导演:</span>
-							<input
-								type='text'
-								value={formData.director}
-								onChange={e => handleFieldChange('director', e.target.value)}
-								placeholder='输入导演名 (必填)'
-								className='flex-1 text-neutral-500 font-medium text-[15px] bg-transparent border-b border-transparent focus:border-neutral-200 focus:outline-none transition-colors pb-1'
-							/>
-						</div>
-						
-						<div className='mb-2 flex items-center gap-6'>
-							<div className='flex items-center gap-3'>
-								<span className="text-xs text-neutral-400 font-medium">评分</span>
-								<EditableStarRating stars={formData.stars} editable={true} onChange={stars => handleFieldChange('stars', stars)} />
-							</div>
-							<label className='flex items-center gap-2 cursor-pointer'>
-								<input 
-									type='checkbox' 
-									checked={formData.isShow || false} 
-									onChange={e => handleFieldChange('isShow', e.target.checked)}
-									className='w-4 h-4 text-neutral-900 border-neutral-300 rounded focus:ring-neutral-900 accent-neutral-900'
-								/>
-								<span className="text-xs text-neutral-400 font-medium hover:text-neutral-900 transition-colors">展示到主页</span>
-							</label>
-						</div>
 					</div>
 
-					{/* Scrollable Area for Description */}
-					<div className='flex-1 overflow-y-auto pr-4 pb-4 custom-scrollbar flex flex-col gap-6'>
-						<div>
-							<h4 className='text-xs font-semibold tracking-widest text-neutral-400 uppercase mb-3'>剧情简介</h4>
-							<textarea
-								value={formData.description}
-								onChange={e => handleFieldChange('description', e.target.value)}
-								placeholder='输入详细简介 (必填)...'
-								className='w-full text-[15px] text-neutral-600 leading-[1.8] font-light bg-neutral-50 p-4 rounded-xl border border-neutral-100 focus:outline-none focus:border-neutral-300 transition-colors resize-none min-h-[150px]'
-							/>
-						</div>
-					</div>
-
-					{/* Submit button */}
-					<div className='pt-6 mt-auto bg-white flex flex-col gap-3 shrink-0 border-t border-neutral-100'>
-						<div className='relative flex items-center mb-1'>
-							<div 
-								className='absolute pointer-events-none flex items-center' 
-								style={{ left: '0.75rem', top: 0, bottom: 0 }}
-							>
-								<div 
-									className='rounded flex items-center justify-center text-white font-bold shadow-sm'
-									style={{ backgroundColor: '#007722', width: '22px', height: '22px', fontSize: '12px' }}
-								>
-									豆
-								</div>
-							</div>
+					{/* HERO ACTION 2: Douban Auto Parse */}
+					<div className='mb-6 p-4 rounded-2xl flex flex-col gap-3 shrink-0' style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+						<label className='text-[11px] text-emerald-400 font-bold uppercase flex items-center gap-1.5 tracking-wider'>
+							<Sparkles className='w-3.5 h-3.5 animate-pulse' />
+							豆瓣影视链接 / 智能解析
+						</label>
+						<div className='flex gap-2'>
 							<input
 								type='url'
 								value={formData.doubanUrl || ''}
 								onChange={e => handleFieldChange('doubanUrl', e.target.value)}
-								placeholder='豆瓣详情页链接 (选填)'
-								className='w-full py-3 bg-white text-neutral-900 text-sm rounded-full font-medium transition-all border border-neutral-200 shadow-sm focus:outline-none placeholder:text-neutral-400'
-								style={{ paddingLeft: '3.2rem', paddingRight: '1rem' }}
+								onKeyDown={async e => {
+									if (e.key === 'Enter') {
+										e.preventDefault();
+										if (!formData.doubanUrl) return;
+										setIsFetching(true);
+										try {
+											const res = await fetch(`/api/og?url=${encodeURIComponent(formData.doubanUrl)}`);
+											const data = await res.json();
+											if (data.title) {
+												setFormData(prev => ({
+													...prev,
+													name: data.title || prev.name,
+													director: data.director || prev.director,
+													description: data.description || data.desc || prev.description,
+													poster: data.image || data.cover || prev.poster,
+													releaseDate: data.releaseDate || prev.releaseDate,
+													tags: data.tags ? Array.from(new Set([...prev.tags, ...data.tags])) : prev.tags
+												}));
+												toast.success('豆瓣解析成功');
+											}
+										} catch (err) {
+											toast.error('豆瓣解析失败');
+										} finally {
+											setIsFetching(false);
+										}
+									}
+								}}
+								placeholder='粘贴来源网页链接，例如 https://movie.douban.com/...'
+								className='flex-1 px-4 py-2.5 rounded-xl border text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all placeholder:font-normal'
+								style={{ backgroundColor: '#0D1117', borderColor: '#30363D', color: '#ffffff' }}
+							/>
+							<button
+								type='button'
+								disabled={isFetching}
+								onClick={async () => {
+									if (!formData.doubanUrl) return;
+									setIsFetching(true);
+									try {
+										const res = await fetch(`/api/og?url=${encodeURIComponent(formData.doubanUrl)}`);
+										const data = await res.json();
+										if (data.title) {
+											setFormData(prev => ({
+												...prev,
+												name: data.title || prev.name,
+												director: data.director || prev.director,
+												description: data.description || data.desc || prev.description,
+												poster: data.image || data.cover || prev.poster,
+												releaseDate: data.releaseDate || prev.releaseDate,
+												tags: data.tags ? Array.from(new Set([...prev.tags, ...data.tags])) : prev.tags
+											}));
+											toast.success('豆瓣解析成功');
+										}
+									} catch (err) {
+										toast.error('豆瓣解析失败');
+									} finally {
+										setIsFetching(false);
+									}
+								}}
+								className='px-5 py-2.5 text-sm font-bold bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl active:scale-95 transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] disabled:opacity-50 shrink-0'
+							>
+								{isFetching ? '解析中...' : '提取数据'}
+							</button>
+						</div>
+					</div>
+
+					{/* SECTION 1: Basic Info */}
+					<div className='flex flex-col gap-4 p-5 rounded-2xl mb-4 shrink-0' style={{ backgroundColor: '#0D1117', border: '1px solid #30363D' }}>
+						<h4 className='text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-1 flex items-center gap-2'>
+							<span className='w-1 h-3 bg-blue-500 rounded-full'></span>
+							基础信息 (Basic)
+						</h4>
+						
+						<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+							<div className='flex flex-col gap-1.5'>
+								<span className='text-slate-400 text-[11px] font-medium'>导演 (必填)</span>
+								<input
+									type='text'
+									value={formData.director}
+									onChange={e => handleFieldChange('director', e.target.value)}
+									placeholder='导演姓名'
+									className='w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none transition-colors'
+									style={{ backgroundColor: '#161B22', borderColor: '#30363D', color: '#ffffff' }}
+								/>
+							</div>
+							
+							<div className='flex flex-col gap-1.5 md:col-span-2 mt-2'>
+								<span className='text-slate-400 text-[11px] font-medium'>分类标签</span>
+								<TagSelector
+									options={MOVIE_TAG_OPTIONS}
+									selectedTags={formData.tags}
+									onChange={tags => handleFieldChange('tags', tags)}
+								/>
+							</div>
+						</div>
+
+						<div className='flex flex-col gap-1.5 mt-4'>
+							<span className='text-slate-400 text-[11px] font-medium'>上映时间 (选填)</span>
+							<input
+								type='date'
+								value={formData.releaseDate || ''}
+								onChange={e => handleFieldChange('releaseDate', e.target.value)}
+								className='w-full md:w-1/2 px-3 py-2.5 rounded-lg border text-sm focus:outline-none transition-colors'
+								style={{ backgroundColor: '#161B22', borderColor: '#30363D', color: '#ffffff' }}
 							/>
 						</div>
 
-						<button 
-							onClick={handleSubmit} 
-							className='w-full py-3.5 bg-neutral-900 text-white text-base rounded-full font-bold transition-all hover:bg-neutral-800 active:scale-[0.98] shadow-lg shadow-black/10'
-						>
-							{movies ? '保存更改' : '立即添加电影'}
-						</button>
+						<div className='flex flex-wrap items-center gap-6 mt-2 pt-4 border-t border-[#30363D]'>
+							<div className='flex items-center gap-3'>
+								<span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">评分</span>
+								<EditableStarRating stars={formData.stars} editable={true} onChange={stars => handleFieldChange('stars', stars)} />
+							</div>
+							
+							<div className='flex items-center gap-3'>
+								<span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">状态</span>
+								<select
+									value={formData.status || ''}
+									onChange={e => handleFieldChange('status', e.target.value || undefined)}
+									className='border text-xs rounded-md px-2.5 py-1.5 focus:outline-none cursor-pointer'
+									style={{ backgroundColor: '#161B22', borderColor: '#30363D', color: '#ffffff' }}
+								>
+									<option value="">-- 选择状态 --</option>
+									<option value="watched">已看</option>
+									<option value="wishlist">想看</option>
+								</select>
+							</div>
+
+							<div className="flex flex-wrap items-center gap-2 ml-auto">
+								<label className='flex items-center gap-2 cursor-pointer px-3 py-1.5 rounded-md border transition-colors border-slate-700 bg-blue-500/10'>
+									<input 
+										type='checkbox' 
+										checked={formData.isShow || false} 
+										onChange={e => {
+											const val = e.target.checked
+											handleFieldChange('isShow', val)
+											if (!val) {
+												handleFieldChange('isShowOnHome', false)
+											} else {
+												handleFieldChange('isShowOnHome', true)
+											}
+										}}
+										className='w-3.5 h-3.5 text-blue-500 rounded focus:ring-blue-500 accent-blue-500 bg-transparent border-slate-700'
+									/>
+									<span className="text-[11px] text-blue-400 font-bold tracking-wider uppercase">公开到 Favorites</span>
+								</label>
+
+								{formData.isShow && (
+									<label className='flex items-center gap-2 cursor-pointer px-3 py-1.5 rounded-md border transition-colors border-slate-700 bg-emerald-500/10'>
+										<input 
+											type='checkbox' 
+											checked={formData.isShowOnHome !== false} 
+											onChange={e => handleFieldChange('isShowOnHome', e.target.checked)}
+											className='w-3.5 h-3.5 text-emerald-500 rounded focus:ring-emerald-500 accent-emerald-500 bg-transparent border-slate-700'
+										/>
+										<span className="text-[11px] text-emerald-400 font-bold tracking-wider uppercase">展示到主页</span>
+									</label>
+								)}
+							</div>
+						</div>
 					</div>
+
+					{/* SECTION 2: Description & Review */}
+					<div className='flex flex-col gap-4 p-5 rounded-2xl mb-4 shrink-0' style={{ backgroundColor: '#0D1117', border: '1px solid #30363D' }}>
+						<h4 className='text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-1 flex items-center gap-2'>
+							<span className='w-1 h-3 bg-blue-500 rounded-full'></span>
+							剧情简介与评价 (Content & Review)
+						</h4>
+
+						<div className='flex flex-col gap-1.5'>
+							<span className='text-slate-400 text-[11px] font-medium'>剧情简介</span>
+							<textarea
+								value={formData.description}
+								onChange={e => handleFieldChange('description', e.target.value)}
+								placeholder='影视的详细剧情...'
+								className='w-full text-sm leading-[1.7] p-3 rounded-lg border focus:outline-none transition-colors resize-vertical min-h-[120px]'
+								style={{ backgroundColor: '#161B22', borderColor: '#30363D', color: '#ffffff' }}
+							/>
+						</div>
+						
+						<div className='flex flex-col gap-1.5 mt-2'>
+							<span className='text-slate-400 text-[11px] font-medium'>影评 / 个人随想笔记</span>
+							<textarea
+								rows={3}
+								value={formData.myReview || ''}
+								onChange={e => handleFieldChange('myReview', e.target.value)}
+								placeholder='撰写您的观影感悟或私人笔记...'
+								className='w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none transition-colors min-h-[75px]'
+								style={{ backgroundColor: '#161B22', borderColor: '#30363D', color: '#ffffff' }}
+							/>
+						</div>
+					</div>
+
+					{/* SECTION 4: Notion Recording */}
+					<div className='flex flex-col gap-4 p-5 rounded-2xl mb-4 shrink-0' style={{ backgroundColor: '#0D1117', border: '1px solid #30363D' }}>
+						<h4 className='text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-1 flex items-center gap-2'>
+							<span className='w-1 h-3 bg-purple-500 rounded-full'></span>
+							个人记录 (Notion Recording)
+						</h4>
+						<div className='flex flex-col gap-1.5'>
+							<span className='text-slate-400 text-[11px] font-medium'>观影完成时间</span>
+							<input
+								type='date'
+								value={formData.watchDate || ''}
+								onChange={e => handleFieldChange('watchDate', e.target.value)}
+								className='w-full md:w-1/2 px-3 py-2.5 rounded-lg border text-sm focus:outline-none transition-colors'
+								style={{ backgroundColor: '#161B22', borderColor: '#30363D', color: '#ffffff' }}
+							/>
+						</div>
+					</div>
+					
 				</div>
 			</div>
 		</DialogModal>

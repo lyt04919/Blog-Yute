@@ -8,8 +8,8 @@ export default function FavoriteVideosPage() {
 		<FavoriteItemPageTemplate
 			initialItems={initialVideos}
 			targetType="videos"
-			pageTitle="精选视频"
-			pageDescription="推荐视频与纪录片：收集对我有极大启发的技术演讲、产品概念片及视觉艺术短片。"
+			pageTitle="Videos"
+			pageDescription="A collection of inspiring tech talks, product concepts, and visual art videos."
 		/>
 	)
 }

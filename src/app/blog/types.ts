@@ -8,6 +8,9 @@ export type BlogIndexItem = {
 	hidden?: boolean
 	category?: string
 	status?: 'draft' | 'published'
+	isFeatured?: boolean
+	projectUrl?: string
+	projectName?: string
 }
 
 export type BlogConfig = {
@@ -18,5 +21,7 @@ export type BlogConfig = {
 	cover?: string
 	hidden?: boolean
 	category?: string
+	projectUrl?: string
+	projectName?: string
 }
 

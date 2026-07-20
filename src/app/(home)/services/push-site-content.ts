@@ -24,7 +24,7 @@ export async function pushSiteContent(
 	const authState = useAuthStore.getState()
 	const isLocalDev = process.env.NODE_ENV === 'development'
 
-	if (!authState.isAuth && isLocalDev) {
+	if (isLocalDev) {
 		toast.info('检测到本地开发环境，正在保存到本地...')
 		
 		const files: { path: string; contentBase64: string }[] = []

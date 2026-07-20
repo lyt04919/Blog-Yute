@@ -1,5 +1,5 @@
 {
 	"title": "关于本站",
 	"description": "一个基于 Github 的现代化博客系统",
-	"content": "📦网站基于 Github 仓库完全存储，所有内容版本可控\n\n🚀无后端，无 serverless function，纯静态站点\n\n✏️文章通过可视化 UI 直接编辑并提交到 Github 仓库\n\n🔑所有用户都可以编辑，提交需要 Owner 的 Private Key\n\n## 技术栈\n\n- Next.js\n- React\n- TypeScript\n- Tailwind CSS\n- Motion\n- Github API"
+	"content": "## 👋 你好，我是 YYsuni\n\n这是一个基于 **Github** 的现代化个人博客系统，所有内容都存储在 Github 仓库中，版本可控，无需后端服务。\n\n### ✨ 核心特性\n\n* 📦 **纯静态站点** - 无后端，无 serverless function\n* 🚀 **Github 驱动** - 所有内容存储在 Github 仓库\n* ✏️ **可视化编辑** - 通过 UI 直接编辑并提交到 Github\n* 🔑 **权限控制** - 所有用户可编辑，提交需 Owner 的 Private Key\n* 🎨 **响应式设计** - 适配桌面端和移动端\n* 🌙 **深色模式** - 支持亮色/暗色主题切换\n\n### 🛠 技术栈\n\n| 技术           | 说明       |\n| ------------ | -------- |\n| Next.js 16   | React 框架 |\n| React 19     | UI 库     |\n| TypeScript   | 类型安全     |\n| Tailwind CSS | 样式框架     |\n| Motion       | 动画库      |\n| Github API   | 数据存储     |\n\n### 📮 联系方式\n\n* GitHub: [lyt04919](https://github.com/lyt04919)\n* 邮箱: 通过页面底部按钮联系\n\n***\n\n> 💡 本站源码开源，欢迎 Star 和 Fork！"
 }

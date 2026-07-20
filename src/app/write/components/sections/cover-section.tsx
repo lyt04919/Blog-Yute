@@ -4,6 +4,7 @@ import { useRef } from 'react'
 import { motion } from 'motion/react'
 import { toast } from 'sonner'
 import { useWriteStore } from '../../stores/write-store'
+import { RefreshCw, Trash2, ImagePlus } from 'lucide-react'
 
 type CoverSectionProps = {
 	delay?: number
@@ -90,38 +91,54 @@ export function CoverSection({ delay = 0 }: CoverSectionProps) {
 	}
 
 	return (
-		<motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay }} className='card relative'>
-			<div className='flex items-center justify-between'>
-				<h2 className='text-sm'>封面</h2>
-				<div className='flex gap-3'>
-					<button
-						type='button'
-						onClick={handleRandomCover}
-						className='text-xs text-brand hover:underline transition-colors'>
-						随机封面
-					</button>
-					{cover && (
-						<button
-							type='button'
-							onClick={() => setCover(null)}
-							className='text-xs text-red-500 hover:underline transition-colors'>
-							清除
-						</button>
-					)}
-				</div>
+		<motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay }} className='relative'>
+			<div className='flex items-center justify-between mb-3 px-1'>
+				<h2 className='text-sm font-semibold text-[var(--color-primary)]'>封面</h2>
 			</div>
 			<input ref={fileInputRef} type='file' accept='image/*' className='hidden' onChange={handleFileChange} />
 			<div
-				className='bg-card mt-3 h-[150px] overflow-hidden rounded-xl border'
+				className='group relative flex h-40 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-[var(--color-border)] bg-[var(--color-bg)] transition-all hover:border-[var(--color-brand)]/50 hover:bg-[var(--color-brand)]/5'
 				onDragOver={e => {
 					e.preventDefault()
 				}}
-				onDrop={handleCoverDrop}>
+				onDrop={handleCoverDrop}
+				onClick={handleClickUpload}>
 				{!!coverPreviewUrl ? (
-					<img src={coverPreviewUrl} alt='cover preview' className='h-full w-full rounded-2xl object-cover' />
+					<>
+						<img src={coverPreviewUrl} alt='cover preview' className='h-full w-full object-cover transition-transform duration-500 group-hover:scale-105' />
+						<div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300" />
+						
+						{/* Hover actions */}
+						<div className="absolute top-2 right-2 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+							<button
+								type='button'
+								onClick={(e) => { e.stopPropagation(); handleRandomCover(); }}
+								className='p-2 rounded-lg bg-black/50 backdrop-blur-md text-white hover:bg-black/70 transition-colors'
+								title="随机封面"
+							>
+								<RefreshCw className="w-4 h-4" />
+							</button>
+							<button
+								type='button'
+								onClick={(e) => { e.stopPropagation(); setCover(null); }}
+								className='p-2 rounded-lg bg-red-500/80 backdrop-blur-md text-white hover:bg-red-600 transition-colors'
+								title="清除"
+							>
+								<Trash2 className="w-4 h-4" />
+							</button>
+						</div>
+					</>
 				) : (
-					<div className='grid h-full w-full cursor-pointer place-items-center transition-colors hover:bg-white/60' onClick={handleClickUpload}>
-						<span className='text-3xl leading-none text-neutral-400'>+</span>
+					<div className='flex flex-col items-center gap-2 text-[var(--color-secondary)] opacity-60 group-hover:opacity-100 transition-opacity'>
+						<ImagePlus className="w-8 h-8" />
+						<span className="text-xs font-medium">点击或拖拽上传</span>
+						<button
+							type='button'
+							onClick={(e) => { e.stopPropagation(); handleRandomCover(); }}
+							className='mt-1 text-xs text-[var(--color-brand)] hover:underline'
+						>
+							或随机生成
+						</button>
 					</div>
 				)}
 			</div>

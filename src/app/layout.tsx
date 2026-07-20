@@ -1,9 +1,18 @@
 import '@/styles/globals.css'
 
 import type { Metadata } from 'next'
+import { Caveat } from 'next/font/google'
 import Layout from '@/layout'
 import Head from '@/layout/head'
+import { CommandMenu } from '@/components/command-menu'
 import siteContent from '@/config/site-content.json'
+import { ThemeProvider } from '@/hooks/use-theme'
+
+const caveat = Caveat({
+	subsets: ['latin'],
+	variable: '--font-cursive',
+	display: 'swap',
+})
 
 const {
 	meta: { title, description },
@@ -11,33 +20,30 @@ const {
 } = siteContent
 
 export const metadata: Metadata = {
-	title,
+	title: {
+		default: title,
+		template: `%s - ${title}`
+	},
 	description,
 	openGraph: {
-		title,
+		title: {
+			default: title,
+			template: `%s - ${title}`
+		},
 		description
 	},
 	twitter: {
-		title,
+		title: {
+			default: title,
+			template: `%s - ${title}`
+		},
 		description
 	}
 }
 
-const htmlStyle = {
-	cursor: 'url(/images/cursor.svg) 2 1, auto',
-	'--color-brand': theme.colorBrand,
-	'--color-primary': theme.colorPrimary,
-	'--color-secondary': theme.colorSecondary,
-	'--color-brand-secondary': theme.colorBrandSecondary,
-	'--color-bg': theme.colorBg,
-	'--color-border': theme.colorBorder,
-	'--color-card': theme.colorCard,
-	'--color-article': theme.colorArticle
-}
-
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
 	return (
-		<html lang='en' suppressHydrationWarning style={htmlStyle}>
+		<html lang='en' suppressHydrationWarning className={`${caveat.variable}`}>
 			<Head />
 
 			<body>
@@ -47,11 +53,12 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
 					if (/windows|win32/i.test(navigator.userAgent)) {
 						document.documentElement.classList.add('windows');
 					}
-		      `
+			      `
 					}}
 				/>
 
 				<Layout>{children}</Layout>
+				<CommandMenu />
 			</body>
 		</html>
 	)

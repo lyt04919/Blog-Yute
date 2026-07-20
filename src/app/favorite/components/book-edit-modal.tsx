@@ -1,10 +1,13 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { X, BookOpen, FileText, ExternalLink, Save, UploadCloud } from 'lucide-react'
-import { DialogModal } from '@/components/dialog-modal'
+import { X, BookOpen, FileText, ExternalLink, Save, UploadCloud, Sparkles } from 'lucide-react'
+import { UniversalEditorShell } from '@/components/ui/universal-editor-shell'
+import { TagSelector } from '@/components/ui/tag-selector'
+
+const BOOK_TAG_OPTIONS = ['Tech', 'Design', 'Fiction', 'Biography', '个人成长', '心理学', 'Non-Tech Learning']
 import EditableStarRating from '@/components/editable-star-rating'
-import { cn } from '@/lib/utils'
+import { toast } from 'sonner'
 import type { Book } from './book-card'
 
 interface BookEditModalProps {
@@ -19,6 +22,10 @@ export default function BookEditModal({ book, onClose, onSave }: BookEditModalPr
 	const [isUploadingEpub, setIsUploadingEpub] = useState(false)
 	const [isUploadingPdf, setIsUploadingPdf] = useState(false)
 	
+	// Auto Parse states
+	const [autoUrl, setAutoUrl] = useState(book.doubanUrl || '')
+	const [isParsing, setIsParsing] = useState(false)
+
 	const coverInputRef = useRef<HTMLInputElement>(null)
 	const epubInputRef = useRef<HTMLInputElement>(null)
 	const pdfInputRef = useRef<HTMLInputElement>(null)
@@ -84,204 +91,310 @@ export default function BookEditModal({ book, onClose, onSave }: BookEditModalPr
 		}
 	}
 
+	const handleAutoParse = async () => {
+		if (!autoUrl.trim()) {
+			toast.error('请输入有效的链接')
+			return
+		}
+		try {
+			setIsParsing(true)
+			const res = await fetch(`/api/og?url=${encodeURIComponent(autoUrl.trim())}&type=book`)
+			if (!res.ok) throw new Error('解析失败')
+			const data = await res.json()
+			if (data.error) throw new Error(data.error)
+			
+			setLocalBook(prev => ({
+				...prev,
+				name: data.title || prev.name,
+				author: data.author || prev.author,
+				description: data.description || prev.description,
+				cover: data.image || prev.cover,
+				doubanUrl: autoUrl || prev.doubanUrl
+			}))
+			toast.success('书籍元数据提取成功！')
+		} catch (err: any) {
+			toast.error(`解析失败: ${err.message}`)
+		} finally {
+			setIsParsing(false)
+		}
+	}
+
 	return (
-		<DialogModal open onClose={onClose} className='card max-w-3xl w-full max-h-[90vh] p-8 md:p-10 relative bg-white flex flex-col shadow-2xl'>
-			{/* Mobile-only Absolute Close/Save Buttons */}
-			<div className='sm:hidden absolute top-6 right-6 z-20 flex items-center gap-3 bg-white/80 rounded-full px-2 py-1'>
-				<button 
-					onClick={() => onSave(localBook)} 
-					className='flex items-center gap-1.5 px-3 py-1.5 bg-neutral-900 text-white text-xs font-bold rounded-full hover:bg-neutral-800 transition-colors'
-				>
-					<Save className='w-3.5 h-3.5' /> 保存
-				</button>
-				<button onClick={onClose} className='p-1.5 text-neutral-400 hover:text-neutral-900 transition-colors'>
-					<X className='w-5 h-5' />
-				</button>
-			</div>
-
-			{/* Desktop-only Close Button */}
-			<button 
-				onClick={onClose} 
-				className='hidden sm:flex absolute top-8 right-8 md:top-10 md:right-10 z-20 p-2 text-neutral-400 hover:text-neutral-900 bg-neutral-50 hover:bg-neutral-100 rounded-full transition-colors'
-			>
-				<X className='w-5 h-5' />
-			</button>
-
-			<div className='flex flex-col sm:flex-row gap-8 md:gap-12 h-full'>
+		<UniversalEditorShell
+			isOpen={true}
+			onClose={onClose}
+			title="Edit Book"
+			description="Manage book details, covers, and reading status"
+			icon={<BookOpen className="w-5 h-5" />}
+			onSave={() => onSave(localBook)}
+			saveText="Update Book"
+			maxWidth="max-w-4xl"
+		>
+			<div className='flex flex-col sm:flex-row gap-6 md:gap-8'>
 				{/* Top Left: Cover Image (Uploadable) */}
-				<div className='shrink-0 w-[140px] sm:w-[200px] mt-2 flex flex-col'>
+				<div className='shrink-0 w-[140px] sm:w-[220px] mt-2 flex flex-col gap-4'>
 					<input type="file" accept="image/*" className="hidden" ref={coverInputRef} onChange={onCoverChange} />
 					<div 
-						className='group relative w-full aspect-[2/3] cursor-pointer rounded shadow-2xl shadow-black/15 ring-1 ring-black/5 overflow-hidden'
+						className='group relative w-full aspect-[2/3] cursor-pointer rounded-xl shadow-xl ring-1 ring-slate-200 dark:ring-slate-800 overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center transition-transform hover:scale-[1.02]'
 						onClick={() => coverInputRef.current?.click()}
 					>
 						{localBook.cover ? (
-							<img src={localBook.cover} alt="Cover" className='w-full h-full object-cover' />
+							<img src={localBook.cover} alt="Cover" className='w-full h-full object-cover' referrerPolicy="no-referrer" />
 						) : (
-							<div className='w-full h-full bg-neutral-100 flex items-center justify-center text-neutral-400 text-sm'>
+							<div className='w-full h-full p-4 flex flex-col items-center justify-center text-slate-400 text-xs text-center gap-2'>
+								<UploadCloud className="w-6 h-6"/>
 								点击上传封面
 							</div>
 						)}
-						<div className='absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity'>
-							<span className='text-white text-sm font-medium flex items-center gap-1'>
+						<div className='absolute inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity'>
+							<span className='text-white text-sm font-medium flex items-center gap-1.5'>
 								<UploadCloud className="w-4 h-4"/> {isUploadingCover ? '上传中...' : '更换封面'}
 							</span>
 						</div>
 					</div>
-					
-					{/* Desktop-only Save Button placed at Bottom Left */}
-					<div className='hidden sm:flex mt-auto pt-6'>
-						<button 
-							onClick={() => onSave(localBook)} 
-							className='w-full flex items-center justify-center gap-2 px-4 py-3 bg-neutral-900 text-white text-sm font-bold rounded-xl hover:bg-neutral-800 hover:shadow-lg active:scale-[0.98] transition-all'
-						>
-							<Save className='w-4 h-4' /> 保存修改
-						</button>
-					</div>
 				</div>
 
-				{/* Right: Details & Resources */}
-				<div className='flex-1 flex flex-col min-w-0'>
-					{/* Header Info */}
-					<div className='shrink-0 mb-6' style={{ paddingRight: '3rem' }}>
-						<div className='mb-3 relative flex items-center w-full'>
+				{/* Right: Form Sections */}
+				<div className='flex-1 flex flex-col min-w-0 pr-2 overflow-y-auto custom-scrollbar pb-6'>
+					
+					{/* HERO ACTION: Auto-Parse */}
+					<div className='mb-6 p-4 rounded-2xl flex flex-col gap-3 shrink-0 bg-blue-500/5 dark:bg-blue-500/10 border border-blue-500/10 dark:border-blue-500/20'>
+						<label className='text-[11px] text-blue-400 font-bold uppercase flex items-center gap-1.5 tracking-wider'>
+							<Sparkles className='w-3.5 h-3.5 animate-pulse' />
+							豆瓣书籍链接 / 智能解析
+						</label>
+						<div className='flex gap-2'>
 							<input
-								type='text'
-								value={localBook.tags.join(', ')}
-								onChange={e => handleTagsChange(e.target.value)}
-								placeholder='输入标签，用逗号分隔'
-								className='w-full bg-neutral-50 px-3 py-1.5 rounded border border-neutral-200 text-xs text-neutral-600 focus:outline-none focus:border-neutral-400 transition-colors'
+								type='url'
+								value={autoUrl}
+								onChange={e => setAutoUrl(e.target.value)}
+								onKeyDown={e => {
+									if (e.key === 'Enter') {
+										e.preventDefault();
+										handleAutoParse();
+									}
+								}}
+								placeholder='粘贴书籍介绍页面，例如 https://book.douban.com/...'
+								className='flex-1 px-4 py-2.5 rounded-xl border text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all placeholder:font-normal'
+								style={{ backgroundColor: '#0D1117', borderColor: '#30363D', color: '#ffffff' }}
 							/>
+							<button
+								type='button'
+								disabled={isParsing}
+								onClick={() => handleAutoParse()}
+								className='px-5 py-2.5 text-sm font-bold bg-blue-600 hover:bg-blue-500 text-slate-900 dark:text-white rounded-xl active:scale-95 transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] disabled:opacity-50 shrink-0'
+							>
+								{isParsing ? '解析中...' : '提取数据'}
+							</button>
 						</div>
+					</div>
 
+					{/* SECTION 1: Basic Info */}
+					<div className='flex flex-col gap-4 p-5 rounded-2xl mb-4 shrink-0 bg-slate-50 dark:bg-slate-50 dark:bg-[#0D1117] border border-slate-200 dark:border-slate-200 dark:border-[#30363D]'>
+						<h4 className='text-[10px] font-bold tracking-widest text-slate-500 dark:text-slate-400 uppercase mb-1 flex items-center gap-2'>
+							<span className='w-1 h-3 bg-blue-500 rounded-full'></span>
+							基础信息 (Basic)
+						</h4>
+						
 						<input
 							type='text'
 							value={localBook.name}
 							onChange={e => handleFieldChange('name', e.target.value)}
-							placeholder='书名'
-							className='w-full text-2xl sm:text-3xl lg:text-4xl font-extrabold text-neutral-900 leading-tight mb-2 tracking-tight bg-transparent border-b border-transparent focus:border-neutral-200 focus:outline-none transition-colors pb-1'
+							placeholder='书名 (必填)'
+							className='w-full text-xl sm:text-2xl font-extrabold leading-tight tracking-tight bg-transparent border-b focus:outline-none transition-colors pb-2 border-slate-200 dark:border-slate-200 dark:border-[#30363D] text-slate-900 dark:text-white'
 						/>
 						
-						<input
-							type='text'
-							value={localBook.author}
-							onChange={e => handleFieldChange('author', e.target.value)}
-							placeholder='作者'
-							className='w-full text-neutral-500 font-medium text-[15px] mb-4 bg-transparent border-b border-transparent focus:border-neutral-200 focus:outline-none transition-colors pb-1'
-						/>
-						
-						<div className='mb-4 flex items-center gap-6'>
+						<div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-2'>
+							<div className='flex flex-col gap-1.5'>
+								<span className='text-slate-500 dark:text-slate-400 text-[11px] font-medium'>作者</span>
+								<input
+									type='text'
+									value={localBook.author}
+									onChange={e => handleFieldChange('author', e.target.value)}
+									placeholder='书籍作者'
+									className='w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none transition-colors bg-white dark:bg-[#161B22] border-slate-200 dark:border-slate-200 dark:border-[#30363D] text-slate-900 dark:text-white'
+								/>
+							</div>
+							
+							<div className='flex flex-col gap-1.5 md:col-span-2'>
+								<span className='text-slate-500 dark:text-slate-400 text-[11px] font-medium'>分类标签</span>
+								<TagSelector
+									options={BOOK_TAG_OPTIONS}
+									selectedTags={localBook.tags}
+									onChange={tags => handleFieldChange('tags', tags)}
+								/>
+							</div>
+						</div>
+
+						<div className='flex flex-wrap items-center gap-6 mt-2 pt-4 border-t' style={{ borderColor: '#30363D' }}>
 							<div className='flex items-center gap-3'>
-								<span className="text-xs text-neutral-400 font-medium">评分</span>
+								<span className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">评分</span>
 								<EditableStarRating stars={localBook.stars} editable={true} onChange={stars => handleFieldChange('stars', stars)} />
 							</div>
-							<label className='flex items-center gap-2 cursor-pointer'>
-								<input 
-									type='checkbox' 
-									checked={localBook.isShow || false} 
-									onChange={e => handleFieldChange('isShow', e.target.checked)}
-									className='w-4 h-4 text-neutral-900 border-neutral-300 rounded focus:ring-neutral-900 accent-neutral-900'
-								/>
-								<span className="text-xs text-neutral-400 font-medium hover:text-neutral-900 transition-colors">展示到主页</span>
-							</label>
-						</div>
-						<div className='mb-4 flex items-center gap-4'>
-							<select
-								value={localBook.status || ''}
-								onChange={e => handleFieldChange('status', e.target.value || undefined)}
-								className='bg-neutral-50 border border-neutral-200 text-neutral-600 text-xs rounded px-2 py-1.5 focus:outline-none focus:border-neutral-400'
-							>
-								<option value="">-- 选择状态 --</option>
-								<option value="reading">正在阅读</option>
-								<option value="finished">已读</option>
-								<option value="wishlist">想读</option>
-							</select>
+							
+							<div className='flex items-center gap-3'>
+								<span className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">状态</span>
+								<select
+									value={localBook.status || ''}
+									onChange={e => handleFieldChange('status', e.target.value || undefined)}
+									className='w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none transition-colors bg-white dark:bg-[#161B22] border-slate-200 dark:border-slate-200 dark:border-[#30363D] text-slate-900 dark:text-white'
+								>
+									<option value="">-- 选择状态 --</option>
+									<option value="reading">正在阅读</option>
+									<option value="finished">已读</option>
+									<option value="wishlist">想读</option>
+								</select>
+							</div>
+
 							{localBook.status === 'reading' && (
 								<div className='flex items-center gap-2'>
-									<span className="text-xs text-neutral-400 font-medium">进度</span>
+									<span className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">进度</span>
 									<input
 										type='number'
 										min="0"
 										max="100"
 										value={localBook.progress || 0}
 										onChange={e => handleFieldChange('progress', Number(e.target.value))}
-										className='w-16 bg-neutral-50 px-2 py-1.5 rounded border border-neutral-200 text-xs text-neutral-600 focus:outline-none focus:border-neutral-400 text-center'
+										className='w-16 px-2 py-1.5 rounded-md border text-xs focus:outline-none transition-colors text-center bg-white dark:bg-[#161B22] border-slate-200 dark:border-[#30363D] text-slate-900 dark:text-white'
 									/>
-									<span className="text-xs text-neutral-400 font-medium">%</span>
+									<span className="text-[11px] text-slate-500 dark:text-slate-400">%</span>
 								</div>
 							)}
+
+							<div className="flex flex-wrap items-center gap-2 ml-auto">
+								<label className='flex items-center gap-2 cursor-pointer px-3 py-1.5 rounded-md border transition-colors' style={{ backgroundColor: 'rgba(37,99,235,0.1)', borderColor: 'rgba(37,99,235,0.3)' }}>
+									<input 
+										type='checkbox' 
+										checked={localBook.isShow || false} 
+										onChange={e => {
+											const val = e.target.checked
+											handleFieldChange('isShow', val)
+											if (!val) {
+												handleFieldChange('isShowOnHome', false)
+											} else {
+												handleFieldChange('isShowOnHome', true)
+											}
+										}}
+										className='w-3.5 h-3.5 text-blue-500 rounded focus:ring-blue-500 accent-blue-500'
+									/>
+									<span className="text-[11px] text-blue-400 font-bold tracking-wider uppercase">公开到 Favorites</span>
+								</label>
+
+								{localBook.isShow && (
+									<label className='flex items-center gap-2 cursor-pointer px-3 py-1.5 rounded-md border transition-colors' style={{ backgroundColor: 'rgba(16,185,129,0.1)', borderColor: 'rgba(16,185,129,0.3)' }}>
+										<input 
+											type='checkbox' 
+											checked={localBook.isShowOnHome !== false} 
+											onChange={e => handleFieldChange('isShowOnHome', e.target.checked)}
+											className='w-3.5 h-3.5 text-emerald-500 rounded focus:ring-emerald-500 accent-emerald-500'
+										/>
+										<span className="text-[11px] text-emerald-400 font-bold tracking-wider uppercase">展示到主页</span>
+									</label>
+								)}
+							</div>
 						</div>
 					</div>
 
-					{/* Scrollable Area for Description & Recommendation */}
-					<div className='flex-1 overflow-y-auto pr-4 pb-4 custom-scrollbar flex flex-col gap-6'>
-						<div className='pl-4 border-l-2 border-neutral-200 focus-within:border-neutral-800 transition-colors py-1'>
+					{/* SECTION 2: Description & Review */}
+					<div className='flex flex-col gap-4 p-5 rounded-2xl mb-4 shrink-0 bg-slate-50 dark:bg-slate-50 dark:bg-[#0D1117] border border-slate-200 dark:border-slate-200 dark:border-[#30363D]'>
+						<h4 className='text-[10px] font-bold tracking-widest text-slate-500 dark:text-slate-400 uppercase mb-1 flex items-center gap-2'>
+							<span className='w-1 h-3 bg-blue-500 rounded-full'></span>
+							内容与评价 (Content & Review)
+						</h4>
+						
+						<div className='flex flex-col gap-1.5'>
+							<span className='text-slate-500 dark:text-slate-400 text-[11px] font-medium'>金句摘抄 / 推荐语</span>
 							<textarea
 								value={localBook.recommendation || ''}
 								onChange={e => handleFieldChange('recommendation', e.target.value)}
-								placeholder='写一句推荐语 (选填)...'
-								className='w-full text-[15px] text-neutral-600 leading-relaxed italic bg-transparent focus:outline-none resize-none'
+								placeholder='写一句极具吸引力的短评...'
+								className='w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none transition-colors bg-white dark:bg-[#161B22] border-slate-200 dark:border-slate-200 dark:border-[#30363D] text-slate-900 dark:text-white'
 								rows={2}
 							/>
 						</div>
 
-						<div>
-							<h4 className='text-xs font-semibold tracking-widest text-neutral-400 uppercase mb-3'>书籍简介</h4>
+						<div className='flex flex-col gap-1.5'>
+							<span className='text-slate-500 dark:text-slate-400 text-[11px] font-medium'>详细介绍</span>
 							<textarea
 								value={localBook.description}
 								onChange={e => handleFieldChange('description', e.target.value)}
-								placeholder='输入详细简介...'
-								className='w-full text-[15px] text-neutral-600 leading-[1.8] font-light bg-neutral-50 p-4 rounded-xl border border-neutral-100 focus:outline-none focus:border-neutral-300 transition-colors resize-none min-h-[150px]'
+								placeholder='书籍的详细简介...'
+								className='w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none transition-colors bg-white dark:bg-[#161B22] border-slate-200 dark:border-slate-200 dark:border-[#30363D] text-slate-900 dark:text-white'
+							/>
+						</div>
+						
+						<div className='flex flex-col gap-1.5 mt-2'>
+							<span className='text-slate-500 dark:text-slate-400 text-[11px] font-medium'>读后感 / 个人随想笔记</span>
+							<textarea
+								rows={3}
+								value={localBook.myReview || ''}
+								onChange={e => handleFieldChange('myReview', e.target.value)}
+								placeholder='撰写您的个人读书心得或私人笔记...'
+								className='w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none transition-colors bg-white dark:bg-[#161B22] border-slate-200 dark:border-[#30363D] text-slate-900 dark:text-white min-h-[75px]'
 							/>
 						</div>
 					</div>
 
-					{/* Action Buttons (File Uploads) */}
-					<div className='pt-6 mt-auto bg-white flex flex-col gap-3 shrink-0 border-t border-neutral-100'>
+					{/* SECTION 3: Assets & Links */}
+					<div className='flex flex-col gap-4 p-5 rounded-2xl mb-4 shrink-0 bg-slate-50 dark:bg-[#0D1117] border border-slate-200 dark:border-[#30363D]'>
+						<h4 className='text-[10px] font-bold tracking-widest text-slate-500 dark:text-slate-400 uppercase mb-1 flex items-center gap-2'>
+							<span className='w-1 h-3 bg-emerald-500 rounded-full'></span>
+							书籍资源 (Assets)
+						</h4>
+						
 						<div className='flex flex-col sm:flex-row gap-3'>
 							<input type="file" accept=".epub" className="hidden" ref={epubInputRef} onChange={onEpubChange} />
 							<button
 								onClick={() => epubInputRef.current?.click()}
-								className='flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-neutral-900 text-white text-sm rounded-full font-medium transition-all hover:bg-neutral-800 hover:shadow-lg active:scale-[0.98]'
+								className='flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium transition-all active:scale-[0.98]'
+								style={{ backgroundColor: '#1E293B', color: '#E2E8F0', border: '1px solid #334155' }}
 							>
 								{isUploadingEpub ? <UploadCloud className="w-4 h-4 animate-bounce" /> : <BookOpen className='w-4 h-4' />}
-								<span className='truncate'>{isUploadingEpub ? '上传中...' : localBook.epubUrl ? '已上传 EPUB (点击重新上传)' : '上传 EPUB 文件'}</span>
+								<span className='truncate'>{isUploadingEpub ? '上传中...' : localBook.epubUrl ? '重新上传 EPUB' : '上传 EPUB 文件'}</span>
 							</button>
 
 							<input type="file" accept=".pdf" className="hidden" ref={pdfInputRef} onChange={onPdfChange} />
 							<button
 								onClick={() => pdfInputRef.current?.click()}
-								className='flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white text-neutral-900 text-sm rounded-full font-medium transition-all hover:bg-neutral-50 border border-neutral-200 shadow-sm active:scale-[0.98]'
+								className='flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium transition-all active:scale-[0.98]'
+								style={{ backgroundColor: '#1E293B', color: '#E2E8F0', border: '1px solid #334155' }}
 							>
 								{isUploadingPdf ? <UploadCloud className="w-4 h-4 animate-bounce" /> : <FileText className='w-4 h-4' />}
-								<span className='truncate'>{isUploadingPdf ? '上传中...' : localBook.pdfUrl ? '已上传 PDF (点击重新上传)' : '上传 PDF 文件'}</span>
+								<span className='truncate'>{isUploadingPdf ? '上传中...' : localBook.pdfUrl ? '重新上传 PDF' : '上传 PDF 文件'}</span>
 							</button>
 						</div>
 
-						<div className='relative flex items-center mt-1'>
-							<div 
-								className='absolute pointer-events-none flex items-center' 
-								style={{ left: '0.75rem', top: 0, bottom: 0 }}
-							>
-								<div 
-									className='rounded flex items-center justify-center text-white font-bold shadow-sm'
-									style={{ backgroundColor: '#007722', width: '22px', height: '22px', fontSize: '12px' }}
-								>
-									豆
-								</div>
-							</div>
+						<div className='flex flex-col gap-1.5 mt-2'>
+							<span className='text-slate-500 dark:text-slate-400 text-[11px] font-medium'>外部链接</span>
 							<input
-								type='url'
+								type='text'
 								value={localBook.doubanUrl || ''}
 								onChange={e => handleFieldChange('doubanUrl', e.target.value)}
-								placeholder='豆瓣详情页链接 (选填)'
-								className='w-full py-3 bg-white text-neutral-900 text-sm rounded-full font-medium transition-all border border-neutral-200 shadow-sm focus:outline-none placeholder:text-neutral-400'
-								style={{ paddingLeft: '3.2rem', paddingRight: '1rem' }}
+								placeholder='豆瓣链接...'
+								className='w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none transition-colors bg-white dark:bg-[#161B22] border-slate-200 dark:border-[#30363D] text-slate-900 dark:text-white'
 							/>
 						</div>
 					</div>
+
+					{/* SECTION 4: Notion Recording */}
+					<div className='flex flex-col gap-4 p-5 rounded-2xl mb-4 shrink-0 bg-slate-50 dark:bg-[#0D1117] border border-slate-200 dark:border-[#30363D]'>
+						<h4 className='text-[10px] font-bold tracking-widest text-slate-500 dark:text-slate-400 uppercase mb-1 flex items-center gap-2'>
+							<span className='w-1 h-3 bg-amber-500 rounded-full'></span>
+							个人记录 (Notion Recording)
+						</h4>
+						<div className='flex flex-col gap-1.5'>
+							<span className='text-slate-500 dark:text-slate-400 text-[11px] font-medium'>阅读完成/出版记录日期</span>
+							<input
+								type='date'
+								value={localBook.readDate || ''}
+								onChange={e => handleFieldChange('readDate', e.target.value)}
+								className='w-full md:w-1/2 px-3 py-2.5 rounded-lg border text-sm focus:outline-none transition-colors bg-white dark:bg-[#161B22] border-slate-200 dark:border-[#30363D] text-slate-900 dark:text-white'
+							/>
+						</div>
+					</div>
+					
 				</div>
 			</div>
-		</DialogModal>
+		</UniversalEditorShell>
 	)
 }

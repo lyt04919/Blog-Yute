@@ -302,9 +302,9 @@ export default function Page() {
 					animate={{ opacity: 1, scale: 1 }}
 					transition={{ delay: INIT_DELAY }}
 					className='space-y-2 text-center'>
-					<p className='text-secondary text-xs tracking-[0.2em] uppercase'>Image Toolbox</p>
+					<p className='text-[var(--color-secondary)] text-xs tracking-[0.2em] uppercase'>Image Toolbox</p>
 					<h1 className='text-2xl font-semibold'>PNG / JPG 转 WEBP</h1>
-					<p className='text-secondary'>选择图片 → 调整质量 → 一键转换下载</p>
+					<p className='text-[var(--color-secondary)]'>选择图片 → 调整质量 → 一键转换下载</p>
 				</motion.div>
 
 				<motion.label
@@ -315,8 +315,8 @@ export default function Page() {
 					onDragOver={handleDragOver}
 					onDragLeave={handleDragLeave}
 					onDrop={handleDrop}
-					className={`group hover:border-brand/20 card relative flex cursor-pointer flex-col items-center justify-center gap-3 text-center transition-colors hover:bg-white/80 ${
-						isDragging ? 'border-brand bg-white' : ''
+					className={`group hover:border-brand/20 card relative flex cursor-pointer flex-col items-center justify-center gap-3 text-center transition-colors hover:bg-[var(--color-bg)]/80 ${
+						isDragging ? 'border-brand bg-[var(--color-bg)]' : ''
 					}`}>
 					<input type='file' accept='image/*' multiple className='hidden' onChange={event => handleFiles(event.target.files)} />
 					<div className='bg-brand/10 text-brand/60 group-hover:bg-brand/10 flex h-20 w-20 items-center justify-center rounded-full text-3xl transition'>
@@ -324,27 +324,27 @@ export default function Page() {
 					</div>
 					<div>
 						<p className='text-base font-medium'>点击或拖拽图片</p>
-						<p className='text-secondary text-xs'>支持 PNG、JPG、JPEG、HEIC 等常见格式</p>
+						<p className='text-[var(--color-secondary)] text-xs'>支持 PNG、JPG、JPEG、HEIC 等常见格式</p>
 					</div>
 				</motion.label>
 
 				{hasImages && (
 					<motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className='card relative'>
-						<div className='text-secondary flex items-center justify-between border-b border-slate-200 pb-3 text-xs tracking-[0.2em] uppercase'>
+						<div className='text-[var(--color-secondary)] flex items-center justify-between border-b border-[var(--color-border)] pb-3 text-xs tracking-[0.2em] uppercase'>
 							<span>已选择 {images.length} 张图片</span>
 							<span>{totalSize}</span>
 						</div>
-						<ul className='divide-y divide-slate-200'>
+						<ul className='divide-y divide-[var(--color-border)]'>
 							{images.map((item, index) => {
 								const { file, preview, converted, converting } = item
 								return (
 									<li key={`${file.name}-${index}`} className='flex items-center gap-4 py-3'>
-										<div className='h-12 w-12 overflow-hidden rounded-xl border border-slate-200 bg-slate-50'>
-											<img src={preview} alt={file.name} className='h-full w-full object-cover' />
-										</div>
-										<div className='flex flex-1 flex-col'>
-											<p className='font-medium'>{formatFileName(file.name)}</p>
-											<p className='text-secondary text-xs'>
+										<div className='h-12 w-12 overflow-hidden rounded-xl border border-[var(--color-border)] bg-slate-50'>
+										<img src={preview} alt={file.name} className='h-full w-full object-cover' />
+									</div>
+									<div className='flex flex-1 flex-col'>
+										<p className='font-medium'>{formatFileName(file.name)}</p>
+										<p className='text-[var(--color-secondary)] text-xs'>
 												{item.width} × {item.height} · {formatBytes(file.size)}
 												{converted ? `（转换后 ${formatBytes(converted.size)}）` : ''}
 											</p>
@@ -391,7 +391,7 @@ export default function Page() {
 					<div className='flex flex-wrap items-center gap-4'>
 						<div className='flex-1 space-y-4'>
 							<div>
-								<p className='text-secondary text-xs tracking-[0.2em] uppercase'>质量</p>
+								<p className='text-[var(--color-secondary)] text-xs tracking-[0.2em] uppercase'>质量</p>
 								<div className='flex items-center gap-3 pt-2'>
 									<input
 										type='range'
@@ -415,9 +415,9 @@ export default function Page() {
 										onChange={event => setLimitMaxWidth(event.target.checked)}
 										className='h-4 w-4 rounded border-slate-300'
 									/>
-									<label htmlFor='limit-max-width' className='text-secondary cursor-pointer text-xs tracking-[0.2em] uppercase'>
-										限制最大宽度
-									</label>
+									<label htmlFor='limit-max-width' className='text-[var(--color-secondary)] cursor-pointer text-xs tracking-[0.2em] uppercase'>
+											限制最大宽度
+										</label>
 								</div>
 								{limitMaxWidth && (
 									<div className='flex items-center gap-2'>

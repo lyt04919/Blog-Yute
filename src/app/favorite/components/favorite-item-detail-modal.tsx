@@ -1,26 +1,13 @@
 'use client'
 
-import { X, ExternalLink, Pencil } from 'lucide-react'
+import { X, ExternalLink, Pencil, Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
 import StarRating from '@/components/star-rating'
 import { DialogModal } from '@/components/dialog-modal'
 import { useConfigStore } from '@/app/(home)/stores/config-store'
 import { useAuthStore } from '@/hooks/use-auth'
 
-interface FavoriteItem {
-	name: string
-	cover: string
-	subtitle?: string
-	desc: string
-	review?: string
-	link?: string
-	isPinned?: boolean
-	isShow?: boolean
-	stars?: number
-	status?: string
-	embedCode?: string
-	category?: string
-}
+import type { FavoriteItem } from './favorite-item-card'
 
 interface FavoriteItemDetailModalProps {
 	item: FavoriteItem
@@ -68,119 +55,170 @@ export function FavoriteItemDetailModal({ item, targetType, onClose, onEdit }: F
 
 	const hasRating = targetType === 'games' && typeof item.stars === 'number'
 
-	const coverAspect = targetType === 'videos'
+	const coverAspect = (targetType === 'videos' || targetType === 'games')
 		? 'aspect-video'
-		: targetType === 'games'
-			? 'aspect-[2/3]'
-			: 'aspect-square'
+		: 'aspect-square'
 
 	return (
-		<DialogModal open onClose={onClose} className='card max-w-3xl w-full max-h-[90vh] p-8 md:p-10 relative bg-white flex flex-col shadow-2xl'>
-			{/* Top Right Buttons: Edit + Close */}
-			<div className='absolute top-6 right-6 z-20 flex items-center gap-2'>
-				{(!hideEditButton || isAuth) && onEdit && (
-					<button
-						onClick={() => {
-							onClose()
-							onEdit()
-						}}
-						className='p-2 rounded-full bg-blue-50 text-blue-500 hover:bg-blue-100 hover:text-blue-700 transition-colors'
-						title='编辑'
-					>
-						<Pencil className='w-4 h-4' />
+		<DialogModal open onClose={onClose} className='max-w-4xl w-full max-h-[90vh] overflow-y-auto p-0 md:p-0 relative flex flex-col shadow-2xl bg-white dark:bg-slate-950 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-800 rounded-xl custom-scrollbar'>
+			{/* Sticky Top Nav within Modal */}
+			<div className='sticky top-0 z-50 flex items-center justify-between px-6 py-4 bg-white/95 dark:bg-slate-950/95 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800'>
+				<div className='flex items-center gap-2'>
+					<span className="text-blue-400 text-lg font-mono font-bold">&lt;{item.name}/&gt;</span>
+				</div>
+				<div className='flex items-center gap-2'>
+					{!hideEditButton && isAuth && onEdit && (
+						<button
+							onClick={() => {
+								onClose()
+								onEdit()
+							}}
+							className='p-2 rounded-md bg-blue-900/50 hover:bg-blue-800/80 text-blue-400 hover:text-slate-900 dark:text-white transition-colors group'
+							title='编辑'
+						>
+							<Pencil className='w-5 h-5 group-hover:scale-110 transition-transform' />
+						</button>
+					)}
+					<button onClick={onClose} className='p-2 rounded-md bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors group'>
+						<X className='w-5 h-5 group-hover:scale-110 transition-transform' />
 					</button>
-				)}
-				<button onClick={onClose} className='p-2 rounded-full bg-white/80 text-neutral-400 hover:text-neutral-900 transition-colors'>
-					<X className='w-5 h-5' />
-				</button>
+				</div>
 			</div>
 
-			<div className='flex flex-col sm:flex-row gap-8 md:gap-12'>
-				{/* Left Side: Cover Image */}
-				<div className='shrink-0 w-[140px] sm:w-[200px] mt-2'>
-					{item.cover ? (
-						<img
-							src={item.cover}
-							alt={item.name}
-							className={`w-full ${coverAspect} object-cover rounded shadow-2xl shadow-black/15 ring-1 ring-black/5`}
-							referrerPolicy='no-referrer'
-						/>
-					) : (
-						<div className={`w-full ${coverAspect} bg-neutral-100 flex items-center justify-center rounded text-neutral-400 text-sm`}>
-							暂无图片
-						</div>
-					)}
-				</div>
-
-				{/* Right Side: Details & Resources */}
-				<div className='flex-1 flex flex-col min-w-0'>
-					{/* Header Info */}
-					<div className='shrink-0 mb-6'>
-						<div className='flex flex-wrap gap-2 mb-4'>
-							{item.category && (
-								<span className='px-2.5 py-0.5 rounded-full bg-neutral-100 text-neutral-600 border border-neutral-200 text-[11px] tracking-wide font-medium'>
-									{item.category}
-								</span>
-							)}
-							{item.status && (
-								<span className='px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 text-[11px] tracking-wide font-medium'>
-									{item.status}
-								</span>
+			<div className="px-6 sm:px-8 lg:px-12 py-8">
+				{/* Content Layout: Left Sidebar + Right Main */}
+				<div className="flex flex-col md:flex-row gap-8 lg:gap-12">
+					
+					{/* Left Sidebar: Cover + Metadata */}
+					<div className="shrink-0 mx-auto md:mx-0 w-48 sm:w-56 md:w-60 space-y-6">
+						<div className="relative group rounded-xl overflow-hidden shadow-xl ring-1 ring-slate-200 dark:ring-slate-800">
+							{item.cover ? (
+								<>
+									<div className="absolute inset-0 bg-blue-500/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+									<img
+										src={item.cover}
+										alt={item.name}
+										className={`relative w-full ${coverAspect} object-cover transition-transform duration-500 group-hover:scale-[1.03] z-10`}
+										referrerPolicy="no-referrer"
+									/>
+								</>
+							) : (
+								<div className={`w-full ${coverAspect} bg-slate-100 dark:bg-slate-900 flex items-center justify-center text-slate-400 dark:text-slate-500 text-sm`}>
+									暂无图片
+								</div>
 							)}
 						</div>
 
-						<h2 className='text-2xl sm:text-3xl lg:text-4xl font-extrabold text-neutral-900 leading-tight mb-2 tracking-tight'>{item.name}</h2>
+						{/* Properties / Metadata List */}
+						<div className="space-y-4 pt-2">
+							<h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-200 dark:border-slate-800 pb-2">
+								Properties
+							</h3>
+							
+							<div className="space-y-3 text-sm">
+								{item.category && (
+									<div className="flex flex-col gap-1">
+										<span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5"><span className="text-base">🏷️</span> Category</span>
+										<span className="font-medium text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800/50 px-2 py-1 rounded w-fit">{item.category}</span>
+									</div>
+								)}
 
-						{item.subtitle && (
-							<p className='text-neutral-500 font-medium text-[15px] mb-4'>
-								{subtitleLabel}: {item.subtitle}
-							</p>
-						)}
+								{item.status && (
+									<div className="flex flex-col gap-1">
+										<span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5"><span className="text-base">🎯</span> Status</span>
+										<span className="font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded w-fit">{item.status}</span>
+									</div>
+								)}
 
-						{hasRating && (
-							<div className='mb-2'>
-								<StarRating stars={item.stars || 5} />
+								{item.playDate && (
+									<div className="flex flex-col gap-1">
+										<span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5"><span className="text-base">🗓️</span> Date</span>
+										<span className="font-mono font-medium text-slate-700 dark:text-slate-300">{item.playDate}</span>
+									</div>
+								)}
+
+								{hasRating && (
+									<div className="flex flex-col gap-1">
+										<span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5"><span className="text-base">⭐</span> Rating</span>
+										<div className="scale-90 origin-left">
+											<StarRating stars={item.stars || 5} />
+										</div>
+									</div>
+								)}
+								
+								{item.rating && (
+									<div className="flex flex-col gap-1">
+										<span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5"><span className="text-base">🌟</span> Personal Score</span>
+										<span className="font-mono font-bold text-amber-500">{item.rating} / 5.0</span>
+									</div>
+								)}
 							</div>
-						)}
-					</div>
-
-					{/* Scrollable Area */}
-					<div className='flex-1 overflow-y-auto pr-4 pb-4 custom-scrollbar'>
-						{item.review && (
-							<div className='mb-8 pl-4 border-l-2 border-neutral-800 py-1'>
-								<p className='text-[15px] text-neutral-600 leading-relaxed italic'>
-									&quot;{item.review}&quot;
-								</p>
-							</div>
-						)}
-
-						<div>
-							<h4 className='text-xs font-semibold tracking-widest text-neutral-400 uppercase mb-3'>{sectionTitle}</h4>
-							<p className='text-[15px] text-neutral-600 leading-[1.8] whitespace-pre-wrap font-light'>
-								{item.desc || '暂无简介'}
-							</p>
 						</div>
 
-						{targetType === 'music' && item.embedCode && (
-							<div
-								className='mt-6 w-full overflow-hidden rounded-xl'
-								dangerouslySetInnerHTML={{ __html: item.embedCode }}
-							/>
-						)}
-					</div>
-
-					{/* Action Buttons */}
-					{item.link && (
-						<div className='pt-6 mt-auto bg-white flex flex-col sm:flex-row gap-3 shrink-0'>
+						{item.link && (
 							<button
 								onClick={() => handleResourceClick(item.link)}
-								className='flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-neutral-900 text-white text-sm rounded-full font-medium transition-all hover:bg-neutral-800 hover:shadow-lg active:scale-[0.98]'
+								className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg font-bold transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md text-sm mt-6"
 							>
-								<ExternalLink className='w-4 h-4' />
-								<span>{linkLabel}</span>
+								<ExternalLink className="w-4 h-4" />
+								{linkLabel}
 							</button>
+						)}
+					</div>
+
+					{/* Right Main Content */}
+					<div className="flex-1 min-w-0">
+						<div className="mb-8">
+							<h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-3 tracking-tight text-slate-900 dark:text-white">
+								{item.name}
+							</h1>
+							
+							{item.subtitle && (
+								<p className="text-lg text-slate-500 dark:text-slate-400 font-medium flex items-center gap-2">
+									<span className="text-blue-500">#</span> {item.subtitle}
+								</p>
+							)}
 						</div>
-					)}
+
+						{/* Overview Section */}
+						<div className="prose prose-slate dark:prose-invert max-w-none mb-10">
+							{item.review && (
+								<blockquote className="text-lg text-blue-600 dark:text-blue-400 font-medium italic border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/10 py-3 px-5 rounded-r-lg mb-6">
+									"{item.review}"
+								</blockquote>
+							)}
+							
+							<div className="text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">
+								{item.desc || '暂无简介'}
+							</div>
+						</div>
+
+						{/* Personal Review Section */}
+						{item.myReview && (
+							<div className="mt-8 mb-10">
+								<h3 className="text-xl font-bold flex items-center gap-2 mb-4 text-slate-900 dark:text-white">
+									<Sparkles className="w-5 h-5 text-amber-500" />
+									随想笔记
+								</h3>
+								<div className="bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
+									<p className="text-[15px] text-slate-700 dark:text-slate-300 leading-loose whitespace-pre-wrap font-serif">
+										{item.myReview}
+									</p>
+								</div>
+							</div>
+						)}
+
+						{/* Music Embed */}
+						{targetType === 'music' && item.embedCode && (
+							<div className="mt-8 pt-8 border-t border-slate-200 dark:border-slate-800">
+								<h3 className="text-lg font-bold mb-4 text-slate-900 dark:text-white">Apple Music</h3>
+								<div
+									className='w-full max-w-xl overflow-hidden rounded-xl ring-1 ring-slate-200 dark:ring-slate-800 shadow-xl'
+									dangerouslySetInnerHTML={{ __html: item.embedCode }}
+								/>
+							</div>
+						)}
+					</div>
 				</div>
 			</div>
 		</DialogModal>

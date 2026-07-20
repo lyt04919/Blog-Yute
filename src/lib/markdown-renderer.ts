@@ -79,14 +79,14 @@ export async function renderMarkdown(markdown: string = ''): Promise<MarkdownRen
 			// Escape HTML entities for attribute value
 			const escapedCode = codeData.original.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 			if (codeData.html) {
-				// Shiki highlighted code
-				return `<pre data-code="${escapedCode}">${codeData.html}</pre>`
+				// Shiki highlighted code - inject data-code into the existing pre tag
+				return codeData.html.replace(/^<pre/, `<pre data-code="${escapedCode}"`)
 			}
-			// Fallback for failed highlighting
-			return `<pre data-code="${escapedCode}"><code>${codeData.original}</code></pre>`
+			// Fallback for failed highlighting - use escapedCode to prevent raw JSX from being parsed as HTML elements
+			return `<pre data-code="${escapedCode}"><code>${escapedCode}</code></pre>`
 		}
 		// Fallback to default (inline code, not code block)
-		return `<code>${token.text}</code>`
+		return `<pre><code class="language-${token.lang || 'text'}">${token.text}</code></pre>`
 	}
 
 	renderer.listitem = (token: Tokens.ListItem) => {

@@ -1,96 +1,130 @@
 'use client'
 
 import { useState } from 'react'
+import { Search } from 'lucide-react'
+import { useAuthStore } from '@/hooks/use-auth'
 
 import { type LogoItem } from './components/logo-upload-dialog'
 import { BookCard, type Book } from './components/book-card'
-import { cn } from '@/lib/utils'
+import { StandardToolbar } from '@/components/ui/standard-toolbar'
 
 interface GridViewProps {
 	books: Book[]
 	categories?: string[]
 	isEditMode?: boolean
+	isManagement?: boolean
 	onUpdate?: (updatedBook: Book, oldBook: Book, logoItem?: LogoItem) => void
 	onDelete?: (book: Book) => void
-	onAddCategory?: (category: string) => void
-	onDeleteCategory?: (category: string) => void
 	onTogglePin?: (book: Book) => void
 }
 
-export default function GridView({ books, categories = [], isEditMode = false, onUpdate, onDelete, onAddCategory, onDeleteCategory, onTogglePin }: GridViewProps) {
+export default function GridView({ books, isEditMode = false, isManagement = false, onUpdate, onDelete, onTogglePin }: GridViewProps) {
 	const [searchTerm, setSearchTerm] = useState('')
 	const [selectedTag, setSelectedTag] = useState<string>('all')
+	const [visibilityFilter, setVisibilityFilter] = useState<'all' | 'public' | 'private'>('all')
+	const [viewMode, setViewMode] = useState<'gallery' | 'list'>('gallery')
+	const { isAuth } = useAuthStore()
 
-	const allTags = categories.length > 0 ? categories : Array.from(new Set(books.flatMap(book => book.tags)))
-
-	const getTagCount = (tag: string) => {
-		if (tag === 'all') return books.length
-		return books.filter(b => b.tags.includes(tag)).length
-	}
+	// 预设标准分类
+	const standardTags = ['all', 'Tech', 'Design', 'Fiction', 'Biography']
+	const extractedTags = Array.from(new Set(books.flatMap(book => book.tags)))
+	const allTags = ['all', ...Array.from(new Set([...standardTags.filter(t => t !== 'all'), ...extractedTags]))]
 
 	const filteredBooks = books.filter(book => {
-		const matchesSearch = book.name.toLowerCase().includes(searchTerm.toLowerCase()) || book.description.toLowerCase().includes(searchTerm.toLowerCase())
-		const matchesTag = selectedTag === 'all' || book.tags.includes(selectedTag)
-		return matchesSearch && matchesTag
+		const matchesSearch = book.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+			(book.description && book.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+			(book.author && book.author.toLowerCase().includes(searchTerm.toLowerCase()))
+		const matchesTag = selectedTag === 'all' || book.tags.some(tag => tag.toLowerCase() === selectedTag.toLowerCase())
+		
+		let matchesVisibility = true
+		if (isManagement && isAuth) {
+			if (visibilityFilter === 'public') {
+				matchesVisibility = book.isShow === true
+			} else if (visibilityFilter === 'private') {
+				matchesVisibility = !book.isShow
+			}
+		}
+		
+		return matchesSearch && matchesTag && matchesVisibility
 	})
+
+	const extraActions = isManagement && isAuth ? (
+		<select
+			value={visibilityFilter}
+			onChange={e => setVisibilityFilter(e.target.value as any)}
+			className='rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/60 text-slate-900 dark:text-white px-3 py-2 text-xs focus:outline-none transition-all cursor-pointer'
+		>
+			<option value="all">所有内容</option>
+			<option value="public">仅精选公开</option>
+			<option value="private">仅私人归档</option>
+		</select>
+	) : undefined
 
 	return (
 		<div className='mx-auto w-full max-w-7xl px-6 pb-12'>
-			<div className='mb-12 flex flex-wrap items-center border-b border-transparent' style={{ gap: '3rem' }}>
-				<button
-					onClick={() => setSelectedTag('all')}
-					className={cn(
-						'text-lg font-medium pb-1 transition-colors relative',
-						selectedTag === 'all' ? 'text-primary after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[2px] after:bg-primary' : 'text-secondary hover:text-primary'
-					)}>
-					All<sup className='ml-0.5 text-xs font-normal'>{books.length}</sup>
-				</button>
-				{allTags.map((tag: string) => (
-					<div key={tag} className='group relative flex items-center'>
-						<button
-							onClick={() => setSelectedTag(tag)}
-							className={cn(
-								'text-lg font-medium pb-1 transition-colors relative',
-								selectedTag === tag ? 'text-primary after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[2px] after:bg-primary' : 'text-secondary hover:text-primary'
-							)}>
-							{tag}<sup className='ml-0.5 text-xs font-normal'>{getTagCount(tag)}</sup>
-						</button>
-						{isEditMode && (
-							<button
-								onClick={(e) => {
-									e.stopPropagation()
-									if (confirm(`确定要删除题材 "${tag}" 吗？该操作不会删除所属书籍。`)) {
-										if (onDeleteCategory) onDeleteCategory(tag)
-									}
-								}}
-								className='ml-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-100 text-[10px] text-red-500 opacity-0 transition-opacity hover:bg-red-200 group-hover:opacity-100'
-								title='删除题材'>
-								✕
-							</button>
-						)}
-					</div>
-				))}
-				{isEditMode && (
-					<button
-						onClick={() => {
-							const newTag = prompt('请输入新题材名称：')
-							if (newTag && onAddCategory) onAddCategory(newTag)
-						}}
-						className='text-sm text-brand border border-brand/30 rounded-full px-3 py-1 hover:bg-brand/10 transition-colors ml-4'>
-						+ 新增题材
-					</button>
-				)}
-			</div>
+			<StandardToolbar
+				tags={allTags.slice(0, 10)}
+				selectedTag={selectedTag}
+				onSelectTag={setSelectedTag}
+				searchValue={searchTerm}
+				onSearchChange={setSearchTerm}
+				searchPlaceholder="搜索书籍..."
+				viewMode={viewMode === 'gallery' ? 'grid' : 'list'}
+				onViewModeChange={(m) => setViewMode(m === 'list' ? 'list' : 'gallery')}
+				extraRightActions={extraActions}
+			/>
 
-			<div className='grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4'>
-				{filteredBooks.map((book: Book) => (
-					<BookCard key={book.name} book={book} categories={allTags} isEditMode={isEditMode} onUpdate={onUpdate} onDelete={() => onDelete?.(book)} onTogglePin={onTogglePin} />
-				))}
-			</div>
+			{/* Grid or List */}
+			{viewMode === 'list' ? (
+				<div className="w-full overflow-x-auto pb-8">
+					<table className="w-full text-sm text-left border-collapse whitespace-nowrap">
+						<thead className="text-xs text-slate-400 dark:text-slate-500 border-b border-slate-200 dark:border-slate-800">
+							<tr>
+								<th className="font-normal py-3 px-4 w-[35%] min-w-[200px]">Aa Name</th>
+								<th className="font-normal py-3 px-4 w-[15%] min-w-[100px]">≡ 状态</th>
+								<th className="font-normal py-3 px-4 w-[15%] min-w-[100px]">🏷️ 标签</th>
+								<th className="font-normal py-3 px-4 w-[20%] min-w-[120px]">📅 阅读时间</th>
+								<th className="font-normal py-3 px-4 w-[15%] min-w-[100px]">⭐ 评分</th>
+							</tr>
+						</thead>
+						<tbody>
+							{filteredBooks.map((book: Book) => (
+								<BookCard 
+									key={book.name} 
+									book={book} 
+									isEditMode={isEditMode} 
+									viewMode={viewMode}
+									onUpdate={onUpdate} 
+									onDelete={() => onDelete?.(book)} 
+									onTogglePin={onTogglePin} 
+								/>
+							))}
+						</tbody>
+					</table>
+				</div>
+			) : (
+				<div className='grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'>
+					{filteredBooks.map((book: Book) => (
+						<BookCard 
+							key={book.name} 
+							book={book} 
+							isEditMode={isEditMode} 
+							viewMode={viewMode}
+							onUpdate={onUpdate} 
+							onDelete={() => onDelete?.(book)} 
+							onTogglePin={onTogglePin} 
+						/>
+					))}
+				</div>
+			)}
 
 			{filteredBooks.length === 0 && (
-				<div className='mt-12 text-center text-gray-500'>
-					<p>没有找到相关资源</p>
+				<div className='flex flex-col items-center justify-center py-24 text-slate-400'>
+					<div className='w-14 h-14 mb-4 rounded-2xl bg-slate-100 dark:bg-slate-800/60 flex items-center justify-center border border-slate-200 dark:border-slate-700/60'>
+						<Search className='w-6 h-6 text-slate-400' />
+					</div>
+					<p className='text-base font-medium text-slate-700 dark:text-slate-200'>未找到相关书籍</p>
+					<p className='text-xs mt-1 text-slate-400'>试试更换搜索关键词或标签筛选</p>
 				</div>
 			)}
 		</div>

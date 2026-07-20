@@ -1,35 +1,13 @@
 [
 	{
-		"name": "Claude Fable 5 首发实测，真是太烧了。。完爆 GPT 5.5！",
-		"cover": "https://i0.hdslb.com/bfs/archive/4c24694e77b08c717e1ff2068f9c88a870ce0dd3.jpg",
-		"subtitle": "程序员鱼皮",
-		"desc": "全球最贵的 AI 模型 Claude Fable 5 来了！这期视频带你看看它到底值不值，用两轮硬核实测对比 Fable 5、Opus 4.8 和 GPT-5.5 的 AI 编程能力。\n开源 AI 编程教程：github.com/liyupi/ai-guide\n编程学习教程+实战项目+简历模板：codefather.cn\n视频先带你了解 Claude Fable 5 的核心更新，包括 Fable 和 Mythos 的双版本机制、降级安全过滤、跑分数据。然后进入实测环节，从零开发 React + FastAPI 全栈任务管理看板，并且从零重构 Claude Code 泄露的源码，打造 AI 编程助手。无论你是关注 AI 编程的程序员、想了解最新模型能力的 AI 爱好者，还是纠结该选哪个模型的开发者，这期内容都能帮你做出更明智的选择。\n记得三连支持、关注鱼皮，让更多朋友学到知识哦~",
+		"name": "44 Harsh Truths About The Game Of Life - Naval Ravikant (4K)",
+		"cover": "https://i.ytimg.com/vi/KyfUysrNaco/hqdefault.jpg",
+		"subtitle": "Chris Williamson",
+		"desc": "",
 		"review": "",
-		"link": "https://player.bilibili.com/player.html?bvid=BV1cpEd66EjT&page=1&high_quality=1&as_wide=1",
+		"link": "https://www.youtube.com/embed/KyfUysrNaco",
 		"isPinned": false,
 		"isShow": true,
 		"category": ""
-	},
-	{
-		"name": "The Art of Code",
-		"category": "编程",
-		"desc": "Dylan Beattie 关于创意编程与代码艺术的演讲。展示了编程不仅是逻辑，更是极具创造力的艺术形式。",
-		"cover": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=800&auto=format&fit=crop",
-		"author": "Dylan Beattie",
-		"link": "https://www.youtube.com/embed/Gd8Pr6tT6c0",
-		"review": "非常风趣且引人深思的演讲，每个程序员都应该看一遍。",
-		"isShow": true,
-		"isPinned": true
-	},
-	{
-		"name": "Apple Vision Pro — Guided Tour",
-		"category": "科技",
-		"desc": "苹果官方发布的 Vision Pro 使用指南。全方位展示了空间计算设备的交互逻辑和生态未来。",
-		"cover": "https://images.unsplash.com/photo-1608248597279-f99d160bfcbc?q=80&w=800&auto=format&fit=crop",
-		"author": "Apple",
-		"link": "https://www.youtube.com/embed/Vb0dG-y_tTE",
-		"review": "展示了极高水平的工业设计与交互系统设计，空间计算的起点。",
-		"isShow": true,
-		"isPinned": false
 	}
 ]

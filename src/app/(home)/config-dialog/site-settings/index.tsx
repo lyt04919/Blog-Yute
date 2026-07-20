@@ -9,6 +9,7 @@ import { BackgroundImagesSection } from './background-images-section'
 import { SocialButtonsSection } from './social-buttons-section'
 import { HatSection } from './hat-section'
 import { BeianForm } from './beian-form'
+import { BentoConfigForm } from './bento-config-form'
 
 export type { FileItem, ArtImageUploads, BackgroundImageUploads, SocialButtonImageUploads } from './types'
 
@@ -46,6 +47,8 @@ export function SiteSettings({
 			<FaviconAvatarUpload faviconItem={faviconItem} setFaviconItem={setFaviconItem} avatarItem={avatarItem} setAvatarItem={setAvatarItem} />
 
 			<SiteMetaForm formData={formData} setFormData={setFormData} />
+
+			<BentoConfigForm formData={formData} setFormData={setFormData} />
 
 			<BeianForm formData={formData} setFormData={setFormData} />
 

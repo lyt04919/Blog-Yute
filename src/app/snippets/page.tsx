@@ -29,7 +29,7 @@ export default function Page() {
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
-			if (!isEditMode && (e.ctrlKey || e.metaKey) && e.key === ',') {
+			if (isAuth && !isEditMode && (e.ctrlKey || e.metaKey) && e.key === 'e' && e.shiftKey) {
 				e.preventDefault()
 				setIsEditMode(true)
 			}
@@ -39,7 +39,7 @@ export default function Page() {
 		return () => {
 			window.removeEventListener('keydown', handleKeyDown)
 		}
-	}, [isEditMode])
+	}, [isEditMode, isAuth])
 
 	const handleSave = async () => {
 		setIsSaving(true)
@@ -143,31 +143,28 @@ export default function Page() {
 				{isEditMode ? (
 					<>
 						<motion.button
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
+							
 							onClick={handleCancel}
 							disabled={isSaving}
-							className='rounded-xl border bg-white/60 px-6 py-2 text-sm'>
+							className='rounded-xl border bg-[var(--color-bg)] dark:bg-[var(--color-card)]/60 px-6 py-2 text-sm'>
 							取消
 						</motion.button>
 						<motion.button
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
+							
 							onClick={openManageDialog}
-							className='rounded-xl border bg-white/60 px-6 py-2 text-sm'>
+							className='rounded-xl border bg-[var(--color-bg)] dark:bg-[var(--color-card)]/60 px-6 py-2 text-sm'>
 							管理
 						</motion.button>
-						<motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleSaveClick} disabled={isSaving} className='brand-btn px-6'>
+						<motion.button   onClick={handleSaveClick} disabled={isSaving} className='brand-btn px-6'>
 							{isSaving ? '保存中...' : buttonText}
 						</motion.button>
 					</>
 				) : (
-					!hideEditButton && (
+					!hideEditButton && isAuth && (
 						<motion.button
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
+							
 							onClick={() => setIsEditMode(true)}
-							className='bg-card rounded-xl border px-6 py-2 text-sm backdrop-blur-sm transition-colors hover:bg-white/80'>
+							className='bg-card rounded-xl border px-6 py-2 text-sm backdrop-blur-sm transition-colors hover:bg-[var(--color-bg)] dark:hover:bg-[var(--color-card)]/80'>
 							编辑
 						</motion.button>
 					)
@@ -182,7 +179,7 @@ export default function Page() {
 							value={newSnippet}
 							onChange={e => setNewSnippet(e.target.value)}
 							placeholder='新增'
-							className='flex-1 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm focus:outline-none'
+							className='flex-1 rounded-lg border border-[var(--color-border)] bg-gray-50 px-3 py-2 text-sm focus:outline-none'
 						/>
 						<button onClick={handleAddDraft} className='brand-btn flex items-center gap-1 px-4 py-2 text-sm'>
 							<Plus className='h-4 w-4' />
@@ -191,7 +188,11 @@ export default function Page() {
 					</div>
 
 					<div className='max-h-[320px] space-y-2 overflow-y-auto pr-1'>
-						{draftSnippets.length === 0 && <p className='text-secondary py-6 text-center text-sm'>暂无内容</p>}
+						{draftSnippets.length === 0 && (
+						<div className='flex flex-col items-center justify-center py-20 text-[var(--color-secondary)]'>
+							<p className='text-lg'>暂无内容</p>
+						</div>
+					)}
 						{draftSnippets.map((item, index) => (
 							<div key={`${item}-${index}`} className='group flex items-start gap-3 rounded-lg px-3 py-2 text-sm'>
 								<p className='flex-1 leading-relaxed text-gray-800'>{item}</p>
@@ -205,7 +206,7 @@ export default function Page() {
 					<div className='mt-4 flex gap-3'>
 						<button
 							onClick={cancelManageChanges}
-							className='flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm transition-colors hover:bg-gray-50'>
+							className='flex-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg)] dark:bg-[var(--color-card)] px-4 py-2 text-sm transition-colors hover:bg-[var(--color-card)]'>
 							取消
 						</button>
 						<button onClick={applyManageChanges} className='brand-btn flex-1 justify-center px-4'>

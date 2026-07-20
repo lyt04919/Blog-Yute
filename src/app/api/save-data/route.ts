@@ -7,21 +7,25 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { target, data } = body;
 
-    if (!target || !data || !Array.isArray(data)) {
+    if (!target || data === undefined || data === null) {
       return NextResponse.json({ error: 'Invalid request body. Expected { target: "movies"|"books"|"book-categories", data: [...] }' }, { status: 400 });
+    }
+
+    // blog-categories data is an object, not an array
+    const isValidData = target === 'blog-categories' ? typeof data === 'object' : Array.isArray(data);
+    if (!isValidData) {
+      return NextResponse.json({ error: 'Invalid data format for target.' }, { status: 400 });
     }
 
     let targetPath = '';
     if (target === 'movies') {
-      targetPath = path.join(process.cwd(), 'src/app/favorite/movies.json');
+      targetPath = path.join(process.cwd(), 'src/data/movies.json');
     } else if (target === 'books') {
-      targetPath = path.join(process.cwd(), 'src/app/favorite/books.json');
+      targetPath = path.join(process.cwd(), 'src/data/books.json');
     } else if (target === 'book-categories') {
       targetPath = path.join(process.cwd(), 'src/app/favorite/categories.json');
     } else if (target === 'share') {
       targetPath = path.join(process.cwd(), 'src/app/favorite/share/list.json');
-    } else if (target === 'bloggers') {
-      targetPath = path.join(process.cwd(), 'src/app/favorite/bloggers/list.json');
     } else if (target === 'gears') {
       targetPath = path.join(process.cwd(), 'src/app/favorite/gears.json');
     } else if (target === 'software') {
@@ -36,8 +40,14 @@ export async function POST(request: Request) {
       targetPath = path.join(process.cwd(), 'public/blogs/index.json');
     } else if (target === 'blog-categories') {
       targetPath = path.join(process.cwd(), 'public/blogs/categories.json');
+    } else if (target === 'projects') {
+      targetPath = path.join(process.cwd(), 'src/data/projects.json');
+    } else if (target === 'footprints') {
+      targetPath = path.join(process.cwd(), 'src/data/footprints.json');
+    } else if (target === 'wishlist') {
+      targetPath = path.join(process.cwd(), 'src/data/wishlist.json');
     } else {
-      return NextResponse.json({ error: 'Invalid target. Only "movies", "books", "book-categories", "share", "bloggers", "gears", "software", "music", "games", "videos", "blog-index", or "blog-categories" are allowed.' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid target. Only "movies", "books", "book-categories", "share", "gears", "software", "music", "games", "videos", "blog-index", "blog-categories", "projects", "footprints", or "wishlist" are allowed.' }, { status: 400 });
     }
 
     // Write the formatted JSON back to the local file

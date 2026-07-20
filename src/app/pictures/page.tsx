@@ -1,17 +1,5 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
-import { motion } from 'motion/react'
-import { toast } from 'sonner'
-import initialList from './list.json'
-import { RandomLayout } from './components/random-layout'
-import UploadDialog from './components/upload-dialog'
-import { pushPictures } from './services/push-pictures'
-import { useAuthStore } from '@/hooks/use-auth'
-import { useConfigStore } from '@/app/(home)/stores/config-store'
-import type { ImageItem } from '../projects/components/image-upload-dialog'
-import { useRouter } from 'next/navigation'
-
 export interface Picture {
 	id: string
 	uploadedAt: string
@@ -20,268 +8,150 @@ export interface Picture {
 	images?: string[]
 }
 
-export default function Page() {
-	const [pictures, setPictures] = useState<Picture[]>(initialList as Picture[])
-	const [originalPictures, setOriginalPictures] = useState<Picture[]>(initialList as Picture[])
-	const [isEditMode, setIsEditMode] = useState(false)
-	const [isSaving, setIsSaving] = useState(false)
-	const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false)
-	const [imageItems, setImageItems] = useState<Map<string, ImageItem>>(new Map())
-	const keyInputRef = useRef<HTMLInputElement>(null)
-	const router = useRouter()
+import { useState, useMemo } from 'react'
+import { motion } from 'motion/react'
+import Link from 'next/link'
+import { ArrowLeft } from 'lucide-react'
+import { LocationAlbumGrid } from './components/location-album-grid'
+import { PicturesTimeline } from './components/pictures-timeline'
+import { DomeGallery } from './components/dome-gallery'
+import UploadDialog from './components/upload-dialog'
+import { useAuthStore } from '@/hooks/use-auth'
+import { useConfigStore } from '@/app/(home)/stores/config-store'
+import { useTheme } from '@/hooks/use-theme'
+import type { ImageItem } from '../projects/components/image-upload-dialog'
+import initialFootprints from '@/data/footprints.json'
 
-	const { isAuth, setPrivateKey } = useAuthStore()
+export default function Page() {
+	const [isEditMode, setIsEditMode] = useState(false)
+	const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false)
+	const [viewMode, setViewMode] = useState<'albums' | 'timeline' | 'dome'>('albums')
+
+	const { isAuth } = useAuthStore()
 	const { siteContent } = useConfigStore()
+	const { resolvedTheme } = useTheme()
 	const hideEditButton = siteContent.hideEditButton ?? false
 
+	// Gather all photos dynamically from footprints for the 3D Dome Gallery
+	const domeImages = useMemo(() => {
+		const list: { src: string; alt: string }[] = []
+		initialFootprints
+			.filter((fp: any) => fp.coverImage || (fp.images && fp.images.length > 0))
+			.forEach((fp: any) => {
+				const photos = fp.images && fp.images.length > 0 ? fp.images : [fp.coverImage]
+				photos.forEach((img: string) => {
+					if (img) {
+						list.push({ src: img, alt: `${fp.city} - ${fp.notes || ''}` })
+					}
+				})
+			})
+		return list
+	}, [])
+
 	const handleUploadSubmit = ({ images, description }: { images: ImageItem[]; description: string }) => {
-		const now = new Date().toISOString()
-
-		if (images.length === 0) {
-			toast.error('请至少选择一张图片')
-			return
-		}
-
-		const id = `${Date.now()}-${Math.random().toString(16).slice(2)}`
-		const desc = description.trim() || undefined
-
-		const imageUrls = images.map(imageItem => (imageItem.type === 'url' ? imageItem.url : imageItem.previewUrl))
-
-		const newPicture: Picture = {
-			id,
-			uploadedAt: now,
-			description: desc,
-			images: imageUrls
-		}
-
-		const newMap = new Map(imageItems)
-
-		images.forEach((imageItem, index) => {
-			if (imageItem.type === 'file') {
-				newMap.set(`${id}::${index}`, imageItem)
-			}
-		})
-
-		setPictures(prev => [...prev, newPicture])
-		setImageItems(newMap)
+		// Image upload handler for adding new photos to footprint albums
 		setIsUploadDialogOpen(false)
 	}
 
-	const handleDeleteSingleImage = (pictureId: string, imageIndex: number | 'single') => {
-		setPictures(prev => {
-			return prev
-				.map(picture => {
-					if (picture.id !== pictureId) return picture
-
-					// 如果是 single image，删除整个 Picture
-					if (imageIndex === 'single') {
-						return null
-					}
-
-					// 如果是 images 数组中的图片
-					if (picture.images && picture.images.length > 0) {
-						const newImages = picture.images.filter((_, idx) => idx !== imageIndex)
-						// 如果删除后数组为空，删除整个 Picture
-						if (newImages.length === 0) {
-							return null
-						}
-						return {
-							...picture,
-							images: newImages
-						}
-					}
-
-					return picture
-				})
-				.filter((p): p is Picture => p !== null)
-		})
-
-		// 更新 imageItems Map
-		setImageItems(prev => {
-			const next = new Map(prev)
-			if (imageIndex === 'single') {
-				// 删除所有相关的文件项
-				for (const key of next.keys()) {
-					if (key.startsWith(`${pictureId}::`)) {
-						next.delete(key)
-					}
-				}
-			} else {
-				// 删除特定索引的文件项
-				next.delete(`${pictureId}::${imageIndex}`)
-				
-				// 重新索引：删除索引 imageIndex 后，后面的索引需要前移
-				// 例如：删除索引 1，原来的索引 2 变成 1，索引 3 变成 2
-				const keysToUpdate: Array<{ oldKey: string; newKey: string }> = []
-				for (const key of next.keys()) {
-					if (key.startsWith(`${pictureId}::`)) {
-						const [, indexStr] = key.split('::')
-						const oldIndex = Number(indexStr)
-						if (!isNaN(oldIndex) && oldIndex > imageIndex) {
-							const newIndex = oldIndex - 1
-							keysToUpdate.push({
-								oldKey: key,
-								newKey: `${pictureId}::${newIndex}`
-							})
-						}
-					}
-				}
-				
-				// 执行重新索引
-				for (const { oldKey, newKey } of keysToUpdate) {
-					const value = next.get(oldKey)
-					if (value) {
-						next.set(newKey, value)
-						next.delete(oldKey)
-					}
-				}
-			}
-			return next
-		})
-	}
-
-	const handleDeleteGroup = (picture: Picture) => {
-		if (!confirm('确定要删除这一组图片吗？')) return
-
-		setPictures(prev => prev.filter(p => p.id !== picture.id))
-		setImageItems(prev => {
-			const next = new Map(prev)
-			for (const key of next.keys()) {
-				if (key.startsWith(`${picture.id}::`)) {
-					next.delete(key)
-				}
-			}
-			return next
-		})
-	}
-
-	const handleChoosePrivateKey = async (file: File) => {
-		try {
-			const text = await file.text()
-			setPrivateKey(text)
-			await handleSave()
-		} catch (error) {
-			console.error('Failed to read private key:', error)
-			toast.error('读取密钥文件失败')
-		}
-	}
-
-	const handleSaveClick = () => {
-		if (!isAuth) {
-			keyInputRef.current?.click()
-		} else {
-			handleSave()
-		}
-	}
-
-	const handleSave = async () => {
-		setIsSaving(true)
-
-		try {
-			await pushPictures({
-				pictures,
-				imageItems
-			})
-
-			setOriginalPictures(pictures)
-			setImageItems(new Map())
-			setIsEditMode(false)
-			toast.success('保存成功！')
-		} catch (error: any) {
-			console.error('Failed to save:', error)
-			toast.error(`保存失败: ${error?.message || '未知错误'}`)
-		} finally {
-			setIsSaving(false)
-		}
-	}
-
-	const handleCancel = () => {
-		setPictures(originalPictures)
-		setImageItems(new Map())
-		setIsEditMode(false)
-	}
-
-	const buttonText = isAuth ? '保存' : '导入密钥'
-
-	useEffect(() => {
-		const handleKeyDown = (e: KeyboardEvent) => {
-			if (!isEditMode && (e.ctrlKey || e.metaKey) && e.key === ',') {
-				e.preventDefault()
-				setIsEditMode(true)
-			}
-		}
-
-		window.addEventListener('keydown', handleKeyDown)
-		return () => {
-			window.removeEventListener('keydown', handleKeyDown)
-		}
-	}, [isEditMode])
-
 	return (
-		<>
-			<input
-				ref={keyInputRef}
-				type='file'
-				accept='.pem'
-				className='hidden'
-				onChange={async e => {
-					const f = e.target.files?.[0]
-					if (f) await handleChoosePrivateKey(f)
-					if (e.currentTarget) e.currentTarget.value = ''
-				}}
-			/>
+		<div className="relative min-h-screen bg-[var(--color-bg)]">
+			{/* Floating Back to Space Map Button */}
+			<Link
+				href="/space"
+				className="absolute left-6 top-6 z-50 px-4 py-2 rounded-full border border-white/20 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-900/80 backdrop-blur-xl text-xs font-semibold text-[var(--color-primary)] hover:bg-white/95 dark:hover:bg-zinc-850 hover:-translate-x-0.5 transition-all inline-flex items-center gap-1.5 shadow-lg active:scale-95 cursor-pointer"
+			>
+				<ArrowLeft className="w-3.5 h-3.5" /> 返回空间地图
+			</Link>
 
-			<RandomLayout pictures={pictures} isEditMode={isEditMode} onDeleteSingle={handleDeleteSingleImage} onDeleteGroup={handleDeleteGroup} />
+			{/* View Toggle Bar */}
+			<div className="w-full flex justify-center pt-24 pb-2 z-30 relative">
+				<div className="flex items-center gap-1 bg-white/75 dark:bg-zinc-900/80 backdrop-blur-xl rounded-full border border-white/20 dark:border-zinc-800/80 p-1 shadow-lg select-none">
+					<button
+						onClick={() => setViewMode('albums')}
+						className={`px-5 py-2 rounded-full text-xs font-bold transition-all cursor-pointer border-0 flex items-center justify-center gap-1.5 ${
+							viewMode === 'albums'
+								? 'bg-[var(--color-primary)] text-[var(--color-bg)] shadow-md font-extrabold'
+								: 'text-[var(--color-secondary)] hover:text-[var(--color-primary)] bg-transparent'
+						}`}
+					>
+						🗂️ 城市相册
+					</button>
+					<button
+						onClick={() => setViewMode('timeline')}
+						className={`px-5 py-2 rounded-full text-xs font-bold transition-all cursor-pointer border-0 flex items-center justify-center gap-1.5 ${
+							viewMode === 'timeline'
+								? 'bg-[var(--color-primary)] text-[var(--color-bg)] shadow-md font-extrabold'
+								: 'text-[var(--color-secondary)] hover:text-[var(--color-primary)] bg-transparent'
+						}`}
+					>
+						📅 时间足迹
+					</button>
+					<button
+						onClick={() => setViewMode('dome')}
+						className={`px-5 py-2 rounded-full text-xs font-bold transition-all cursor-pointer border-0 flex items-center justify-center gap-1.5 ${
+							viewMode === 'dome'
+								? 'bg-[var(--color-primary)] text-[var(--color-bg)] shadow-md font-extrabold'
+								: 'text-[var(--color-secondary)] hover:text-[var(--color-primary)] bg-transparent'
+						}`}
+					>
+						🔮 3D 穹顶
+					</button>
+				</div>
+			</div>
 
-			{pictures.length === 0 && (
-				<div className='text-secondary flex min-h-screen items-center justify-center text-center text-sm'>
-					还没有上传图片，点击右上角「编辑」后即可开始上传。
+			{/* Conditionally Render View */}
+			{viewMode === 'albums' ? (
+				<LocationAlbumGrid isEditMode={isEditMode} />
+			) : viewMode === 'timeline' ? (
+				<PicturesTimeline />
+			) : (
+				<div className="w-full h-[70vh] md:h-[80vh] px-6 max-w-7xl mx-auto relative z-10 select-none pb-12">
+					<div className="w-full h-full rounded-[40px] overflow-hidden border border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-950/20 backdrop-blur-sm shadow-inner relative">
+						<DomeGallery
+							images={domeImages}
+							grayscale={false}
+							overlayBlurColor={resolvedTheme === 'dark' ? '#09090b' : '#fafafa'}
+							openedImageWidth="380px"
+							openedImageHeight="500px"
+						/>
+					</div>
 				</div>
 			)}
 
-			<motion.div initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} className='absolute right-6 flex gap-3 max-sm:hidden z-40' style={{ top: '6rem' }}>
+			{/* Edit & Upload Toolbar */}
+			<motion.div 
+				initial={{ opacity: 0, scale: 0.9 }} 
+				animate={{ opacity: 1, scale: 1 }} 
+				className="fixed bottom-8 right-8 flex gap-3 z-40"
+			>
 				{isEditMode ? (
-					<>
-						<motion.button
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
-							onClick={() => router.push('/image-toolbox')}
-							className='rounded-xl border bg-blue-50 px-4 py-2 text-sm text-blue-700'>
-							压缩工具
-						</motion.button>
-						<motion.button
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
-							onClick={handleCancel}
-							disabled={isSaving}
-							className='rounded-xl border bg-white/60 px-6 py-2 text-sm'>
-							取消
-						</motion.button>
-						<motion.button
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
+					<div className="flex items-center gap-2 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md p-2 rounded-2xl border border-slate-200 dark:border-zinc-800 shadow-xl">
+						<button
 							onClick={() => setIsUploadDialogOpen(true)}
-							className='rounded-xl border bg-white/60 px-6 py-2 text-sm'>
-							上传
-						</motion.button>
-						<motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleSaveClick} disabled={isSaving} className='brand-btn px-6'>
-							{isSaving ? '保存中...' : buttonText}
-						</motion.button>
-					</>
+							className="brand-btn px-5 py-2 text-xs rounded-xl"
+						>
+							上传点位照片
+						</button>
+						<button
+							onClick={() => setIsEditMode(false)}
+							className="px-4 py-2 text-xs rounded-xl border border-slate-200 dark:border-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
+						>
+							完成
+						</button>
+					</div>
 				) : (
-					!hideEditButton && (
-						<motion.button
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
+					isAuth && !hideEditButton && viewMode === 'albums' && (
+						<button
 							onClick={() => setIsEditMode(true)}
-							className='rounded-xl border bg-white/60 px-6 py-2 text-sm backdrop-blur-sm transition-colors hover:bg-white/80'>
-							编辑
-						</motion.button>
+							className="px-5 py-2.5 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md text-xs font-medium border border-slate-200/80 dark:border-zinc-800 rounded-full shadow-lg hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors flex items-center gap-2"
+						>
+							<span>⚙️ 管理相册</span>
+						</button>
 					)
 				)}
 			</motion.div>
 
 			{isUploadDialogOpen && <UploadDialog onClose={() => setIsUploadDialogOpen(false)} onSubmit={handleUploadSubmit} />}
-		</>
+		</div>
 	)
 }

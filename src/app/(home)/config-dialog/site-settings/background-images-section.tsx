@@ -118,7 +118,7 @@ export function BackgroundImagesSection({ formData, setFormData, backgroundImage
 					<button
 						type='button'
 						onClick={handleClearBackgroundImage}
-						className='text-secondary rounded-lg border bg-white/60 px-3 py-1 text-xs font-medium hover:bg-white/80'>
+						className='text-secondary rounded-lg border bg-white/60 dark:bg-[#27272a]/60 px-3 py-1 text-xs font-medium hover:bg-white dark:bg-[#27272a]/80'>
 						取消设置
 					</button>
 				)}
@@ -149,7 +149,7 @@ export function BackgroundImagesSection({ formData, setFormData, backgroundImage
 								<button
 									type='button'
 									onClick={() => handleRemoveBackgroundImage(item.id)}
-									className='text-secondary absolute top-1 right-1 hidden rounded-full bg-white/90 px-1.5 py-0.5 text-[10px] shadow group-hover:block'>
+									className='text-secondary absolute top-1 right-1 hidden rounded-full bg-white dark:bg-[#27272a]/90 px-1.5 py-0.5 text-[10px] shadow group-hover:block'>
 									删除
 								</button>
 							</div>
@@ -159,7 +159,7 @@ export function BackgroundImagesSection({ formData, setFormData, backgroundImage
 					<button
 						type='button'
 						onClick={() => backgroundInputRef.current?.click()}
-						className='hover:border-brand/60 flex h-24 w-full items-center justify-center rounded-xl border border-dashed bg-white/40 text-2xl text-gray-400 hover:bg-white/80'>
+						className='hover:border-brand/60 flex h-24 w-full items-center justify-center rounded-xl border border-dashed bg-white/40 text-2xl text-gray-400 hover:bg-white dark:bg-[#27272a]/80'>
 						+
 					</button>
 				</div>

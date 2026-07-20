@@ -91,7 +91,7 @@ export default function ImageUploadDialog({ currentImage, onClose, onSubmit }: I
 						<div className='w-full border-t border-gray-300'></div>
 					</div>
 					<div className='relative flex justify-center text-sm'>
-						<span className='text-secondary rounded-lg bg-white px-4 py-1'>或</span>
+						<span className='text-secondary rounded-lg bg-white dark:bg-[#27272a] px-4 py-1'>或</span>
 					</div>
 				</div>
 
@@ -119,7 +119,7 @@ export default function ImageUploadDialog({ currentImage, onClose, onSubmit }: I
 					<button
 						type='button'
 						onClick={handleClose}
-						className='flex-1 rounded-lg border border-gray-300 bg-white px-6 py-2.5 transition-colors hover:bg-gray-50'>
+						className='flex-1 rounded-lg border border-gray-300 bg-white dark:bg-[#27272a] px-6 py-2.5 transition-colors hover:bg-gray-50'>
 						取消
 					</button>
 				</div>

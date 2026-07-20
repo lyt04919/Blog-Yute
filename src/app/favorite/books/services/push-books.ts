@@ -64,7 +64,7 @@ export async function pushBooks(params: PushBooksParams): Promise<void> {
 	const booksJson = JSON.stringify(updatedBooks, null, '\t')
 	const booksBlob = await createBlob(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, toBase64Utf8(booksJson), 'base64')
 	treeItems.push({
-		path: 'src/app/favorite/books.json',
+		path: 'src/data/books.json',
 		mode: '100644',
 		type: 'blob',
 		sha: booksBlob.sha

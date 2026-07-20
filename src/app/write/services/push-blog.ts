@@ -18,6 +18,8 @@ export type PushBlogParams = {
 		summary?: string
 		hidden?: boolean
 		category?: string
+		projectUrl?: string
+		projectName?: string
 	}
 	cover?: ImageItem | null
 	images?: ImageItem[]
@@ -128,7 +130,9 @@ export async function pushBlog(params: PushBlogParams): Promise<void> {
 		cover: coverPath,
 		hidden: form.hidden,
 		category: form.category,
-		status: 'published'
+		status: 'published',
+		projectUrl: form.projectUrl,
+		projectName: form.projectName
 	}
 
 	const configBlob = await createBlob(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, toBase64Utf8(JSON.stringify(config, null, 2)), 'base64')
@@ -153,7 +157,9 @@ export async function pushBlog(params: PushBlogParams): Promise<void> {
 			cover: coverPath,
 			hidden: form.hidden,
 			category: form.category,
-			status: 'published'
+			status: 'published',
+			projectUrl: form.projectUrl,
+			projectName: form.projectName
 		},
 		GITHUB_CONFIG.BRANCH
 	)

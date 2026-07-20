@@ -1,0 +1,13 @@
+{
+  "title": "打破边界：如何优雅地在 Notion 中直接打开 Obsidian 笔记",
+  "tags": [
+    "AI 与工具",
+    "前端开发",
+    "效率折腾"
+  ],
+  "date": "2026-07-13T22:36",
+  "summary": "解决 Notion 无法识别 obsidian:// 协议的痛点，用 100 行以内的纯静态代码实现无缝双向链接，附带一键生成快捷指令方案。",
+  "cover": "/blogs/draft-1783953517184/9c7895a4b6205b13.png",
+  "hidden": false,
+  "category": "开源"
+}

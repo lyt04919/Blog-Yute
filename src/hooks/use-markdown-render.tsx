@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useState, type ReactElement, Fragment } from 'react'
 import parse, { type HTMLReactParserOptions, Element, type DOMNode } from 'html-react-parser'
 import { renderMarkdown, type TocItem } from '@/lib/markdown-renderer'
@@ -28,16 +30,17 @@ export function useMarkdownRender(markdown: string): MarkdownRenderResult {
 					let processedHtml = html.replace(/<pre\s+data-code="([^"]*)"([^>]*)>([\s\S]*?)<\/pre>/g, (match, codeAttr, attrs, content) => {
 						const placeholder = `__CODE_BLOCK_${codeBlocks.length}__`
 						// Decode HTML entities in code attribute
-						const code = codeAttr
-							.replace(/&quot;/g, '"')
-							.replace(/&#39;/g, "'")
-							.replace(/&lt;/g, '<')
-							.replace(/&gt;/g, '>')
-							.replace(/&amp;/g, '&')
+					// IMPORTANT: &amp; must be decoded FIRST to allow other entities to be decoded
+					const code = codeAttr
+						.replace(/&amp;/g, '&')
+						.replace(/&quot;/g, '"')
+						.replace(/&#39;/g, "'")
+						.replace(/&lt;/g, '<')
+						.replace(/&gt;/g, '>')
 						codeBlocks.push({
 							placeholder,
 							code,
-							preHtml: `${content}`
+							preHtml: match
 						})
 						return placeholder
 					})

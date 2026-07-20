@@ -28,7 +28,6 @@ export default function ConfigDialog({ open, onClose }: ConfigDialogProps) {
 	const [originalCardStyles, setOriginalCardStyles] = useState<CardStyles>(cardStyles)
 	const [isSaving, setIsSaving] = useState(false)
 	const [activeTab, setActiveTab] = useState<TabType>('site')
-	const keyInputRef = useRef<HTMLInputElement>(null)
 	const [faviconItem, setFaviconItem] = useState<FileItem | null>(null)
 	const [avatarItem, setAvatarItem] = useState<FileItem | null>(null)
 	const [artImageUploads, setArtImageUploads] = useState<ArtImageUploads>({})
@@ -79,21 +78,9 @@ export default function ConfigDialog({ open, onClose }: ConfigDialogProps) {
 		}
 	}, [faviconItem, avatarItem, artImageUploads, backgroundImageUploads, socialButtonImageUploads])
 
-	const handleChoosePrivateKey = async (file: File) => {
-		try {
-			const text = await file.text()
-			setPrivateKey(text)
-			await handleSave()
-		} catch (error) {
-			console.error('Failed to read private key:', error)
-			toast.error('读取密钥文件失败')
-		}
-	}
-
 	const handleSaveClick = () => {
-		const isLocalDev = process.env.NODE_ENV === 'development'
-		if (!isAuth && !isLocalDev) {
-			keyInputRef.current?.click()
+		if (!isAuth) {
+			toast.error('未授权，请先使用右上角切换到作者模式')
 		} else {
 			handleSave()
 		}
@@ -185,20 +172,7 @@ export default function ConfigDialog({ open, onClose }: ConfigDialogProps) {
 	}
 
 	const updateThemeVariables = (theme?: SiteContent['theme']) => {
-		if (typeof document === 'undefined' || !theme) return
-
-		const { colorBrand, colorBrandSecondary, colorPrimary, colorSecondary, colorBg, colorBorder, colorCard, colorArticle } = theme
-
-		const root = document.documentElement
-
-		if (colorBrand) root.style.setProperty('--color-brand', colorBrand)
-		if (colorBrandSecondary) root.style.setProperty('--color-brand-secondary', colorBrandSecondary)
-		if (colorPrimary) root.style.setProperty('--color-primary', colorPrimary)
-		if (colorSecondary) root.style.setProperty('--color-secondary', colorSecondary)
-		if (colorBg) root.style.setProperty('--color-bg', colorBg)
-		if (colorBorder) root.style.setProperty('--color-border', colorBorder)
-		if (colorCard) root.style.setProperty('--color-card', colorCard)
-		if (colorArticle) root.style.setProperty('--color-article', colorArticle)
+		// Removed to enforce Cyber-Security Noir dark mode
 	}
 
 	const handlePreview = () => {
@@ -220,7 +194,7 @@ export default function ConfigDialog({ open, onClose }: ConfigDialogProps) {
 		onClose()
 	}
 
-	const buttonText = (isAuth || process.env.NODE_ENV === 'development') ? '保存' : '导入密钥'
+	const buttonText = '保存'
 
 	const tabs: { id: TabType; label: string }[] = [
 		{ id: 'site', label: '网站设置' },
@@ -230,18 +204,6 @@ export default function ConfigDialog({ open, onClose }: ConfigDialogProps) {
 
 	return (
 		<>
-			<input
-				ref={keyInputRef}
-				type='file'
-				accept='.pem'
-				className='hidden'
-				onChange={async e => {
-					const f = e.target.files?.[0]
-					if (f) await handleChoosePrivateKey(f)
-					if (e.currentTarget) e.currentTarget.value = ''
-				}}
-			/>
-
 			<DialogModal open={open} onClose={handleCancel} className='card scrollbar-none max-h-[90vh] min-h-[600px] w-[640px] overflow-y-auto'>
 				<div className='mb-6 flex items-center justify-between'>
 					<div className='flex gap-1'>
@@ -259,21 +221,21 @@ export default function ConfigDialog({ open, onClose }: ConfigDialogProps) {
 					</div>
 					<div className='flex gap-3'>
 						<motion.button
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
-							onClick={handlePreview}
-							className='bg-card rounded-xl border px-6 py-2 text-sm'>
-							预览
-						</motion.button>
-						<motion.button
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
-							onClick={handleCancel}
-							disabled={isSaving}
-							className='bg-card rounded-xl border px-6 py-2 text-sm'>
-							取消
-						</motion.button>
-						<motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleSaveClick} disabled={isSaving} className='brand-btn px-6'>
+						whileHover={{ scale: 1 }}
+						whileTap={{ scale: 0.95 }}
+						onClick={handlePreview}
+						className='bg-card rounded-xl border px-6 py-2 text-sm'>
+						预览
+					</motion.button>
+					<motion.button
+						whileHover={{ scale: 1 }}
+						whileTap={{ scale: 0.95 }}
+						onClick={handleCancel}
+						disabled={isSaving}
+						className='bg-card rounded-xl border px-6 py-2 text-sm'>
+						取消
+					</motion.button>
+					<motion.button whileHover={{ scale: 1 }} whileTap={{ scale: 0.95 }} onClick={handleSaveClick} disabled={isSaving} className='brand-btn px-6'>
 							{isSaving ? '保存中...' : buttonText}
 						</motion.button>
 					</div>

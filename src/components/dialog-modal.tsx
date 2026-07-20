@@ -10,13 +10,14 @@ interface DialogModalProps {
 	onClose: () => void
 	children: ReactNode
 	className?: string
+	style?: React.CSSProperties
 	overlayClassName?: string
 	disableCloseOnOverlay?: boolean
 	lockScroll?: boolean
 	closeOnEsc?: boolean
 }
 
-export function DialogModal({ open, onClose, children, className, disableCloseOnOverlay = false, lockScroll = true, closeOnEsc = true }: DialogModalProps) {
+export function DialogModal({ open, onClose, children, className, style, disableCloseOnOverlay = false, lockScroll = true, closeOnEsc = true }: DialogModalProps) {
 	const [mounted, setMounted] = useState(false)
 
 	useEffect(() => {
@@ -61,6 +62,7 @@ export function DialogModal({ open, onClose, children, className, disableCloseOn
 						animate={{ opacity: 1, scale: 1, y: 0 }}
 						exit={{ opacity: 0, scale: 0.8, y: 20 }}
 						className={cn('static', className)}
+						style={style}
 						onClick={e => e.stopPropagation()}>
 						{children}
 					</motion.div>

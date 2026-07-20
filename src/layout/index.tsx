@@ -1,20 +1,29 @@
 'use client'
 import { PropsWithChildren } from 'react'
 import { useCenterInit } from '@/hooks/use-center'
-import BlurredBubblesBackground from './backgrounds/blurred-bubbles'
 import TopNav from '@/components/top-nav'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { Toaster } from 'sonner'
 import { CircleCheckIcon, InfoIcon, Loader2Icon, OctagonXIcon, TriangleAlertIcon } from 'lucide-react'
 import { useSize, useSizeInit } from '@/hooks/use-size'
 import { useConfigStore } from '@/app/(home)/stores/config-store'
 import { ScrollTopButton } from '@/components/scroll-top-button'
 import MusicCard from '@/components/music-card'
+import ModeToggle from '@/components/mode-toggle'
+import { ThemeProvider } from '@/hooks/use-theme'
+import Footer from './footer'
+import dynamic from 'next/dynamic'
+import { useAuthStore } from '@/hooks/use-auth'
+
+const ConfigDialog = dynamic(() => import('@/app/(home)/config-dialog'), { ssr: false })
+const HomeDisplayModal = dynamic(() => import('@/app/(home)/components/home-display-modal').then(mod => mod.HomeDisplayModal), { ssr: false })
 
 export default function Layout({ children }: PropsWithChildren) {
 	useCenterInit()
 	useSizeInit()
-	const { cardStyles, siteContent, regenerateKey } = useConfigStore()
+	const { cardStyles, siteContent, configDialogOpen, setConfigDialogOpen } = useConfigStore()
+	const { isAuth } = useAuthStore()
 	const { maxSM, init } = useSize()
 
 	const backgroundImages = (siteContent.backgroundImages ?? []) as Array<{ id: string; url: string }>
@@ -37,8 +46,13 @@ export default function Layout({ children }: PropsWithChildren) {
 		}
 	}, [])
 
+	const pathname = usePathname()
+	const isHome = pathname === '/'
+	const isFullMap = pathname === '/space'
+	const isWrite = pathname?.startsWith('/write')
+
 	return (
-		<>
+		<ThemeProvider>
 			<Toaster
 				position='bottom-right'
 				richColors
@@ -55,7 +69,7 @@ export default function Layout({ children }: PropsWithChildren) {
 					} as React.CSSProperties
 				}
 			/>
-			{currentBackgroundImage && (
+			{!isHome && !isFullMap && currentBackgroundImage && (
 				<div
 					className='fixed inset-0 z-0 overflow-hidden'
 					style={{
@@ -66,23 +80,27 @@ export default function Layout({ children }: PropsWithChildren) {
 					}}
 				/>
 			)}
-			<BlurredBubblesBackground 
-				colors={siteContent.backgroundColors} 
-				regenerateKey={regenerateKey} 
-				count={8} 
-				bottomBandStart={0} 
-				targetFps={24} 
-				speed={0.15} 
-			/>
 
-			<main className='relative z-10 min-h-full pt-8 pb-24'>
+			<main className={
+				isFullMap 
+					? 'relative z-10 w-full h-screen overflow-hidden' 
+					: isHome 
+						? 'relative z-10 w-full min-h-screen' 
+						: 'relative z-10 min-h-full pt-8 pb-40'
+			}>
 				{children}
-				<TopNav />
-
-				{!maxSM && cardStyles.musicCard?.enabled !== false && <MusicCard />}
 			</main>
 
-			{maxSM && init && <ScrollTopButton className='bg-brand/20 fixed right-6 bottom-24 z-50 shadow-md' />}
-		</>
+			<ModeToggle />
+			{isAuth && configDialogOpen && (
+				<ConfigDialog open={configDialogOpen} onClose={() => setConfigDialogOpen(false)} />
+			)}
+			{isAuth && <HomeDisplayModal />}
+			{!isFullMap && !isWrite && <TopNav />}
+			{!isHome && !isFullMap && !isWrite && !maxSM && cardStyles.musicCard?.enabled !== false && <MusicCard />}
+
+			{!isHome && !isFullMap && !isWrite && init && <ScrollTopButton className='bg-brand/20 fixed right-6 bottom-28 z-50 shadow-md' />}
+			{!isHome && !isFullMap && <Footer />}
+		</ThemeProvider>
 	)
 }

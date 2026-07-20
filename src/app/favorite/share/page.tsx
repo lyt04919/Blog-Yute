@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { motion } from 'motion/react'
 import { toast } from 'sonner'
 import GridView from './grid-view'
 import CreateDialog from './components/create-dialog'
@@ -11,8 +10,7 @@ import { useConfigStore } from '@/app/(home)/stores/config-store'
 import initialList from './list.json'
 import type { Share } from './components/share-card'
 import type { LogoItem } from './components/logo-upload-dialog'
-import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { StandardPageHeader } from '@/components/ui/standard-page-header'
 
 export default function Page() {
 	const [shares, setShares] = useState<Share[]>(initialList as Share[])
@@ -37,7 +35,8 @@ export default function Page() {
 			}
 		}
 
-		setShares(prev => prev.map(s => (s.url === oldShare.url ? updatedShare : s)))
+		const updated = shares.map(s => (s.url === oldShare.url ? updatedShare : s))
+		setShares(updated)
 		if (logoItem) {
 			setLogoItems(prev => {
 				const newMap = new Map(prev)
@@ -45,6 +44,7 @@ export default function Page() {
 				return newMap
 			})
 		}
+		autoSave(updated)
 	}
 
 	const handleAdd = () => {
@@ -53,17 +53,21 @@ export default function Page() {
 	}
 
 	const handleSaveShare = (updatedShare: Share) => {
+		let updated: Share[] = []
 		if (editingShare) {
-			const updated = shares.map(s => (s.url === editingShare.url ? updatedShare : s))
-			setShares(updated)
+			updated = shares.map(s => (s.url === editingShare.url ? updatedShare : s))
 		} else {
-			setShares([...shares, updatedShare])
+			updated = [...shares, updatedShare]
 		}
+		setShares(updated)
+		autoSave(updated)
 	}
 
 	const handleDelete = (share: Share) => {
 		if (confirm(`确定要删除 ${share.name} 吗？`)) {
-			setShares(shares.filter(s => s.url !== share.url))
+			const updated = shares.filter(s => s.url !== share.url)
+			setShares(updated)
+			autoSave(updated)
 		}
 	}
 
@@ -71,7 +75,6 @@ export default function Page() {
 		try {
 			const text = await file.text()
 			setPrivateKey(text)
-			// 选择文件后自动保存云端
 			await handlePublishCloud()
 		} catch (error) {
 			console.error('Failed to read private key:', error)
@@ -79,21 +82,19 @@ export default function Page() {
 		}
 	}
 
-	const handleSaveLocal = async () => {
+	const autoSave = async (updatedShares: Share[]) => {
 		setIsSaving(true)
-
 		try {
-			const res = await fetch('/api/save-data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ target: 'share', data: shares }) })
+			const res = await fetch('/api/save-data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ target: 'share', data: updatedShares }) })
 			const data = await res.json()
 			if (!data.success) throw new Error(data.error)
 
-			setOriginalShares(shares)
+			setOriginalShares(updatedShares)
 			setLogoItems(new Map())
-			setIsEditMode(false)
-			toast.success('本地保存成功！')
+			toast.success('已自动保存！')
 		} catch (error: any) {
-			console.error('Failed to save:', error)
-			toast.error(`保存失败: ${error?.message || '未知错误'}`)
+			console.error('Failed to auto-save:', error)
+			toast.error(`自动保存失败: ${error?.message || '未知错误'}`)
 		} finally {
 			setIsSaving(false)
 		}
@@ -109,36 +110,23 @@ export default function Page() {
 
 	const handlePublishCloud = async () => {
 		setIsSaving(true)
-
 		try {
-			await pushShares({
-				shares,
-				logoItems
-			})
-
+			await pushShares({ shares, logoItems })
 			setOriginalShares(shares)
 			setLogoItems(new Map())
 			setIsEditMode(false)
-			toast.success('云端发布成功！')
+			toast.success('上传同步云端成功！')
 		} catch (error: any) {
-			console.error('Failed to save:', error)
-			toast.error(`保存失败: ${error?.message || '未知错误'}`)
+			console.error('Failed to publish cloud:', error)
+			toast.error(`上传同步云端失败: ${error?.message || '未知错误'}`)
 		} finally {
 			setIsSaving(false)
 		}
 	}
 
-	const handleCancel = () => {
-		setShares(originalShares)
-		setLogoItems(new Map())
-		setIsEditMode(false)
-	}
-
-	const buttonText = isAuth ? '发布云端' : '导入密钥'
-
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
-			if (!isEditMode && (e.ctrlKey || e.metaKey) && e.key === ',') {
+			if (isAuth && !isEditMode && (e.ctrlKey || e.metaKey) && e.key === 'e' && e.shiftKey) {
 				e.preventDefault()
 				setIsEditMode(true)
 			}
@@ -148,16 +136,40 @@ export default function Page() {
 		return () => {
 			window.removeEventListener('keydown', handleKeyDown)
 		}
-	}, [isEditMode])
+	}, [isEditMode, isAuth])
 
-	const sortedShares = [...shares].sort((a, b) => {
+	const sortedShares = [...shares].reverse().sort((a, b) => {
 		if (a.isPinned && !b.isPinned) return -1
 		if (!a.isPinned && b.isPinned) return 1
 		return 0
 	})
 
+	const headerActions = (
+		<div className="flex items-center gap-2">
+			{isEditMode ? (
+				<>
+					<button onClick={() => setIsEditMode(false)} className='px-4 py-2 text-xs font-medium rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors'>
+						退出编辑
+					</button>
+					<button onClick={handleAdd} className='px-4 py-2 text-xs font-medium rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors'>
+						+ 添加
+					</button>
+					<button onClick={handlePublishCloudClick} disabled={isSaving} className='px-4 py-2 text-xs font-medium rounded-xl bg-blue-600 hover:bg-blue-500 text-white transition-colors shadow-sm'>
+						{isSaving ? '发布中...' : isAuth ? '发布云端' : '导入密钥'}
+					</button>
+				</>
+			) : (
+				!hideEditButton && isAuth && (
+					<button onClick={() => setIsEditMode(true)} className='px-4 py-2 text-xs font-medium rounded-xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors'>
+						编辑模式
+					</button>
+				)
+			)}
+		</div>
+	)
+
 	return (
-		<>
+		<div className="min-h-screen relative pb-20 bg-[var(--color-bg)] text-[var(--color-primary)]">
 			<input
 				ref={keyInputRef}
 				type='file'
@@ -170,53 +182,18 @@ export default function Page() {
 				}}
 			/>
 
-			<div className='mx-auto w-full max-w-7xl px-6 pt-32'>
-				<Link href='/favorite' className='inline-flex items-center gap-2 text-neutral-500 hover:text-neutral-900 transition-colors text-sm font-medium'>
-					<ArrowLeft className='w-4 h-4' /> Back to Favorites
-				</Link>
-			</div>
+			<StandardPageHeader
+				backHref='/favorite'
+				backLabel='FAVORITES'
+				title='Bookmarks'
+				badge={`${shares.length} ITEMS`}
+				subtitle='A curated collection of useful websites, resources, and inspiration.'
+				actions={headerActions}
+			/>
 
 			<GridView shares={sortedShares} isEditMode={isEditMode} onUpdate={handleUpdate} onDelete={handleDelete} />
 
-			<motion.div initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} className='absolute right-6 flex gap-3 max-sm:hidden z-40' style={{ top: '6rem' }}>
-				{isEditMode ? (
-					<>
-						<motion.button
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
-							onClick={handleCancel}
-							disabled={isSaving}
-							className='rounded-xl border bg-white/60 px-6 py-2 text-sm'>
-							取消
-						</motion.button>
-						<motion.button
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
-							onClick={handleAdd}
-							className='rounded-xl border bg-white/60 px-6 py-2 text-sm'>
-							添加
-						</motion.button>
-						<motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleSaveLocal} disabled={isSaving} className='rounded-xl border bg-white/60 px-6 py-2 text-sm'>
-							保存本地
-						</motion.button>
-						<motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handlePublishCloudClick} disabled={isSaving} className='brand-btn px-6'>
-							{isSaving ? '发布中...' : buttonText}
-						</motion.button>
-					</>
-				) : (
-					!hideEditButton && (
-						<motion.button
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
-							onClick={() => setIsEditMode(true)}
-							className='bg-card rounded-xl border px-6 py-2 text-sm backdrop-blur-sm transition-colors hover:bg-white/80'>
-							编辑
-						</motion.button>
-					)
-				)}
-			</motion.div>
-
 			{isCreateDialogOpen && <CreateDialog share={editingShare} onClose={() => setIsCreateDialogOpen(false)} onSave={handleSaveShare} />}
-		</>
+		</div>
 	)
 }

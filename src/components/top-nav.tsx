@@ -7,8 +7,11 @@ import { motion, AnimatePresence } from 'motion/react'
 import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
 import { useConfigStore } from '@/app/(home)/stores/config-store'
+import { useAuthStore } from '@/hooks/use-auth'
+import { useTheme } from '@/hooks/use-theme'
 import { toast } from 'sonner'
 import { Dock, DockIcon } from '@/components/magicui/dock'
+import { Sun, Moon, ChevronDown, ChevronUp, Globe } from 'lucide-react'
 
 // Nav Icons
 import ScrollOutlineSVG from '@/svgs/scroll-outline.svg'
@@ -38,9 +41,9 @@ import QqSVG from '@/svgs/qq.svg'
 const navList = [
 	{ icon: ScrollOutlineSVG, label: 'Blog', href: '/blog' },
 	{ icon: ProjectsOutlineSVG, label: 'Projects', href: '/projects' },
-	{ icon: AboutOutlineSVG, label: 'About', href: '/about' },
-	{ icon: DiaryOutlineSVG, label: 'Diary', href: '/diary' },
-	{ icon: BooksOutlineSVG, label: 'Favorite', href: '/favorite' }
+	{ icon: DiaryOutlineSVG, label: 'Diary', href: '/vault/diary' },
+	{ icon: BooksOutlineSVG, label: 'Favorite', href: '/favorite' },
+	{ icon: Globe, label: 'Footprints', href: '/space' }
 ]
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -66,10 +69,10 @@ const TooltipWrapper = ({ children, content, href, onClick, external }: { childr
 		<div className="relative group/tooltip flex items-center justify-center size-full">
 			{children}
 			<div className="absolute bottom-full mb-3 opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 pointer-events-none scale-95 group-hover/tooltip:scale-100 ease-out flex-col items-center flex z-[100]">
-				<div className="bg-neutral-800 border border-neutral-700 text-neutral-200 px-3 py-1.5 rounded-xl text-xs font-semibold shadow-xl whitespace-nowrap">
+				<div className="bg-[var(--color-card)] border border-[var(--color-border)] text-[var(--color-primary)] px-3 py-1.5 rounded-xl text-xs font-semibold shadow-xl whitespace-nowrap">
 					{content}
 				</div>
-				<div className="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-neutral-800" />
+				<div className="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-[var(--color-card)]" />
 			</div>
 		</div>
 	)
@@ -91,11 +94,24 @@ const TooltipWrapper = ({ children, content, href, onClick, external }: { childr
 export default function TopNav() {
 	const pathname = usePathname()
 	const { siteContent } = useConfigStore()
+	const { isAuth } = useAuthStore()
+	const canSeeDiary = isAuth
 	
+	const activeNavList = useMemo(() => {
+		if (canSeeDiary) return navList
+		return navList.filter(item => item.href !== '/vault/diary')
+	}, [canSeeDiary])
+
+	const { resolvedTheme, toggleTheme } = useTheme()
+
+	const [isDockVisible, setIsDockVisible] = useState(true)
+	const [isDockHovered, setIsDockHovered] = useState(false)
+	const [isBottomHovered, setIsBottomHovered] = useState(false)
+
 	const activeIndex = useMemo(() => {
-		const index = navList.findIndex(item => pathname === item.href)
+		const index = activeNavList.findIndex(item => pathname === item.href)
 		return index >= 0 ? index : -1
-	}, [pathname])
+	}, [pathname, activeNavList])
 
 	const sortedSocialButtons = useMemo(() => {
 		const buttons = (siteContent.socialButtons || []) as any[]
@@ -129,113 +145,183 @@ export default function TopNav() {
 	}, [openDropdowns])
 
 	return (
-		<div className="pointer-events-none fixed inset-x-0 bottom-8 z-50 w-full">
-			<Dock style={{ height: 56 }} iconMagnification={64} iconDistance={140} className="pointer-events-auto relative mx-auto flex p-2 w-fit gap-2 bg-white/90 dark:bg-neutral-900/90 border border-neutral-200 dark:border-neutral-800 backdrop-blur-3xl shadow-[0_0_10px_3px] shadow-black/5 rounded-full">
-				
-				{/* Home */}
-				<DockIcon className="rounded-3xl cursor-pointer bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 shadow-sm">
-					<TooltipWrapper content="Home" href="/">
-						<img src='/images/avatar.png' alt='avatar' className='size-full object-cover rounded-3xl grayscale hover:grayscale-0 transition-transform p-0.5' />
-					</TooltipWrapper>
-				</DockIcon>
+		<>
+			{/* Dock */}
+			<AnimatePresence>
+				{isDockVisible && (
+					<motion.div
+						initial={{ y: 100, opacity: 0 }}
+						animate={{ y: 0, opacity: 1 }}
+						exit={{ y: 100, opacity: 0 }}
+						transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+						className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50"
+						onMouseEnter={() => setIsDockHovered(true)}
+						onMouseLeave={() => setIsDockHovered(false)}
+					>
+						<Dock style={{ height: 56 }} iconMagnification={64} iconDistance={140} className="relative flex p-2 w-fit gap-2 bg-white dark:bg-[var(--color-card)]/90 border border-[#e4e4e7] dark:border-[var(--color-border)] backdrop-blur-3xl shadow-[0_0_10px_3px] shadow-black/5 rounded-full">
 
-				{/* Nav Links */}
-				{navList.map((item, index) => {
-					const isActive = activeIndex === index
-					return (
-						<DockIcon key={item.href} className={cn(
-							"rounded-3xl cursor-pointer bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 shadow-sm",
-							isActive ? "text-brand" : "text-neutral-600 dark:text-neutral-300 hover:text-black dark:hover:text-white transition-colors"
-						)}>
-							<TooltipWrapper content={item.label} href={item.href}>
-								<item.icon className="size-full p-0.5" />
+							{/* Home */}
+							<DockIcon className="rounded-3xl cursor-pointer bg-white dark:bg-[var(--color-card)] border border-[#e4e4e7] dark:border-[var(--color-border)] shadow-sm">
+							<TooltipWrapper content="Home" href="/">
+								<img src='/images/avatar.png' alt='avatar' className='size-full object-cover rounded-3xl grayscale hover:grayscale-0 transition-transform p-0.5' />
 							</TooltipWrapper>
-						</DockIcon>
-					)
-				})}
+							</DockIcon>
 
-				<div className="h-8 w-[1px] bg-neutral-200 dark:bg-neutral-800 mx-1 shrink-0" />
-
-				{/* Social Links */}
-				{sortedSocialButtons.map((button) => {
-					const Icon = iconMap[button.type]
-					if (!Icon) return null
-
-					const commonDockIconProps = {
-						className: "rounded-3xl cursor-pointer bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 shadow-sm text-neutral-600 dark:text-neutral-300 hover:text-black dark:hover:text-white transition-colors"
-					}
-					
-					const label = button.type.charAt(0).toUpperCase() + button.type.slice(1);
-
-					if (button.type === 'email' || button.type === 'wechat' || button.type === 'qq') {
-						const isImagePath = button.value.startsWith('/images/social-buttons/')
-						if (isImagePath && (button.type === 'wechat' || button.type === 'qq')) {
-							const isOpen = openDropdowns[button.id] || false
+						{/* Nav Links */}
+						{activeNavList.map((item, index) => {
+							const isActive = activeIndex === index
 							return (
-								<DockIcon key={button.id} {...commonDockIconProps}>
-									<button ref={el => { buttonRefs.current[button.id] = el }} className="size-full">
-										<TooltipWrapper content={label} onClick={() => setOpenDropdowns(prev => ({ ...prev, [button.id]: !prev[button.id] }))}>
+								<DockIcon key={item.href} className={cn(
+									"rounded-3xl cursor-pointer bg-white dark:bg-[var(--color-card)] border border-[#e4e4e7] dark:border-[var(--color-border)] shadow-sm relative",
+									isActive ? "text-[var(--color-accent)]" : "text-[#52525b] dark:text-[var(--color-secondary)] hover:text-[var(--color-primary)] transition-colors"
+									)}>
+										{isActive && (
+											<span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[var(--color-accent)]" />
+										)}
+										<TooltipWrapper content={item.label} href={item.href}>
+											<item.icon className="size-full p-0.5" />
+										</TooltipWrapper>
+									</DockIcon>
+								)
+								})}
+
+							<div className="h-8 w-[1px] bg-[#e4e4e7] dark:bg-[#27272a] mx-1 shrink-0" />
+
+							{/* Social Links */}
+							{sortedSocialButtons.map((button) => {
+								const Icon = iconMap[button.type]
+								if (!Icon) return null
+
+								const commonDockIconProps = {
+								className: "rounded-3xl cursor-pointer bg-white dark:bg-[var(--color-card)] border border-[#e4e4e7] dark:border-[var(--color-border)] shadow-sm text-[#52525b] dark:text-[var(--color-secondary)] hover:text-black dark:hover:text-[var(--color-primary)] transition-colors"
+							}
+
+								const label = button.type.charAt(0).toUpperCase() + button.type.slice(1);
+
+								if (button.type === 'email' || button.type === 'wechat' || button.type === 'qq') {
+									const isImagePath = button.value.startsWith('/images/social-buttons/')
+									if (isImagePath && (button.type === 'wechat' || button.type === 'qq')) {
+										const isOpen = openDropdowns[button.id] || false
+										return (
+											<DockIcon key={button.id} {...commonDockIconProps}>
+												<button ref={el => { buttonRefs.current[button.id] = el }} className="size-full">
+													<TooltipWrapper content={label} onClick={() => setOpenDropdowns(prev => ({ ...prev, [button.id]: !prev[button.id] }))}>
+														<Icon className='size-full p-0.5' />
+													</TooltipWrapper>
+												</button>
+												{typeof window !== 'undefined' && createPortal(
+													<AnimatePresence>
+														{isOpen && (
+															<>
+																<motion.div
+																	initial={{ opacity: 0 }}
+																	animate={{ opacity: 1 }}
+																	exit={{ opacity: 0 }}
+																	onClick={() => setOpenDropdowns(prev => ({ ...prev, [button.id]: false }))}
+																	className='fixed inset-0 z-40'
+																/>
+																<motion.div
+																		ref={el => { dropdownRefs.current[button.id] = el }}
+																		initial={{ opacity: 0, y: 8, scale: 0.95 }}
+																		animate={{ opacity: 1, y: 0, scale: 1 }}
+																		exit={{ opacity: 0, y: 8, scale: 0.95 }}
+																		transition={{ duration: 0.2 }}
+																		className='bg-[var(--color-card)] fixed z-50 rounded-2xl border border-[var(--color-border)] p-4 backdrop-blur-xl shadow-2xl'
+																		style={{
+																			top: buttonRefs.current[button.id] ? `${buttonRefs.current[button.id]!.getBoundingClientRect().top - 210}px` : '0px',
+																			left: buttonRefs.current[button.id] ? `${buttonRefs.current[button.id]!.getBoundingClientRect().left - 80}px` : '0px',
+																		}}>
+																		<img src={button.value} alt='QR Code' className='w-40 h-40 object-cover rounded-lg' />
+																	</motion.div>
+															</>
+														)}
+													</AnimatePresence>,
+													document.body
+												)}
+											</DockIcon>
+										)
+									}
+
+									return (
+										<DockIcon key={button.id} {...commonDockIconProps}>
+											<TooltipWrapper
+												content={label}
+												onClick={() => {
+													navigator.clipboard.writeText(button.value).then(() => {
+														toast.success('已复制到剪贴板')
+													})
+												}}
+											>
+												<Icon className='size-full p-0.5' />
+											</TooltipWrapper>
+										</DockIcon>
+									)
+								}
+
+								return (
+									<DockIcon key={button.id} {...commonDockIconProps}>
+										<TooltipWrapper content={label} href={button.value} external>
 											<Icon className='size-full p-0.5' />
 										</TooltipWrapper>
-									</button>
-									{typeof window !== 'undefined' && createPortal(
-										<AnimatePresence>
-											{isOpen && (
-												<>
-													<motion.div
-														initial={{ opacity: 0 }}
-														animate={{ opacity: 1 }}
-														exit={{ opacity: 0 }}
-														onClick={() => setOpenDropdowns(prev => ({ ...prev, [button.id]: false }))}
-														className='fixed inset-0 z-40'
-													/>
-													<motion.div
-														ref={el => { dropdownRefs.current[button.id] = el }}
-														initial={{ opacity: 0, y: 8, scale: 0.95 }}
-														animate={{ opacity: 1, y: 0, scale: 1 }}
-														exit={{ opacity: 0, y: 8, scale: 0.95 }}
-														transition={{ duration: 0.2 }}
-														className='bg-neutral-900 fixed z-50 rounded-2xl border border-neutral-700 p-4 backdrop-blur-xl shadow-2xl'
-														style={{
-															top: buttonRefs.current[button.id] ? `${buttonRefs.current[button.id]!.getBoundingClientRect().top - 210}px` : '0px',
-															left: buttonRefs.current[button.id] ? `${buttonRefs.current[button.id]!.getBoundingClientRect().left - 80}px` : '0px',
-														}}>
-														<img src={button.value} alt='QR Code' className='w-40 h-40 object-cover rounded-lg' />
-													</motion.div>
-												</>
-											)}
-										</AnimatePresence>,
-										document.body
-									)}
-								</DockIcon>
-							)
-						}
-						
-						return (
-							<DockIcon key={button.id} {...commonDockIconProps}>
-								<TooltipWrapper 
-									content={label} 
-									onClick={() => {
-										navigator.clipboard.writeText(button.value).then(() => {
-											toast.success('已复制到剪贴板')
-										})
-									}}
-								>
-									<Icon className='size-full p-0.5' />
-								</TooltipWrapper>
-							</DockIcon>
-						)
-					}
+									</DockIcon>
+								)
+							})}
 
-					return (
-						<DockIcon key={button.id} {...commonDockIconProps}>
-							<TooltipWrapper content={label} href={button.value} external>
-								<Icon className='size-full p-0.5' />
+							<div className="h-8 w-[1px] bg-[#e4e4e7] dark:bg-[#27272a] mx-1 shrink-0" />
+
+							{/* Theme Toggle */}
+							<DockIcon className="rounded-3xl cursor-pointer bg-white dark:bg-[var(--color-card)] border border-[#e4e4e7] dark:border-[var(--color-border)] shadow-sm text-[#52525b] dark:text-[var(--color-secondary)] hover:text-black dark:hover:text-[var(--color-primary)] transition-colors">
+							<TooltipWrapper content={resolvedTheme === 'dark' ? '切换亮色' : '切换暗色'} onClick={toggleTheme}>
+								{resolvedTheme === 'dark' ? <Sun className="size-full p-1.5" /> : <Moon className="size-full p-1.5" />}
 							</TooltipWrapper>
-						</DockIcon>
-					)
-				})}
-			</Dock>
-		</div>
+							</DockIcon>
+						</Dock>
+
+						{/* 隐藏按钮 - dock下方小箭头 */}
+						<AnimatePresence>
+							{isDockHovered && (
+								<motion.button
+									initial={{ opacity: 0, y: -2 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={{ opacity: 0, y: -2 }}
+									transition={{ duration: 0.15 }}
+									onClick={() => {
+										setIsDockVisible(false)
+										setIsDockHovered(false)
+									}}
+									className="absolute -bottom-5 left-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-white/80 dark:bg-[var(--color-card)]/80 border border-[#e4e4e7]/60 dark:border-[var(--color-border)]/60 backdrop-blur-sm flex items-center justify-center text-[var(--color-secondary)] hover:text-[var(--color-border)] dark:hover:text-[var(--color-primary)] transition-colors cursor-pointer shadow-sm"
+									title="隐藏导航栏"
+								>
+									<ChevronDown className="w-3 h-3" />
+								</motion.button>
+							)}
+						</AnimatePresence>
+					</motion.div>
+				)}
+			</AnimatePresence>
+
+			{/* 底部触发区域 - 当dock隐藏时，鼠标移到底部显示小指示器 */}
+			{!isDockVisible && (
+				<div
+					className="fixed bottom-0 left-1/2 -translate-x-1/2 z-40 w-32 h-6 flex items-end justify-center"
+					onMouseEnter={() => setIsBottomHovered(true)}
+					onMouseLeave={() => setIsBottomHovered(false)}
+				>
+					<AnimatePresence>
+						{isBottomHovered && (
+							<motion.button
+								initial={{ opacity: 0, y: 5 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: 5 }}
+								transition={{ duration: 0.2 }}
+								onClick={() => setIsDockVisible(true)}
+								className="mb-1 w-8 h-1.5 rounded-full bg-[#d4d4d8]/50 dark:bg-[#52525b]/50 hover:bg-[#a1a1aa]/70 dark:hover:bg-[#71717a]/70 transition-colors cursor-pointer"
+								title="显示导航栏"
+							/>
+						)}
+					</AnimatePresence>
+				</div>
+			)}
+		</>
 	)
 }

@@ -46,3 +46,10 @@ next-env.d.ts
 
 #vscode
 .history/
+
+# temp files
+.dev.log
+.dev.pid
+output.html
+*.bak
+.trae/

@@ -1,13 +1,9 @@
 'use client'
 
-import { useState, useRef, useEffect, useMemo } from 'react'
-import Card from '@/components/card'
-import { useCenterStore } from '@/hooks/use-center'
+import { useState, useRef, useEffect } from 'react'
 import { useConfigStore } from '../app/(home)/stores/config-store'
-import { CARD_SPACING } from '@/consts'
 import MusicSVG from '@/svgs/music.svg'
 import PlaySVG from '@/svgs/play.svg'
-import { HomeDraggableLayer } from '../app/(home)/home-draggable-layer'
 import { Pause } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
@@ -16,12 +12,8 @@ const MUSIC_FILES = ['/music/close-to-you.mp3']
 
 export default function MusicCard() {
 	const pathname = usePathname()
-	const center = useCenterStore()
 	const { cardStyles, siteContent } = useConfigStore()
 	const styles = cardStyles.musicCard
-	const hiCardStyles = cardStyles.hiCard
-	const clockCardStyles = cardStyles.clockCard
-	const calendarCardStyles = cardStyles.calendarCard
 
 	const [isPlaying, setIsPlaying] = useState(false)
 	const [currentIndex, setCurrentIndex] = useState(0)
@@ -30,24 +22,6 @@ export default function MusicCard() {
 	const currentIndexRef = useRef(0)
 
 	const isHomePage = pathname === '/'
-
-	const position = useMemo(() => {
-		// If not on home page, always position at bottom-right corner when playing
-		if (!isHomePage) {
-			return {
-				x: center.width - styles.width - 16,
-				y: center.height - styles.height - 16
-			}
-		}
-
-		// Default position on home page: aligned with the left column under NavCard (General)
-		return {
-			x: styles.offsetX !== null ? center.x + styles.offsetX : center.x - hiCardStyles.width / 2 - cardStyles.navCard.width - CARD_SPACING + (cardStyles.navCard.width - styles.width),
-			y: styles.offsetY !== null ? center.y + styles.offsetY : (center.y - hiCardStyles.height / 2 - cardStyles.artCard.height - CARD_SPACING) + (cardStyles.navCard.height + 180) + CARD_SPACING
-		}
-	}, [isPlaying, isHomePage, center, styles, hiCardStyles, clockCardStyles, calendarCardStyles, cardStyles])
-
-	const { x, y } = position
 
 	// Initialize audio element
 	useEffect(() => {
@@ -130,45 +104,46 @@ export default function MusicCard() {
 		setIsPlaying(!isPlaying)
 	}
 
-	// Hide component if not on home page and not playing
+	// Hide component if not playing and we only want it on demand
 	if (!isHomePage && !isPlaying) {
 		return null
 	}
 
 	return (
-		<HomeDraggableLayer cardKey='musicCard' x={x} y={y} width={styles.width} height={styles.height}>
-			<Card order={styles.order} width={styles.width} height={styles.height} x={x} y={y} className={clsx('flex items-center gap-3', !isHomePage && 'fixed')}>
-				{siteContent.enableChristmas && (
-					<>
-						<img
-							src='/images/christmas/snow-10.webp'
-							alt='Christmas decoration'
-							className='pointer-events-none absolute'
-							style={{ width: 120, left: -8, top: -12, opacity: 0.8 }}
-						/>
-						<img
-							src='/images/christmas/snow-11.webp'
-							alt='Christmas decoration'
-							className='pointer-events-none absolute'
-							style={{ width: 80, right: -10, top: -12, opacity: 0.8 }}
-						/>
-					</>
-				)}
+		<div className={clsx(
+			'fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-2xl border border-border bg-card/80 p-3 shadow-2xl backdrop-blur-xl',
+			'w-[280px]'
+		)}>
+			{siteContent.enableChristmas && (
+				<>
+					<img
+						src='/images/christmas/snow-10.webp'
+						alt='Christmas decoration'
+						className='pointer-events-none absolute'
+						style={{ width: 120, left: -8, top: -12, opacity: 0.8 }}
+					/>
+					<img
+						src='/images/christmas/snow-11.webp'
+						alt='Christmas decoration'
+						className='pointer-events-none absolute'
+						style={{ width: 80, right: -10, top: -12, opacity: 0.8 }}
+					/>
+				</>
+			)}
 
-				<MusicSVG className='h-8 w-8' />
+			<MusicSVG className='h-8 w-8 text-brand' />
 
-				<div className='flex-1'>
-					<div className='text-secondary text-sm'>Close To You</div>
+			<div className='flex-1'>
+				<div className='text-primary font-medium text-sm'>Close To You</div>
 
-					<div className='mt-1 h-2 rounded-full bg-white/60'>
-						<div className='bg-linear h-full rounded-full transition-all duration-300' style={{ width: `${progress}%` }} />
-					</div>
+				<div className='mt-1 h-1.5 rounded-full bg-secondary/20 overflow-hidden'>
+					<div className='bg-brand h-full rounded-full transition-all duration-300' style={{ width: `${progress}%` }} />
 				</div>
+			</div>
 
-				<button onClick={togglePlayPause} className='flex h-10 w-10 items-center justify-center rounded-full bg-white transition-opacity hover:opacity-80'>
-					{isPlaying ? <Pause className='text-brand h-4 w-4' /> : <PlaySVG className='text-brand ml-1 h-4 w-4' />}
-				</button>
-			</Card>
-		</HomeDraggableLayer>
+			<button onClick={togglePlayPause} className='flex h-10 w-10 items-center justify-center rounded-full bg-secondary/10 hover:bg-secondary/20 transition-colors'>
+				{isPlaying ? <Pause className='text-brand h-4 w-4' /> : <PlaySVG className='text-brand ml-1 h-4 w-4' />}
+			</button>
+		</div>
 	)
 }

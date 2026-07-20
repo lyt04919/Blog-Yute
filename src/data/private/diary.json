@@ -1,0 +1,87 @@
+[
+	{
+		"id": "1781577664218",
+		"date": "2024-06-16",
+		"content": "Tekapo",
+		"media": [
+			"/images/uploads/0c004c6f642839f2.jpeg"
+		],
+		"mood": "",
+		"weather": "",
+		"tags": [],
+		"location": "",
+		"image": "/images/uploads/0c004c6f642839f2.jpeg"
+	},
+	{
+		"id": "mock_historical_123",
+		"date": "2025-06-16 14:30:00",
+		"content": "时间过得真快。去年的这个时候，我还在为一个非常难缠的 UI 布局问题发愁，甚至通宵看了无数遍 Tailwind 文档。现在回看当时的纠结，只觉得好笑。果然，时间才是最好的解药。期待明天的自己能继续进步。",
+		"media": [
+			"/images/uploads/844b159ea02995f4.jpeg"
+		],
+		"mood": "平静",
+		"weather": "微风",
+		"tags": [
+			"回忆",
+			"成长"
+		],
+		"location": "家中书房",
+		"image": "/images/uploads/844b159ea02995f4.jpeg"
+	},
+	{
+		"id": "mock_historical_2024",
+		"date": "2024-06-16 19:20:00",
+		"content": "两年前的今天，第一次一个人去看海。虽然海风很凉，但听着浪花拍打礁石的声音，内心竟然出奇地平静。拍了好多照片，最喜欢这张黄昏时的抓拍。人生其实就像大海一样，有时波澜壮阔，有时又归于宁静。希望自己永远能保持这份面对世界的好奇心。🌊🌅",
+		"media": [
+			"/images/uploads/7ef4d45667098fa8.jpeg"
+		],
+		"mood": "激动",
+		"weather": "晴朗",
+		"tags": [
+			"旅行",
+			"摄影",
+			"看海"
+		],
+		"location": "海边",
+		"image": "/images/uploads/7ef4d45667098fa8.jpeg"
+	},
+	{
+		"id": "1781056275520",
+		"date": "2026-06-10",
+		"content": "✅ 今日完成：\n\n❌ 待改进：\n\n🎯 明日计划：\n",
+		"media": [],
+		"mood": "开心",
+		"weather": "晴朗",
+		"tags": [],
+		"location": "",
+		"image": ""
+	},
+	{
+		"id": "1",
+		"date": "2026-06-08",
+		"content": "今天终于把博客的日记、书籍、电影功能全部跑通了！看着它一步步变成自己喜欢的样子，真的是非常有成就感的一件事。明天要给自己放个假，奖励一杯奶茶 🥤",
+		"mood": "开心",
+		"weather": "雾霾",
+		"image": "/images/uploads/1294fc8cc03fc7ac.jpeg",
+		"media": [
+			"/images/uploads/1294fc8cc03fc7ac.jpeg",
+			"/images/uploads/ef3e6173ce82dffb.jpeg",
+			"/images/uploads/3072da01c183322c.jpg",
+			"/images/uploads/93108dcd9b4d166b.jpeg"
+		],
+		"location": "北京",
+		"tags": [
+			"111",
+			"222"
+		]
+	},
+	{
+		"id": "2",
+		"date": "2026-06-07",
+		"content": "晚上看了好久的新鲜 UI 框架，在玻璃拟态和卡片风格之间徘徊，最后决定坚持这种简约通透的设计。",
+		"mood": "平静",
+		"weather": "多云",
+		"image": "",
+		"media": []
+	}
+]

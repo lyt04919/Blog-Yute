@@ -32,8 +32,8 @@ export function TagFilter({ tags, selectedTag, tagCounts, onSelectTag }: TagFilt
       className={cn(
         "h-8 flex items-center px-1 pl-3 rounded-full cursor-pointer border text-sm transition-colors whitespace-nowrap shrink-0",
         selectedTag === tag
-          ? "border-neutral-900 bg-neutral-900 text-white shadow-sm"
-          : "border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-600"
+          ? "border-[#18181b] bg-[#18181b] text-white shadow-sm"
+          : "border-[#e4e4e7] bg-white hover:bg-[#fafafa] text-[#52525b]"
       )}
     >
       <span className="font-medium">{tag}</span>
@@ -42,8 +42,8 @@ export function TagFilter({ tags, selectedTag, tagCounts, onSelectTag }: TagFilt
           className={cn(
             "ml-2 text-[10px] border rounded-full h-5 min-w-5 font-semibold flex items-center justify-center",
             selectedTag === tag
-              ? "border-neutral-700 bg-neutral-800 text-neutral-100"
-              : "border-neutral-200 bg-neutral-100 text-neutral-500"
+              ? "border-[#3f3f46] bg-[#27272a] text-[#f4f4f5]"
+              : "border-[#e4e4e7] bg-[#f4f4f5] text-[#71717a]"
           )}
         >
           {tagCounts[tag]}
@@ -70,7 +70,7 @@ export function TagFilter({ tags, selectedTag, tagCounts, onSelectTag }: TagFilt
         {needsExpansion && (
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="mt-4 flex items-center justify-center w-8 h-8 rounded-full border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-400 hover:text-neutral-900 transition-colors shadow-sm cursor-pointer z-20"
+            className="mt-4 flex items-center justify-center w-8 h-8 rounded-full border border-[#e4e4e7] bg-white dark:bg-[#27272a] hover:bg-[#fafafa] text-[#a1a1aa] hover:text-[#18181b] transition-colors shadow-sm cursor-pointer z-20"
           >
             <ChevronDown className={cn("w-4 h-4 transition-transform duration-500", isExpanded ? "rotate-180" : "")} />
           </button>
@@ -82,7 +82,7 @@ export function TagFilter({ tags, selectedTag, tagCounts, onSelectTag }: TagFilt
         <select
           value={selectedTag}
           onChange={(e) => onSelectTag(e.target.value)}
-          className="w-full appearance-none bg-white border border-neutral-200 rounded-lg px-4 py-3 text-sm font-medium text-neutral-700 focus:outline-none focus:ring-2 focus:ring-neutral-900 shadow-sm"
+          className="w-full appearance-none bg-white dark:bg-[#27272a] border border-[#e4e4e7] rounded-lg px-4 py-3 text-sm font-medium text-[#3f3f46] focus:outline-none focus:ring-2 focus:ring-neutral-900 shadow-sm"
         >
           {sortedTags.map((tag) => (
             <option key={tag} value={tag}>
@@ -90,7 +90,7 @@ export function TagFilter({ tags, selectedTag, tagCounts, onSelectTag }: TagFilt
             </option>
           ))}
         </select>
-        <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none text-neutral-400" />
+        <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none text-[#a1a1aa]" />
       </div>
     </>
   )

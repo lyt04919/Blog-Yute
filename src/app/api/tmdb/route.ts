@@ -34,7 +34,12 @@ export async function GET(request: Request) {
 		}
 		
 		const data = await res.json()
-		return NextResponse.json(data)
+		return NextResponse.json(data, {
+			headers: {
+				'Cache-Control': 'public, max-age=300, s-maxage=3600, stale-while-revalidate=60',
+				'CDN-Cache-Control': 'max-age=3600'
+			}
+		})
 	} catch (error: any) {
 		return NextResponse.json({ error: error.message }, { status: 500 })
 	}

@@ -61,8 +61,8 @@ export function WritePreview({ form, coverPreviewUrl, onClose, slug, isSplit }: 
 			</div>
 			{isSplit && (
 				<div className="mt-12 space-y-6 pb-20 max-w-[800px] mx-auto w-full">
-					<div className="h-[1px] bg-neutral-200 dark:bg-neutral-800 my-8" />
-					<h3 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 px-1">文章配置与附件</h3>
+					<div className="h-[1px] bg-[#e4e4e7] dark:bg-[#27272a] my-8" />
+					<h3 className="text-sm font-semibold text-[#71717a] dark:text-[#a1a1aa] px-1">文章配置与附件</h3>
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 						<CoverSection />
 						<MetaSection />
@@ -84,9 +84,8 @@ export function WritePreview({ form, coverPreviewUrl, onClose, slug, isSplit }: 
 				<motion.button
 					initial={{ opacity: 0, scale: 0.6 }}
 					animate={{ opacity: 1, scale: 1 }}
-					whileHover={{ scale: 1.05 }}
-					whileTap={{ scale: 0.95 }}
-					className='absolute right-6 rounded-xl border bg-white/60 px-6 py-2 text-sm z-40' style={{ top: '6rem' }}
+					
+					className='absolute right-6 rounded-xl border bg-white dark:bg-[#27272a]/60 px-6 py-2 text-sm z-40' style={{ top: '6rem' }}
 					onClick={onClose}>
 					关闭预览
 				</motion.button>

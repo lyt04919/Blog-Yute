@@ -7,6 +7,7 @@ import { usePreviewStore } from '../stores/preview-store'
 import { usePublish } from '../hooks/use-publish'
 import { saveBlogLocal } from '../services/save-blog-local'
 import { useAutoSave } from '../hooks/use-auto-save'
+import { ArrowLeft, Minimize2, Columns, Monitor, FileUp, Save, MoreHorizontal } from 'lucide-react'
 
 export function WriteActions() {
 	const { loading, mode, form, loadBlogForEdit, originalSlug, updateForm, autoSaveStatus, isZenMode, isSplitMode, toggleZenMode, toggleSplitMode } = useWriteStore()
@@ -96,7 +97,7 @@ export function WriteActions() {
 			<motion.button
 				initial={{ opacity: 0, y: -20 }}
 				animate={{ opacity: 1, y: 0 }}
-				className="fixed top-6 right-6 z-50 bg-card rounded-full shadow-lg border px-4 py-2 text-sm flex items-center gap-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+				className="fixed top-6 right-6 z-50 bg-card rounded-full shadow-lg border px-4 py-2 text-sm flex items-center gap-2 hover:bg-[#f4f4f5] dark:hover:bg-[#27272a] transition-colors"
 				onClick={toggleZenMode}>
 				退出禅模式 (Esc)
 			</motion.button>
@@ -118,89 +119,76 @@ export function WriteActions() {
 			/>
 			<input ref={mdInputRef} type='file' accept='.md' className='hidden' onChange={handleMdFileChange} />
 
-			<div className='flex items-center justify-between w-full z-40'>
-				<div className='flex items-center gap-2'>
-					<motion.button
-						initial={{ opacity: 0, scale: 0.6 }}
-						animate={{ opacity: 1, scale: 1 }}
-						whileHover={{ scale: 1.05 }}
-						whileTap={{ scale: 0.95 }}
+			<div className='flex items-center justify-between w-full z-40 bg-[var(--color-bg)]/80 backdrop-blur-md pb-4 pt-2 -mt-2 sticky top-0 border-b border-transparent transition-colors'>
+				<div className='flex items-center gap-3'>
+					<button
 						onClick={handleCancel}
 						disabled={saving}
-						className='bg-card rounded-xl border px-4 py-2 text-sm'>
-						返回
-					</motion.button>
+						title="返回"
+						className='p-2 rounded-xl text-[var(--color-secondary)] hover:bg-[var(--color-border)]/50 hover:text-[var(--color-primary)] transition-all'>
+						<ArrowLeft className='w-5 h-5' />
+					</button>
 
 					{mode === 'edit' && (
-						<motion.div initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} className='flex items-center gap-2'>
-							<div className='rounded-lg border bg-blue-50 px-4 py-2 text-sm text-blue-700'>编辑模式</div>
+						<motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className='flex items-center'>
+							<span className='px-2.5 py-1 rounded-md bg-[var(--color-brand)]/10 text-[var(--color-brand)] text-xs font-medium'>
+								编辑模式
+							</span>
 						</motion.div>
 					)}
 				</div>
 
-				<div className='flex items-center gap-2'>
-					<motion.button
-						initial={{ opacity: 0, scale: 0.6 }}
-						animate={{ opacity: 1, scale: 1 }}
-						whileHover={{ scale: 1.05 }}
-						whileTap={{ scale: 0.95 }}
-						className={`rounded-xl border px-4 py-2 text-sm ${isZenMode ? 'bg-brand text-white border-brand' : 'bg-card'}`}
-						disabled={loading}
-						onClick={toggleZenMode}>
-						{isZenMode ? '退出禅模式' : '禅模式'}
-					</motion.button>
-					<motion.button
-						initial={{ opacity: 0, scale: 0.6 }}
-						animate={{ opacity: 1, scale: 1 }}
-						whileHover={{ scale: 1.05 }}
-						whileTap={{ scale: 0.95 }}
-						className={`rounded-xl border px-4 py-2 text-sm ${isSplitMode ? 'bg-brand text-white border-brand' : 'bg-card'}`}
-						disabled={loading}
-						onClick={toggleSplitMode}>
-						{isSplitMode ? '退出分栏' : '分栏预览'}
-					</motion.button>
-					<motion.button
-						initial={{ opacity: 0, scale: 0.6 }}
-						animate={{ opacity: 1, scale: 1 }}
-						whileHover={{ scale: 1.05 }}
-						whileTap={{ scale: 0.95 }}
-						className='bg-card rounded-xl border px-4 py-2 text-sm'
-						disabled={loading}
-						onClick={handleImportMd}>
-						导入 MD
-					</motion.button>
-					<motion.button
-						initial={{ opacity: 0, scale: 0.6 }}
-						animate={{ opacity: 1, scale: 1 }}
-						whileHover={{ scale: 1.05 }}
-						whileTap={{ scale: 0.95 }}
-						className='bg-card rounded-xl border px-6 py-2 text-sm'
-						disabled={loading}
-						onClick={openPreview}>
-						全屏预览
-					</motion.button>
-					<motion.button
-						initial={{ opacity: 0, scale: 0.6 }}
-						animate={{ opacity: 1, scale: 1 }}
-						whileHover={{ scale: 1.05 }}
-						whileTap={{ scale: 0.95 }}
-						className='bg-card rounded-xl border px-6 py-2 text-sm flex items-center gap-2'
+				<div className='flex items-center gap-3'>
+					{/* Mode Toggles */}
+					<div className="flex items-center bg-[var(--color-border)]/30 rounded-xl p-1 border border-[var(--color-border)]/50">
+						<button
+							onClick={toggleZenMode}
+							title="禅模式"
+							className={`p-1.5 rounded-lg transition-all ${isZenMode ? 'bg-[var(--color-bg)] shadow-sm text-[var(--color-primary)]' : 'text-[var(--color-secondary)] hover:text-[var(--color-primary)]'}`}>
+							<Minimize2 className="w-4 h-4" />
+						</button>
+						<button
+							onClick={toggleSplitMode}
+							title="分栏预览"
+							className={`p-1.5 rounded-lg transition-all ${isSplitMode ? 'bg-[var(--color-bg)] shadow-sm text-[var(--color-primary)]' : 'text-[var(--color-secondary)] hover:text-[var(--color-primary)]'}`}>
+							<Columns className="w-4 h-4" />
+						</button>
+						<button
+							onClick={openPreview}
+							title="全屏预览"
+							className="p-1.5 rounded-lg transition-all text-[var(--color-secondary)] hover:text-[var(--color-primary)]">
+							<Monitor className="w-4 h-4" />
+						</button>
+					</div>
+
+					{/* Secondary Actions (Dropdown) */}
+					<div className="relative group">
+						<button className="p-2 text-[var(--color-secondary)] hover:text-[var(--color-primary)] transition-colors rounded-xl hover:bg-[var(--color-border)]/50">
+							<MoreHorizontal className="w-5 h-5" />
+						</button>
+						<div className="absolute right-0 top-full mt-1 w-48 bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all flex flex-col p-1 z-50">
+							<button onClick={handleImportMd} className="px-3 py-2.5 text-sm text-left hover:bg-[var(--color-border)]/50 rounded-lg flex items-center gap-2 text-[var(--color-primary)] transition-colors">
+								<FileUp className="w-4 h-4" /> 导入 MD
+							</button>
+						</div>
+					</div>
+
+					{/* Local Save Action */}
+					<button
+						className='px-6 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 text-sm font-medium hover:bg-slate-200 dark:hover:bg-zinc-700 transition-all flex items-center gap-2 shadow-sm border border-slate-200 dark:border-zinc-700'
 						disabled={loading || saving}
 						onClick={handleSaveLocal}>
-						<span>{saving ? '保存中...' : '本地保存'}</span>
-						{autoSaveStatus === 'saving' && <span className="text-xs text-gray-400">自动保存中...</span>}
-						{autoSaveStatus === 'saved' && !saving && <span className="text-xs text-green-500">✓ 已保存</span>}
-					</motion.button>
-					<motion.button
-						initial={{ opacity: 0, scale: 0.6 }}
-						animate={{ opacity: 1, scale: 1 }}
-						whileHover={{ scale: 1.05 }}
-						whileTap={{ scale: 0.95 }}
-						className='brand-btn px-6'
+						<Save className="w-4 h-4" />
+						{saving ? '保存中...' : '本地保存'}
+					</button>
+
+					{/* Primary Action */}
+					<button
+						className='px-6 py-2 rounded-xl bg-[var(--color-brand)] text-white text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-2 shadow-md shadow-[var(--color-brand)]/20'
 						disabled={loading || saving}
 						onClick={handleImportOrPublish}>
-						{buttonText}
-					</motion.button>
+						{saving ? '保存中...' : buttonText}
+					</button>
 				</div>
 			</div>
 		</>

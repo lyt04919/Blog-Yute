@@ -64,7 +64,7 @@ export async function pushMovies(params: PushMoviesParams): Promise<void> {
 	const moviesJson = JSON.stringify(updatedMovies, null, '\t')
 	const moviesBlob = await createBlob(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, toBase64Utf8(moviesJson), 'base64')
 	treeItems.push({
-		path: 'src/app/favorite/movies.json',
+		path: 'src/data/movies.json',
 		mode: '100644',
 		type: 'blob',
 		sha: moviesBlob.sha

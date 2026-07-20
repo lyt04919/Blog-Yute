@@ -27,8 +27,8 @@ export function WriteSidebar() {
 	return (
 		<div
 			style={{ height: 'calc(100vh - 220px)', minHeight: '600px' }}
-			className={`flex flex-col shrink-0 overflow-y-auto scrollbar-none pr-1 pb-10 ${
-				isSplitMode ? 'w-[260px] space-y-4' : 'w-[320px] space-y-6'
+			className={`flex flex-col shrink-0 overflow-y-auto scrollbar-none p-5 bg-[var(--color-bg)] rounded-3xl border border-[var(--color-border)] shadow-sm ${
+				isSplitMode ? 'w-[260px] space-y-6' : 'w-[320px] space-y-6'
 			}`}>
 			<CoverSection delay={INIT_DELAY + ANIMATION_DELAY * 0} />
 			<MetaSection delay={INIT_DELAY + ANIMATION_DELAY * 1} />

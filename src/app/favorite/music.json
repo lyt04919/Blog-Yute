@@ -1,24 +1,26 @@
 [
 	{
-		"name": "Syntax.fm",
-		"category": "播客",
-		"desc": "由 Wes Bos 和 Scott Tolinski 主持的硬核前端开发播客。讲解各种前端新技术与开发者经验。",
-		"cover": "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?q=80&w=800&auto=format&fit=crop",
-		"link": "https://syntax.fm/",
-		"review": "两位前端专家的对谈幽默风趣，信息密度极高，每周必听。",
-		"embedCode": "",
+		"name": "海阔天空",
+		"cover": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/e5/82/34/e58234b6-e653-3c70-918b-c3056b36ec34/4710149707673_cover.jpg/600x600bb.jpg",
+		"subtitle": "Beyond",
+		"desc": "粤语流行 · 1993 · 12 首",
+		"review": "",
+		"link": "https://music.apple.com/cn/album/%E6%B5%B7%E9%98%94%E5%A4%A9%E7%A9%BA/1722083311?i=1722083721&uo=4",
+		"isPinned": false,
 		"isShow": true,
-		"isPinned": true
+		"embedCode": "<iframe allow=\"autoplay *; encrypted-media *; fullscreen *; clipboard-write\" frameborder=\"0\" height=\"450\" style=\"width:100%;max-width:660px;overflow:hidden;border-radius:10px;\" sandbox=\"allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation\" src=\"https://embed.music.apple.com/cn/song/1722083721\"></iframe>",
+		"category": "音乐"
 	},
 	{
-		"name": "Random Access Memories",
-		"category": "音乐",
-		"desc": "Daft Punk 的经典电子音乐专辑。将复古迪斯科与现代合成器完美融合的旷世杰作。",
-		"cover": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=800&auto=format&fit=crop",
-		"link": "https://open.spotify.com/album/4m28wbPx3mtZJDn52nGSmd",
-		"review": "完美的编曲和声音工程，写代码时的绝佳律动背景乐。",
-		"embedCode": "<iframe style=\"border-radius:12px\" src=\"https://open.spotify.com/embed/album/4m28wbPx3mtZJDn52nGSmd?utm_source=generator\" width=\"100%\" height=\"152\" frameBorder=\"0\" allowfullscreen=\"\" allow=\"autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture\" loading=\"lazy\"></iframe>",
+		"name": "范特西",
+		"cover": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/a4/f2/f0/a4f2f0d4-cc80-d1a0-7f20-a0cc842a523c/JAY.jpg/600x600bb.jpg",
+		"subtitle": "周杰伦",
+		"desc": "国语流行 · 2001 · 10 首",
+		"review": "",
+		"link": "https://music.apple.com/cn/album/%E8%8C%83%E7%89%B9%E8%A5%BF/535739206?uo=4",
+		"isPinned": false,
 		"isShow": true,
-		"isPinned": false
+		"embedCode": "<iframe allow=\"autoplay *; encrypted-media *; fullscreen *; clipboard-write\" frameborder=\"0\" height=\"450\" style=\"width:100%;max-width:660px;overflow:hidden;border-radius:10px;\" sandbox=\"allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation\" src=\"https://embed.music.apple.com/cn/album/535739206\"></iframe>",
+		"category": "音乐"
 	}
 ]
