@@ -137,6 +137,15 @@ function runTests() {
 		}
 	})
 
+	// 6. Verify AudioCinemaLounge integrates all 6 categories with CSS mask feathering
+	test('AudioCinemaLounge integrates all 6 categories with CSS mask feathering and geek tools', () => {
+		const loungeContent = fs.readFileSync(path.join(ROOT, 'src/app/(home)/components/audio-cinema-lounge.tsx'), 'utf8')
+		assert.ok(loungeContent.includes("import shareData from '@/app/favorite/share/list.json'"), 'AudioCinemaLounge must import shareData')
+		assert.ok(loungeContent.includes('Web & Tools · 灵感工具与极客站点'), 'AudioCinemaLounge must have Web & Tools section')
+		assert.ok(loungeContent.includes('mask-image:linear-gradient'), 'AudioCinemaLounge must use CSS mask-image for feathering')
+		assert.ok(loungeContent.includes('handleCopyUrl'), 'AudioCinemaLounge modal must support copy URL for web tools')
+	})
+
 	console.log(`\n🏁 Test Results: ${passed}/${total} passed.`)
 	if (passed === total) {
 		console.log('✨ All performance and integrity tests PASSED successfully!\n')
