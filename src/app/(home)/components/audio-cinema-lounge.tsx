@@ -1239,7 +1239,6 @@ export default function AudioCinemaLounge() {
 				isOpen={Boolean(activeVideo)}
 				onClose={() => setActiveVideo(null)}
 				videoSrc={activeVideo?.url || ''}
-				title={activeVideo?.title}
 				animationStyle="from-center"
 			/>
 		</section>

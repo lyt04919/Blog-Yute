@@ -21,7 +21,6 @@ export interface HeroVideoProps {
 	videoSrc: string
 	thumbnailSrc: string
 	thumbnailAlt?: string
-	title?: string
 	className?: string
 }
 
@@ -30,9 +29,13 @@ export function getEmbedVideoUrl(url: string, autoplay = true): { embedUrl: stri
 
 	// 1. 已经包含 /embed/
 	if (url.includes('/embed/')) {
-		const embed = autoplay && !url.includes('autoplay=') 
-			? `${url}${url.includes('?') ? '&' : '?'}autoplay=1` 
-			: url
+		let embed = url
+		if (autoplay && !embed.includes('autoplay=')) {
+			embed = `${embed}${embed.includes('?') ? '&' : '?'}autoplay=1`
+		}
+		if (!embed.includes('controls=')) {
+			embed = `${embed}${embed.includes('?') ? '&' : '?'}controls=1`
+		}
 		return { embedUrl: embed, canEmbed: true }
 	}
 
@@ -43,8 +46,8 @@ export function getEmbedVideoUrl(url: string, autoplay = true): { embedUrl: stri
 			const v = parsed.searchParams.get('v')
 			if (v) {
 				return {
-					embedUrl: `https://www.youtube.com/embed/${v}?autoplay=${autoplay ? '1' : '0'}&rel=0`,
-					canEmbed: true
+					embedUrl: `https://www.youtube.com/embed/${v}?autoplay=${autoplay ? '1' : '0'}&controls=1&rel=0`,
+					canEmbed: true,
 				}
 			}
 		} catch {}
@@ -55,8 +58,8 @@ export function getEmbedVideoUrl(url: string, autoplay = true): { embedUrl: stri
 		const id = url.split('youtu.be/')[1]?.split('?')[0]
 		if (id) {
 			return {
-				embedUrl: `https://www.youtube.com/embed/${id}?autoplay=${autoplay ? '1' : '0'}&rel=0`,
-				canEmbed: true
+				embedUrl: `https://www.youtube.com/embed/${id}?autoplay=${autoplay ? '1' : '0'}&controls=1&rel=0`,
+				canEmbed: true,
 			}
 		}
 	}
@@ -67,7 +70,7 @@ export function getEmbedVideoUrl(url: string, autoplay = true): { embedUrl: stri
 		if (bvid) {
 			return {
 				embedUrl: `https://player.bilibili.com/player.html?bvid=${bvid}&autoplay=${autoplay ? '1' : '0'}&page=1&high_quality=1&danmaku=0`,
-				canEmbed: true
+				canEmbed: true,
 			}
 		}
 	}
@@ -81,16 +84,58 @@ export function getEmbedVideoUrl(url: string, autoplay = true): { embedUrl: stri
 	return { embedUrl: url, canEmbed: false }
 }
 
+const animationVariants = {
+	'from-bottom': {
+		initial: { y: '100%', opacity: 0 },
+		animate: { y: 0, opacity: 1 },
+		exit: { y: '100%', opacity: 0 },
+	},
+	'from-center': {
+		initial: { scale: 0.5, opacity: 0 },
+		animate: { scale: 1, opacity: 1 },
+		exit: { scale: 0.5, opacity: 0 },
+	},
+	'from-top': {
+		initial: { y: '-100%', opacity: 0 },
+		animate: { y: 0, opacity: 1 },
+		exit: { y: '-100%', opacity: 0 },
+	},
+	'from-left': {
+		initial: { x: '-100%', opacity: 0 },
+		animate: { x: 0, opacity: 1 },
+		exit: { x: '-100%', opacity: 0 },
+	},
+	'from-right': {
+		initial: { x: '100%', opacity: 0 },
+		animate: { x: 0, opacity: 1 },
+		exit: { x: '100%', opacity: 0 },
+	},
+	fade: {
+		initial: { opacity: 0 },
+		animate: { opacity: 1 },
+		exit: { opacity: 0 },
+	},
+	'top-in-bottom-out': {
+		initial: { y: '-100%', opacity: 0 },
+		animate: { y: 0, opacity: 1 },
+		exit: { y: '100%', opacity: 0 },
+	},
+	'left-in-right-out': {
+		initial: { x: '-100%', opacity: 0 },
+		animate: { x: 0, opacity: 1 },
+		exit: { x: '100%', opacity: 0 },
+	},
+}
+
 export function HeroVideoModal({
 	isOpen,
 	onClose,
 	videoSrc,
-	title,
+	animationStyle = 'from-center',
 }: {
 	isOpen: boolean
 	onClose: () => void
 	videoSrc: string
-	title?: string
 	animationStyle?: AnimationStyle
 }) {
 	const [mounted, setMounted] = useState(false)
@@ -116,6 +161,7 @@ export function HeroVideoModal({
 
 	if (!mounted) return null
 
+	const selectedAnimation = animationVariants[animationStyle]
 	const { embedUrl, canEmbed } = getEmbedVideoUrl(videoSrc, true)
 
 	return createPortal(
@@ -126,76 +172,48 @@ export function HeroVideoModal({
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0 }}
 					style={{ zIndex: 999999 }}
-					className="fixed inset-0 flex items-center justify-center bg-black/85 backdrop-blur-xl p-3 sm:p-6"
+					className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-md p-4 md:p-0"
 					onClick={onClose}
 				>
 					<motion.div
-						initial={{ scale: 0.92, opacity: 0, y: 15 }}
-						animate={{ scale: 1, opacity: 1, y: 0 }}
-						exit={{ scale: 0.92, opacity: 0, y: 15 }}
-						transition={{ type: 'spring', damping: 26, stiffness: 320 }}
-						style={{ width: '100%', maxWidth: '960px', backgroundColor: '#09090b' }}
-						className="relative mx-auto rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-white/20 flex flex-col"
+						{...selectedAnimation}
+						transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+						className="relative mx-4 aspect-video w-full max-w-4xl md:mx-0"
 						onClick={(e) => e.stopPropagation()}
 					>
-						{/* 顶栏控制条 */}
-						<div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10 bg-zinc-900">
-							<div className="flex items-center gap-2.5 min-w-0 pr-4">
-								<span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse shrink-0" />
-								<h4 className="text-xs sm:text-sm font-medium text-zinc-100 truncate font-serif">
-									{title || '视听视野 · 原地高清影院'}
-								</h4>
-							</div>
-							<div className="flex items-center gap-2 shrink-0">
-								{videoSrc && (
-									<a
-										href={videoSrc}
-										target="_blank"
-										rel="noopener noreferrer"
-										className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono font-medium text-zinc-300 hover:text-white bg-white/10 hover:bg-white/15 border border-white/10 transition-colors"
-										title="在新标签页中打开源站"
-									>
-										<span>前往源站</span>
-										<ExternalLink className="w-3 h-3" />
-									</a>
-								)}
-								<button
-									type="button"
-									onClick={onClose}
-									className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-zinc-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
-									aria-label="关闭视频"
-								>
-									<X className="w-4 h-4" />
-								</button>
-							</div>
-						</div>
-
-						{/* 16:9 视频播放区 */}
-						<div 
-							style={{ width: '100%', aspectRatio: '16 / 9' }} 
-							className="relative w-full bg-black flex items-center justify-center overflow-hidden"
+						{/* 浮动在右上角的圆形关闭按钮 (Magic UI 官方原版结构) */}
+						<motion.button
+							type="button"
+							onClick={onClose}
+							className="absolute -top-14 sm:-top-16 right-0 rounded-full bg-neutral-900/60 p-2 text-white ring-1 ring-white/20 backdrop-blur-md hover:bg-neutral-900/90 cursor-pointer shadow-lg dark:bg-neutral-100/50 dark:text-black"
+							aria-label="关闭视频"
 						>
+							<X className="size-5" />
+						</motion.button>
+
+						{/* 纯净 16:9 白边圆角全屏视频框 */}
+						<div className="relative isolate z-1 size-full overflow-hidden rounded-2xl border-2 border-white shadow-2xl bg-black">
 							{canEmbed ? (
 								<iframe
 									src={embedUrl}
-									title={title || 'Hero Video Player'}
-									style={{ width: '100%', height: '100%', border: 0 }}
+									title="Hero Video player"
+									className="mt-0 size-full rounded-2xl border-0"
 									allowFullScreen
 									allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
 								/>
 							) : (
-								<div className="p-8 text-center flex flex-col items-center justify-center gap-3">
-									<p className="text-sm text-zinc-300">
-										该视频源站点（如 Netflix 等）限制直接网页内嵌，支持一键前往官方源站观看。
+								<div className="size-full flex flex-col items-center justify-center gap-4 p-8 text-center bg-zinc-950">
+									<p className="text-base text-zinc-200">
+										该视频源（如专属版权站）限制直接内嵌，点击可前往官方播放
 									</p>
 									<a
 										href={videoSrc}
 										target="_blank"
 										rel="noopener noreferrer"
-										className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-lg transition-all"
+										className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-semibold text-sm shadow-xl"
 									>
-										<span>前往官方源站观看</span>
-										<ExternalLink className="w-3.5 h-3.5" />
+										<span>前往官方播放</span>
+										<ExternalLink className="size-4" />
 									</a>
 								</div>
 							)}
@@ -213,7 +231,6 @@ export function HeroVideoDialog({
 	videoSrc,
 	thumbnailSrc,
 	thumbnailAlt = 'Video thumbnail',
-	title,
 	className,
 }: HeroVideoProps) {
 	const [isVideoOpen, setIsVideoOpen] = useState(false)
@@ -229,12 +246,21 @@ export function HeroVideoDialog({
 				<img
 					src={thumbnailSrc}
 					alt={thumbnailAlt}
-					style={{ width: '100%', aspectRatio: '16 / 9', objectFit: 'cover' }}
-					className="w-full rounded-2xl border border-black/10 dark:border-white/10 shadow-lg transition-all duration-300 ease-out group-hover:scale-104 group-hover:brightness-90"
+					className="w-full rounded-md border shadow-lg transition-all duration-200 ease-out group-hover:brightness-[0.8]"
 				/>
-				<div className="absolute inset-0 flex items-center justify-center">
-					<div className="flex size-14 sm:size-16 items-center justify-center rounded-full bg-black/40 backdrop-blur-md border border-white/25 shadow-xl transition-all duration-300 ease-out group-hover:scale-110 group-hover:bg-black/60">
-						<Play className="size-6 fill-white text-white translate-x-0.5" />
+				<div className="absolute inset-0 flex scale-[0.9] items-center justify-center rounded-2xl transition-all duration-200 ease-out group-hover:scale-100">
+					<div className="bg-primary/10 flex size-28 items-center justify-center rounded-full backdrop-blur-md">
+						<div
+							className={`from-primary/30 to-primary relative flex size-20 scale-100 items-center justify-center rounded-full bg-gradient-to-b shadow-md transition-all duration-200 ease-out group-hover:scale-[1.2]`}
+						>
+							<Play
+								className="size-8 scale-100 fill-white text-white transition-transform duration-200 ease-out group-hover:scale-105"
+								style={{
+									filter:
+										'drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06))',
+								}}
+							/>
+						</div>
 					</div>
 				</div>
 			</button>
@@ -243,10 +269,10 @@ export function HeroVideoDialog({
 				isOpen={isVideoOpen}
 				onClose={() => setIsVideoOpen(false)}
 				videoSrc={videoSrc}
-				title={title}
 				animationStyle={animationStyle}
 			/>
 		</div>
 	)
 }
+
 
