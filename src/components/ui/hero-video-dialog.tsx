@@ -191,14 +191,14 @@ export function HeroVideoModal({
             className="relative mx-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* 视频框外右上角悬浮圆形关闭按钮 (更大尺寸 + 清晰外置) */}
+            {/* 视频框外右上角悬浮圆形关闭按钮 (精确对齐红框位置 -top-20 -right-12 + 超大尺寸) */}
             <motion.button
               type="button"
               onClick={onClose}
-              className="absolute -top-14 sm:-top-18 right-0 sm:-right-2 z-50 flex size-12 sm:size-14 items-center justify-center rounded-full bg-neutral-900/85 text-white ring-2 ring-white/30 backdrop-blur-lg transition-all duration-200 hover:bg-neutral-900 hover:scale-110 active:scale-95 dark:bg-neutral-100/70 dark:text-black cursor-pointer shadow-2xl"
+              className="absolute -top-16 sm:-top-20 -right-4 sm:-right-12 z-50 flex size-14 sm:size-16 items-center justify-center rounded-full bg-neutral-900/85 text-white ring-2 ring-white/30 backdrop-blur-xl transition-all duration-200 hover:bg-neutral-900 hover:scale-110 active:scale-95 dark:bg-neutral-100/70 dark:text-black cursor-pointer shadow-2xl"
               aria-label="关闭视频"
             >
-              <XIcon className="size-6 sm:size-7 stroke-[2.2]" />
+              <XIcon className="size-7 sm:size-8 stroke-[2.5]" />
             </motion.button>
             <div 
               style={{ width: "100%", height: "100%" }}
