@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { createPortal } from "react-dom"
 import { Play, XIcon } from "lucide-react"
 import { AnimatePresence, motion } from "motion/react"
 
@@ -129,44 +130,68 @@ export function HeroVideoModal({
   videoSrc: string
   animationStyle?: AnimationStyle
 }) {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!isOpen) return
+    const previous = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose()
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => {
+      document.body.style.overflow = previous
+      window.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [isOpen, onClose])
+
+  if (!mounted) return null
+
   const selectedAnimation = animationVariants[animationStyle]
   const { embedUrl } = getEmbedVideoUrl(videoSrc, true)
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === "Escape" || e.key === "Enter" || e.key === " ") {
-              onClose()
-            }
-          }}
-          onClick={onClose}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md"
+          style={{ zIndex: 999999 }}
+          className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-md p-4 md:p-6"
+          onClick={onClose}
         >
           <motion.div
-            {...selectedAnimation}
+            variants={selectedAnimation}
+            initial="initial"
+            animate="animate"
+            exit="exit"
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="relative mx-4 aspect-video w-full max-w-4xl md:mx-0"
+            style={{ width: "100%", maxWidth: "896px", aspectRatio: "16 / 9" }}
+            className="relative mx-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <motion.button
               type="button"
               onClick={onClose}
-              className="absolute -top-16 right-0 rounded-full bg-neutral-900/50 p-2 text-xl text-white ring-1 backdrop-blur-md dark:bg-neutral-100/50 dark:text-black cursor-pointer"
+              className="absolute -top-14 sm:-top-16 right-0 rounded-full bg-neutral-900/60 p-2 text-xl text-white ring-1 ring-white/20 backdrop-blur-md dark:bg-neutral-100/50 dark:text-black cursor-pointer shadow-lg hover:bg-neutral-900/80"
+              aria-label="关闭视频"
             >
               <XIcon className="size-5" />
             </motion.button>
-            <div className="relative isolate z-1 size-full overflow-hidden rounded-2xl border-2 border-white">
+            <div 
+              style={{ width: "100%", height: "100%" }}
+              className="relative isolate z-1 overflow-hidden rounded-2xl border-2 border-white shadow-2xl bg-black"
+            >
               <iframe
                 src={embedUrl}
                 title="Hero Video player"
-                className="mt-0 size-full rounded-2xl"
+                style={{ width: "100%", height: "100%", border: 0 }}
                 allowFullScreen
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               ></iframe>
@@ -174,7 +199,8 @@ export function HeroVideoModal({
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   )
 }
 
@@ -186,8 +212,6 @@ export function HeroVideoDialog({
   className,
 }: HeroVideoProps) {
   const [isVideoOpen, setIsVideoOpen] = useState(false)
-  const selectedAnimation = animationVariants[animationStyle]
-  const { embedUrl } = getEmbedVideoUrl(videoSrc, true)
 
   return (
     <div className={cn("relative", className)}>
@@ -220,51 +244,17 @@ export function HeroVideoDialog({
           </div>
         </div>
       </button>
-      <AnimatePresence>
-        {isVideoOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === "Escape" || e.key === "Enter" || e.key === " ") {
-                setIsVideoOpen(false)
-              }
-            }}
-            onClick={() => setIsVideoOpen(false)}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md"
-          >
-            <motion.div
-              {...selectedAnimation}
-              transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="relative mx-4 aspect-video w-full max-w-4xl md:mx-0"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <motion.button 
-                type="button"
-                onClick={() => setIsVideoOpen(false)}
-                className="absolute -top-16 right-0 rounded-full bg-neutral-900/50 p-2 text-xl text-white ring-1 backdrop-blur-md dark:bg-neutral-100/50 dark:text-black cursor-pointer"
-              >
-                <XIcon className="size-5" />
-              </motion.button>
-              <div className="relative isolate z-1 size-full overflow-hidden rounded-2xl border-2 border-white">
-                <iframe
-                  src={embedUrl}
-                  title="Hero Video player"
-                  className="mt-0 size-full rounded-2xl"
-                  allowFullScreen
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                ></iframe>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+
+      <HeroVideoModal
+        isOpen={isVideoOpen}
+        onClose={() => setIsVideoOpen(false)}
+        videoSrc={videoSrc}
+        animationStyle={animationStyle}
+      />
     </div>
   )
 }
+
 
 
 
