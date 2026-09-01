@@ -191,14 +191,14 @@ export function HeroVideoModal({
             className="relative mx-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* 视频框外右上角悬浮圆形关闭按钮 (Magic UI 官方规格) */}
+            {/* 视频框外右上角悬浮圆形关闭按钮 (更大尺寸 + 清晰外置) */}
             <motion.button
               type="button"
               onClick={onClose}
-              className="absolute -top-14 sm:-top-16 right-0 z-50 flex size-10 items-center justify-center rounded-full bg-neutral-900/70 text-white ring-1 ring-white/20 backdrop-blur-md transition-all hover:bg-neutral-900/95 dark:bg-neutral-100/60 dark:text-black cursor-pointer shadow-2xl"
+              className="absolute -top-14 sm:-top-18 right-0 sm:-right-2 z-50 flex size-12 sm:size-14 items-center justify-center rounded-full bg-neutral-900/85 text-white ring-2 ring-white/30 backdrop-blur-lg transition-all duration-200 hover:bg-neutral-900 hover:scale-110 active:scale-95 dark:bg-neutral-100/70 dark:text-black cursor-pointer shadow-2xl"
               aria-label="关闭视频"
             >
-              <XIcon className="size-5" />
+              <XIcon className="size-6 sm:size-7 stroke-[2.2]" />
             </motion.button>
             <div 
               style={{ width: "100%", height: "100%" }}
