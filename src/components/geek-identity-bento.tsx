@@ -3,30 +3,31 @@
 import { useState, useEffect } from 'react'
 import { BentoGrid, BentoCard } from '@/components/ui/bento-grid'
 import { 
-	Terminal, 
-	Globe, 
-	Disc3, 
-	GitBranch, 
-	Laptop, 
-	Sparkles, 
-	Clock, 
+	FileCode2, 
+	Bell, 
+	Share2, 
+	CalendarDays, 
+	Zap, 
+	CheckCircle2, 
 	MapPin, 
+	Clock,
 	Code2,
-	Cpu,
-	Music2,
-	Flame
+	GitBranch,
+	Music,
+	Cpu
 } from 'lucide-react'
 import { motion } from 'motion/react'
-import gearsData from '@/app/about/gears.json'
-import musicData from '@/app/favorite/music.json'
 
 export function GeekIdentityBento({ className }: { className?: string }) {
 	const [timeString, setTimeString] = useState<string>('')
+	const [currentDay, setCurrentDay] = useState<number>(1)
+	const [currentMonth, setCurrentMonth] = useState<string>('September')
+	const [currentYear, setCurrentYear] = useState<number>(2026)
 	const [mounted, setMounted] = useState<boolean>(false)
 
 	useEffect(() => {
 		setMounted(true)
-		const updateTime = () => {
+		const update = () => {
 			const now = new Date()
 			setTimeString(
 				now.toLocaleTimeString('en-US', {
@@ -36,219 +37,221 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					second: '2-digit',
 				})
 			)
+			setCurrentDay(now.getDate())
+			setCurrentMonth(now.toLocaleDateString('en-US', { month: 'long' }))
+			setCurrentYear(now.getFullYear())
 		}
-		updateTime()
-		const timer = setInterval(updateTime, 1000)
+		update()
+		const timer = setInterval(update, 1000)
 		return () => clearInterval(timer)
 	}, [])
 
-	const currentMusic = musicData[0] || { name: 'Sunset Flow', subtitle: 'Lofi Vibes' }
-	const topGears = (gearsData as any[]).filter((g) => g.isShow !== false).slice(0, 6)
-
 	return (
 		<div className={className}>
-			<BentoGrid className="grid-cols-1 md:grid-cols-3 auto-rows-[20rem] sm:auto-rows-[22rem]">
-				{/* ════════════════ Card 1: 🛠️ 全栈工程与架构哲学 (Col 1-2, Row 1) ════════════════ */}
+			<BentoGrid className="grid-cols-1 md:grid-cols-3 auto-rows-[22rem]">
+				{/* ════════════════ 1. File Stack (Col 1, Row 1 - like "Save your files") ════════════════ */}
 				<BentoCard
-					name="Full Stack Craftsman & System Architect"
-					description="精通 Next.js 16、React 19、TypeScript 与 AI Agent 架构，专注于高性能 Web 系统设计与优雅交互体验。"
-					Icon={Terminal}
+					name="Save your architecture"
+					description="模块化、高可维护的 TypeScript 与 Next.js 边缘架构设计。"
+					Icon={FileCode2}
 					href="https://github.com/lyt04919"
-					cta="探索开源与架构哲学"
-					className="col-span-1 md:col-span-2"
+					cta="查看仓库源码"
+					className="col-span-1"
 					background={
-						<div className="absolute inset-0 flex flex-col justify-between p-6 opacity-30 dark:opacity-20 select-none pointer-events-none">
-							<div className="flex items-center gap-2 font-mono text-[11px] text-zinc-500">
-								<div className="size-2.5 rounded-full bg-rose-500/80" />
-								<div className="size-2.5 rounded-full bg-amber-500/80" />
-								<div className="size-2.5 rounded-full bg-emerald-500/80" />
-								<span className="ml-2 font-semibold text-zinc-400">~/architecture/philosophy.ts</span>
+						<div className="absolute top-4 inset-x-4 flex items-center justify-center gap-2.5 overflow-hidden select-none pointer-events-none">
+							{/* File Card 1 */}
+							<div className="w-28 h-32 rounded-xl bg-zinc-50 dark:bg-zinc-800/90 border border-zinc-200/90 dark:border-zinc-700/80 p-3 shadow-md flex flex-col justify-between transform -rotate-3 transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-105">
+								<div className="flex items-center justify-between text-zinc-400">
+									<FileCode2 className="size-4 text-blue-500" />
+									<span className="text-[9px] font-mono font-bold">.ts</span>
+								</div>
+								<div className="space-y-1">
+									<div className="h-1.5 w-16 bg-zinc-300 dark:bg-zinc-600 rounded-full" />
+									<div className="h-1.5 w-10 bg-zinc-200 dark:bg-zinc-700 rounded-full" />
+								</div>
+								<span className="text-[9.5px] font-mono font-bold text-zinc-600 dark:text-zinc-300 truncate">
+									agent.core.ts
+								</span>
 							</div>
-							<div className="font-mono text-xs text-zinc-600 dark:text-zinc-300 space-y-1.5 pl-2 border-l border-zinc-300 dark:border-zinc-700">
-								<p><span className="text-purple-500">const</span> <span className="text-blue-500">craftsman</span> = &#123;</p>
-								<p className="pl-4">principles: [<span className="text-emerald-500">'Clean Architecture'</span>, <span className="text-emerald-500">'Ultra-Low Latency'</span>, <span className="text-emerald-500">'Zero Bloat'</span>],</p>
-								<p className="pl-4">stack: [<span className="text-emerald-500">'Next.js'</span>, <span className="text-emerald-500">'TypeScript'</span>, <span className="text-emerald-500">'Tailwind'</span>, <span className="text-emerald-500">'Motion'</span>, <span className="text-emerald-500">'LLM Agent'</span>],</p>
-								<p className="pl-4">status: <span className="text-amber-500">'Shipping production-grade software'</span></p>
-								<p>&#125;</p>
+
+							{/* File Card 2 (Center highlight) */}
+							<div className="w-32 h-36 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 p-3 shadow-xl flex flex-col justify-between z-10 transition-transform duration-300 group-hover:scale-105 group-hover:-translate-y-1">
+								<div className="flex items-center justify-between">
+									<Code2 className="size-4 text-purple-500" />
+									<span className="text-[9px] font-mono font-bold text-purple-500">PROD</span>
+								</div>
+								<div className="space-y-1.5">
+									<div className="h-2 w-20 bg-purple-500/20 rounded-full" />
+									<div className="h-1.5 w-14 bg-zinc-200 dark:bg-zinc-700 rounded-full" />
+									<div className="h-1.5 w-18 bg-zinc-200 dark:bg-zinc-700 rounded-full" />
+								</div>
+								<span className="text-[10px] font-mono font-extrabold text-zinc-800 dark:text-zinc-100 truncate">
+									architecture.config
+								</span>
 							</div>
-							{/* Floating Tech Badges */}
-							<div className="flex flex-wrap gap-2 pt-2">
-								{['Next.js 16', 'React 19', 'TypeScript', 'Tailwind CSS', 'Motion/React', 'Cloudflare', 'AI SDK'].map((tech) => (
-									<span key={tech} className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold bg-zinc-200/60 dark:bg-zinc-800/60 text-zinc-700 dark:text-zinc-300 border border-zinc-300/40 dark:border-zinc-700/50">
-										{tech}
-									</span>
-								))}
+
+							{/* File Card 3 */}
+							<div className="w-28 h-32 rounded-xl bg-zinc-50 dark:bg-zinc-800/90 border border-zinc-200/90 dark:border-zinc-700/80 p-3 shadow-md flex flex-col justify-between transform rotate-3 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-105">
+								<div className="flex items-center justify-between text-zinc-400">
+									<Cpu className="size-4 text-emerald-500" />
+									<span className="text-[9px] font-mono font-bold">.env</span>
+								</div>
+								<div className="space-y-1">
+									<div className="h-1.5 w-14 bg-zinc-300 dark:bg-zinc-600 rounded-full" />
+									<div className="h-1.5 w-8 bg-zinc-200 dark:bg-zinc-700 rounded-full" />
+								</div>
+								<span className="text-[9.5px] font-mono font-bold text-zinc-600 dark:text-zinc-300 truncate">
+									edge.worker.js
+								</span>
 							</div>
 						</div>
 					}
 				/>
 
-				{/* ════════════════ Card 2: 🌍 数字游民与基站时区 (Col 3, Row 1-2 双高卡) ════════════════ */}
+				{/* ════════════════ 2. Notifications (Col 2-3, Row 1 - like "Notifications") ════════════════ */}
 				<BentoCard
-					name="Nomad Station & World Time"
-					description="跨越地理维度的全球协同探索，随时随地开启沉浸式高效编码。"
-					Icon={Globe}
-					href="/#trajectory-map"
-					cta="查看游民足迹地图"
-					className="col-span-1 md:col-span-1 md:row-span-2 auto-rows-auto"
+					name="Real-time Pulse & Notifications"
+					description="全自动边缘构建、毫秒级响应分发与全天候在线的数字游民基站。"
+					Icon={Bell}
+					href="https://github.com/lyt04919"
+					cta="查看系统运行日志"
+					className="col-span-1 md:col-span-2"
 					background={
-						<div className="absolute inset-0 flex flex-col items-center justify-center overflow-hidden">
-							{/* Radar pulse ripples */}
-							<div className="absolute size-48 rounded-full border border-blue-500/20 animate-ping opacity-25" />
-							<div className="absolute size-36 rounded-full border border-blue-500/30" />
-							<div className="absolute size-24 rounded-full border border-blue-500/40 bg-blue-500/5" />
-							
-							{/* Ambient globe grid */}
-							<div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.08)_0,transparent_70%)]" />
-						</div>
-					}
-				>
-					{/* Live Time Display */}
-					<div className="my-auto py-6 flex flex-col items-center justify-center text-center">
-						<div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs font-mono font-bold mb-4 backdrop-blur-md">
-							<span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-							<span>LIVE ONLINE</span>
-						</div>
-						<div className="font-mono text-3xl sm:text-4xl font-extrabold text-zinc-800 dark:text-zinc-100 tracking-tight flex items-center justify-center gap-2">
-							<Clock className="size-6 text-blue-500 animate-pulse" />
-							<span>{mounted ? timeString || '00:00:00' : '00:00:00'}</span>
-						</div>
-						<div className="flex items-center gap-1.5 mt-3 text-xs text-zinc-500 dark:text-zinc-400 font-medium">
-							<MapPin className="size-3.5 text-rose-500" />
-							<span>Hangzhou · GMT+8 / Earth Base</span>
-						</div>
-					</div>
-				</BentoCard>
-
-				{/* ════════════════ Card 3: 🎵 黑胶唱片与声浪律动 (Col 1, Row 2) ════════════════ */}
-				<BentoCard
-					name="Sonic Sanctuary"
-					description="黑胶低鸣与电子声浪，在沉浸音乐氛围中构筑纯粹心流代码世界。"
-					Icon={Disc3}
-					href="/#favorites-lounge"
-					cta="进入视听室聆听"
-					className="col-span-1"
-					background={
-						<div className="absolute inset-0 flex items-center justify-end pr-4 opacity-25 dark:opacity-20 overflow-hidden">
-							{/* Rotating Vinyl Record */}
-							<div className="size-36 rounded-full bg-zinc-950 border-4 border-zinc-800 shadow-2xl flex items-center justify-center animate-[spin_12s_linear_infinite]">
-								<div className="size-24 rounded-full border border-zinc-700/60 flex items-center justify-center">
-									<div className="size-12 rounded-full bg-amber-500/80 flex items-center justify-center text-[8px] font-bold text-black font-mono">
-										VINYL
+						<div className="absolute top-3 inset-x-6 flex flex-col gap-2.5 overflow-hidden select-none pointer-events-none">
+							{/* Notification Item 1 */}
+							<div className="flex items-center gap-3 p-2.5 px-3.5 rounded-xl bg-white/90 dark:bg-zinc-800/90 border border-zinc-200/80 dark:border-zinc-700/80 shadow-sm transition-all duration-300 group-hover:translate-x-1">
+								<div className="size-7 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+									<CheckCircle2 className="size-4" />
+								</div>
+								<div className="flex flex-col flex-1 min-w-0">
+									<div className="flex items-center justify-between">
+										<span className="text-xs font-bold text-zinc-800 dark:text-zinc-100 truncate">Production Deployed</span>
+										<span className="text-[10px] text-zinc-400 font-mono">2m ago</span>
 									</div>
+									<span className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">All static assets synced to global edge</span>
+								</div>
+							</div>
+
+							{/* Notification Item 2 */}
+							<div className="flex items-center gap-3 p-2.5 px-3.5 rounded-xl bg-white/90 dark:bg-zinc-800/90 border border-zinc-200/80 dark:border-zinc-700/80 shadow-sm transition-all duration-300 group-hover:translate-x-1 delay-75">
+								<div className="size-7 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+									<Zap className="size-4" />
+								</div>
+								<div className="flex flex-col flex-1 min-w-0">
+									<div className="flex items-center justify-between">
+										<span className="text-xs font-bold text-zinc-800 dark:text-zinc-100 truncate">Edge Latency: 12ms</span>
+										<span className="text-[10px] text-zinc-400 font-mono">5m ago</span>
+									</div>
+									<span className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">Cloudflare CDN cached with 100% score</span>
+								</div>
+							</div>
+
+							{/* Notification Item 3 */}
+							<div className="flex items-center gap-3 p-2.5 px-3.5 rounded-xl bg-white/90 dark:bg-zinc-800/90 border border-zinc-200/80 dark:border-zinc-700/80 shadow-sm transition-all duration-300 group-hover:translate-x-1 delay-150">
+								<div className="size-7 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+									<MapPin className="size-4" />
+								</div>
+								<div className="flex flex-col flex-1 min-w-0">
+									<div className="flex items-center justify-between">
+										<span className="text-xs font-bold text-zinc-800 dark:text-zinc-100 truncate">Nomad Base Station</span>
+										<span className="text-[10px] text-zinc-400 font-mono">LIVE</span>
+									</div>
+									<span className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">Hangzhou · GMT+8 Active Nomad</span>
 								</div>
 							</div>
 						</div>
 					}
-				>
-					{/* Music Equalizer Visualizer */}
-					<div className="flex items-center gap-3 pt-2">
-						<div className="flex items-end gap-1 h-6">
-							{[40, 75, 100, 50, 90, 65, 80].map((h, i) => (
-								<motion.div
-									key={i}
-									animate={{ height: ['20%', `${h}%`, '30%'] }}
-									transition={{ repeat: Infinity, duration: 1.2, delay: i * 0.15, ease: 'easeInOut' }}
-									className="w-1 rounded-full bg-[var(--color-brand)] opacity-80"
-								/>
-							))}
-						</div>
-						<div className="text-xs truncate">
-							<p className="font-semibold text-zinc-700 dark:text-zinc-200 truncate">{currentMusic.name}</p>
-							<p className="text-[10px] text-zinc-400 truncate">{currentMusic.subtitle || 'Now Playing'}</p>
-						</div>
-					</div>
-				</BentoCard>
+				/>
 
-				{/* ════════════════ Card 4: 🚀 GitHub 脉冲与开源贡献 (Col 2, Row 2) ════════════════ */}
+				{/* ════════════════ 3. Integrations (Col 1-2, Row 2 - like "Integrations") ════════════════ */}
 				<BentoCard
-					name="Open Source Pulse"
-					description="坚持代码开源与知识共享，构建纯静态、零运维的高性能现代化架构。"
-					Icon={GitBranch}
+					name="Integrations & Stack"
+					description="深度整合 Next.js 16、TypeScript、React 19、Tailwind CSS、GitHub 与现代 AI 工具链。"
+					Icon={Share2}
 					href="https://github.com/lyt04919"
-					cta="查看 GitHub 仓库"
+					cta="探索完整生态集成"
+					className="col-span-1 md:col-span-2"
+					background={
+						<div className="absolute inset-0 flex items-center justify-center select-none pointer-events-none">
+							<svg className="w-full h-full max-w-[360px] max-h-[140px]" viewBox="0 0 360 140" fill="none">
+								{/* Curved Connector Lines */}
+								<path d="M 60 70 C 120 70, 120 30, 180 30" stroke="currentColor" strokeWidth="1.5" className="text-zinc-300 dark:text-zinc-700 stroke-dasharray-[4_4] animate-pulse" />
+								<path d="M 60 70 C 120 70, 120 70, 180 70" stroke="currentColor" strokeWidth="1.5" className="text-zinc-300 dark:text-zinc-700" />
+								<path d="M 60 70 C 120 70, 120 110, 180 110" stroke="currentColor" strokeWidth="1.5" className="text-zinc-300 dark:text-zinc-700 stroke-dasharray-[4_4]" />
+								
+								<path d="M 180 30 C 240 30, 240 25, 300 25" stroke="currentColor" strokeWidth="1.5" className="text-zinc-300 dark:text-zinc-700" />
+								<path d="M 180 70 C 240 70, 240 60, 300 55" stroke="currentColor" strokeWidth="1.5" className="text-zinc-300 dark:text-zinc-700 stroke-dasharray-[4_4]" />
+								<path d="M 180 70 C 240 70, 240 85, 300 85" stroke="currentColor" strokeWidth="1.5" className="text-zinc-300 dark:text-zinc-700" />
+								<path d="M 180 110 C 240 110, 240 115, 300 115" stroke="currentColor" strokeWidth="1.5" className="text-zinc-300 dark:text-zinc-700 stroke-dasharray-[4_4]" />
+
+								{/* Left Origin Node */}
+								<g transform="translate(40, 50)">
+									<rect width="40" height="40" rx="12" className="fill-white dark:fill-zinc-800 stroke-zinc-200 dark:stroke-zinc-700" strokeWidth="1.5" />
+									<text x="20" y="25" textAnchor="middle" className="fill-zinc-800 dark:fill-zinc-100 font-bold text-xs font-mono">YOU</text>
+								</g>
+
+								{/* Center Core Node */}
+								<g transform="translate(160, 50)">
+									<rect width="40" height="40" rx="12" className="fill-purple-600 text-white shadow-lg" />
+									<text x="20" y="25" textAnchor="middle" fill="white" className="font-extrabold text-xs font-mono">HUB</text>
+								</g>
+
+								{/* Right Stack Nodes */}
+								<g transform="translate(285, 8)">
+									<rect width="34" height="34" rx="10" className="fill-white dark:fill-zinc-800 stroke-zinc-200 dark:stroke-zinc-700" strokeWidth="1.5" />
+									<text x="17" y="21" textAnchor="middle" className="fill-blue-500 font-bold text-[10px] font-mono">React</text>
+								</g>
+								<g transform="translate(285, 42)">
+									<rect width="34" height="34" rx="10" className="fill-white dark:fill-zinc-800 stroke-zinc-200 dark:stroke-zinc-700" strokeWidth="1.5" />
+									<text x="17" y="21" textAnchor="middle" className="fill-zinc-800 dark:fill-zinc-100 font-bold text-[10px] font-mono">Next</text>
+								</g>
+								<g transform="translate(285, 72)">
+									<rect width="34" height="34" rx="10" className="fill-white dark:fill-zinc-800 stroke-zinc-200 dark:stroke-zinc-700" strokeWidth="1.5" />
+									<text x="17" y="21" textAnchor="middle" className="fill-blue-600 font-bold text-[10px] font-mono">TS</text>
+								</g>
+								<g transform="translate(285, 102)">
+									<rect width="34" height="34" rx="10" className="fill-white dark:fill-zinc-800 stroke-zinc-200 dark:stroke-zinc-700" strokeWidth="1.5" />
+									<text x="17" y="21" textAnchor="middle" className="fill-emerald-500 font-bold text-[10px] font-mono">Git</text>
+								</g>
+							</svg>
+						</div>
+					}
+				/>
+
+				{/* ════════════════ 4. Calendar & Time (Col 3, Row 2 - like "Calendar") ════════════════ */}
+				<BentoCard
+					name="Calendar & Nomad Clock"
+					description="全球时区与数字日程基站，保持高能心流专注。"
+					Icon={CalendarDays}
+					href="/about"
+					cta="查看时区基站"
 					className="col-span-1"
 					background={
-						<div className="absolute inset-0 flex items-center justify-center p-6 opacity-25 dark:opacity-20">
-							{/* Matrix Contribution Dots */}
-							<div className="grid grid-cols-8 gap-1.5">
-								{Array.from({ length: 32 }).map((_, i) => {
-									const levels = [
-										'bg-zinc-300 dark:bg-zinc-800',
-										'bg-emerald-300 dark:bg-emerald-900/60',
-										'bg-emerald-400 dark:bg-emerald-700',
-										'bg-emerald-500 dark:bg-emerald-500',
-									]
-									const level = levels[i % 4]
-									return (
-										<div
-											key={i}
-											className={`size-3 rounded-xs ${level} transition-all duration-300`}
-										/>
-									)
-								})}
+						<div className="absolute top-3 inset-x-6 flex flex-col items-center justify-center select-none pointer-events-none">
+							{/* Mini Apple Calendar Widget */}
+							<div className="w-full max-w-[200px] rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 p-3 shadow-md">
+								<div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-700/80 pb-2 mb-2">
+									<span className="text-xs font-bold text-rose-500 font-mono">{currentMonth} {currentYear}</span>
+									<span className="text-[10px] font-mono font-bold text-zinc-400">{timeString || '00:00'}</span>
+								</div>
+								<div className="grid grid-cols-7 gap-1 text-center text-[10px] font-mono text-zinc-400 mb-1">
+									<span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+								</div>
+								<div className="grid grid-cols-7 gap-1 text-center text-[10px] font-mono text-zinc-600 dark:text-zinc-300">
+									<span className="opacity-30">30</span>
+									<span className="opacity-30">31</span>
+									<span className="font-semibold">1</span>
+									<span className="size-5 mx-auto rounded-full bg-rose-500 text-white font-bold flex items-center justify-center shadow-xs">
+										{mounted ? currentDay : 2}
+									</span>
+									<span className="font-semibold">3</span>
+									<span className="font-semibold">4</span>
+									<span className="font-semibold">5</span>
+								</div>
 							</div>
 						</div>
 					}
-				>
-					<div className="flex items-center gap-4 pt-2">
-						<div className="px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-center">
-							<span className="block text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400">100%</span>
-							<span className="text-[9px] text-zinc-400 font-mono">OPEN SOURCE</span>
-						</div>
-						<div className="px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-center">
-							<span className="block text-xs font-mono font-bold text-purple-600 dark:text-purple-400">0 SERVER</span>
-							<span className="text-[9px] text-zinc-400 font-mono">EDGE STATIC</span>
-						</div>
-					</div>
-				</BentoCard>
-
-				{/* ════════════════ Card 5: 💻 极客数字装备与生产力工作流 (Col 1-3, Row 3 全宽卡) ════════════════ */}
-				<BentoCard
-					name="Desk Setup & Hardware Workspace"
-					description="MacBook Air M4、ROG 旗舰、AirPods Pro 2 与定制机械键盘，构筑全天候数字生产力系统。"
-					Icon={Laptop}
-					href="/about"
-					cta="探索完整装备清单与工作流"
-					className="col-span-1 md:col-span-3"
-					background={
-						<div className="absolute inset-0 flex items-center justify-end pr-6 opacity-30 dark:opacity-25 overflow-hidden pointer-events-none">
-							<div className="flex gap-3 translate-x-12 sm:translate-x-0">
-								{topGears.map((gear: any, idx: number) => (
-									<div
-										key={gear.name || idx}
-										className="w-28 sm:w-36 h-28 rounded-2xl overflow-hidden border border-zinc-300/60 dark:border-zinc-700/60 bg-zinc-100 dark:bg-zinc-800/90 shadow-lg shrink-0 flex flex-col items-center justify-center p-2 text-center"
-									>
-										{gear.cover ? (
-											<img
-												src={gear.cover}
-												alt={gear.name}
-												className="size-16 object-contain mb-1 rounded-lg"
-											/>
-										) : (
-											<Laptop className="size-8 text-zinc-400 mb-1" />
-										)}
-										<span className="text-[10px] font-bold text-zinc-700 dark:text-zinc-200 truncate w-full">
-											{gear.name}
-										</span>
-									</div>
-								))}
-							</div>
-						</div>
-					}
-				>
-					{/* Fast Gear Tags */}
-					<div className="flex flex-wrap gap-2 pt-2">
-						{['MacBook Air M4', 'ROG 魔霸 2023 (RTX 4060)', 'iPad Pro 12.9', 'AirPods Pro 2', '狼蛛 F99 Gasket', 'Apple Watch S11'].map((item) => (
-							<span
-								key={item}
-								className="px-2.5 py-1 rounded-lg text-[10px] sm:text-xs font-mono font-semibold bg-zinc-100/90 dark:bg-zinc-800/90 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-700/80 shadow-xs"
-							>
-								⚡ {item}
-							</span>
-						))}
-					</div>
-				</BentoCard>
+				/>
 			</BentoGrid>
 		</div>
 	)
