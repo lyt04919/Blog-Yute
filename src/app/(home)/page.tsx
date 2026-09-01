@@ -1,33 +1,77 @@
 'use client'
 
+import { useState, useEffect, useRef } from 'react'
+import dynamic from 'next/dynamic'
 import HeroSection from './components/hero-section'
-import FeaturedProjects from './components/featured-projects'
-import FootprintBento from './components/footprint-bento'
-import LiveStatus from './components/live-status'
-import RecentInsights from './components/recent-insights'
 
-// Force rebuild trigger to clear next.js dev cache
+const EditorialProjects = dynamic(() => import('./components/editorial-projects'), { ssr: false })
+const NomadTrajectoryMap = dynamic(() => import('./components/nomad-trajectory-map'), { ssr: false })
+const AudioCinemaLounge = dynamic(() => import('./components/audio-cinema-lounge'), { ssr: false })
+
+function LazySection({
+	children,
+	minHeight,
+	rootMargin = '300px',
+}: {
+	children: React.ReactNode
+	minHeight: string
+	rootMargin?: string
+}) {
+	const [isVisible, setIsVisible] = useState(false)
+	const containerRef = useRef<HTMLDivElement>(null)
+
+	useEffect(() => {
+		if (isVisible) return
+		const el = containerRef.current
+		if (!el) return
+		if (typeof IntersectionObserver === 'undefined') {
+			setIsVisible(true)
+			return
+		}
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (entries[0]?.isIntersecting) {
+					setIsVisible(true)
+					observer.disconnect()
+				}
+			},
+			{ rootMargin }
+		)
+		observer.observe(el)
+		return () => observer.disconnect()
+	}, [isVisible, rootMargin])
+
+	return (
+		<div ref={containerRef} className="w-full" style={{ minHeight: isVisible ? undefined : minHeight }}>
+			{isVisible ? children : <div style={{ height: minHeight }} aria-hidden="true" />}
+		</div>
+	)
+}
+
 export default function Home() {
 	return (
-		<main className="relative w-full min-h-screen bg-[var(--color-bg)] font-sans text-[var(--color-primary)] overflow-hidden">
-			{/* High-fidelity background dot pattern */}
-			<div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(rgba(0,0,0,0.06)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+		<main className="relative w-full min-h-screen bg-[var(--color-bg)] font-sans text-[var(--color-primary)] overflow-hidden transition-colors duration-300">
+			{/* Minimalist dot grid background */}
+			<div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(rgba(0,0,0,0.05)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.05)_1px,transparent_1px)] [background-size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
 
-			<div className="relative z-10 w-full flex flex-col gap-12 md:gap-20 pt-8 pb-36">
-				{/* 1. Hero Bento Header */}
+			<div className="relative z-10 w-full flex flex-col items-center pb-24">
+				{/* 1. 原版第一个页面：3D 卡片与双层 Orbit 卫星环绕系统 */}
 				<HeroSection />
 
-				{/* 2. Featured Works 精选代表作与工具展柜 */}
-				<FeaturedProjects />
+				{/* 2. 项目展示：Selected Works 3 联 App Browser Mockup */}
+				<LazySection minHeight="620px">
+					<EditorialProjects />
+				</LazySection>
 
-				{/* 3. Live Status & Favorites 个人状态与收藏 */}
-				<LiveStatus />
+				{/* 3. 足迹航线：Nomad Trajectory 真实地理矢量地图与图钉挂照 */}
+				<LazySection minHeight="720px">
+					<NomadTrajectoryMap />
+				</LazySection>
 
-				{/* 4. Bento Dashboard 数字足迹 (旅行地图与相册) */}
-				<FootprintBento />
-
-				{/* 5. Recent Insights 最新文章 */}
-				<RecentInsights />
+				{/* 4. 影音书香客厅：Audio & Cinema Lounge 黑胶唱机与全分类画廊展架 */}
+				<LazySection minHeight="850px">
+					<AudioCinemaLounge />
+				</LazySection>
 			</div>
 		</main>
 	)

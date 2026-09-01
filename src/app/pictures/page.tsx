@@ -9,18 +9,29 @@ export interface Picture {
 }
 
 import { useState, useMemo } from 'react'
+import dynamic from 'next/dynamic'
 import { motion } from 'motion/react'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
-import { LocationAlbumGrid } from './components/location-album-grid'
-import { PicturesTimeline } from './components/pictures-timeline'
-import { DomeGallery } from './components/dome-gallery'
-import UploadDialog from './components/upload-dialog'
 import { useAuthStore } from '@/hooks/use-auth'
 import { useConfigStore } from '@/app/(home)/stores/config-store'
 import { useTheme } from '@/hooks/use-theme'
 import type { ImageItem } from '../projects/components/image-upload-dialog'
 import initialFootprints from '@/data/footprints.json'
+
+const LocationAlbumGrid = dynamic(
+	() => import('./components/location-album-grid').then(mod => mod.LocationAlbumGrid),
+	{ ssr: false }
+)
+const PicturesTimeline = dynamic(
+	() => import('./components/pictures-timeline').then(mod => mod.PicturesTimeline),
+	{ ssr: false }
+)
+const DomeGallery = dynamic(
+	() => import('./components/dome-gallery').then(mod => mod.DomeGallery),
+	{ ssr: false }
+)
+const UploadDialog = dynamic(() => import('./components/upload-dialog'), { ssr: false })
 
 export default function Page() {
 	const [isEditMode, setIsEditMode] = useState(false)
