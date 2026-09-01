@@ -178,7 +178,7 @@ export function HeroVideoModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           style={{ zIndex: 999999 }}
-          className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-md p-4 md:p-6"
+          className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-md p-4 sm:p-6 pt-20"
           onClick={onClose}
         >
           <motion.div
@@ -191,10 +191,11 @@ export function HeroVideoModal({
             className="relative mx-auto"
             onClick={(e) => e.stopPropagation()}
           >
+            {/* 浮动在视频右上角外侧的圆形关闭按钮 (与 Magic UI 官方红框位置 100% 对齐) */}
             <motion.button
               type="button"
               onClick={onClose}
-              className="absolute -top-14 sm:-top-16 right-0 rounded-full bg-neutral-900/60 p-2 text-xl text-white ring-1 ring-white/20 backdrop-blur-md dark:bg-neutral-100/50 dark:text-black cursor-pointer shadow-lg hover:bg-neutral-900/80"
+              className="absolute -top-16 right-0 flex size-10 items-center justify-center rounded-full bg-neutral-900/60 text-white ring-1 ring-white/20 backdrop-blur-md transition-all hover:bg-neutral-900/90 dark:bg-neutral-100/50 dark:text-black cursor-pointer shadow-2xl"
               aria-label="关闭视频"
             >
               <XIcon className="size-5" />
