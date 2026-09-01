@@ -143,8 +143,8 @@ sequenceDiagram
 
 ```bash
 # 克隆仓库
-git clone https://github.com/lyt04919/myBlog.git
-cd myBlog
+git clone https://github.com/lyt04919/Blog-Yute.git
+cd Blog-Yute
 
 # 安装依赖
 npm install --legacy-peer-deps
@@ -157,7 +157,7 @@ npm install --legacy-peer-deps
 ```env
 # ===== GitHub 仓库配置 =====
 NEXT_PUBLIC_GITHUB_OWNER=lyt04919
-NEXT_PUBLIC_GITHUB_REPO=myBlog
+NEXT_PUBLIC_GITHUB_REPO=Blog-Yute
 NEXT_PUBLIC_GITHUB_BRANCH=main
 
 # ===== GitHub App 授权配置 =====
@@ -248,12 +248,12 @@ npm run deploy
 
 ## Star History
 
-<a href="https://www.star-history.com/#lyt04919/myBlog&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=lyt04919/myBlog&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=lyt04919/myBlog&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=lyt04919/myBlog&type=date&legend=top-left" />
- </picture>
+<a href="https://www.star-history.com/#lyt04919/Blog-Yute&type=date&legend=top-left">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=lyt04919/Blog-Yute&type=date&theme=dark&legend=top-left" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=lyt04919/Blog-Yute&type=date&legend=top-left" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=lyt04919/Blog-Yute&type=date&legend=top-left" />
+  </picture>
 </a>
 
 ---

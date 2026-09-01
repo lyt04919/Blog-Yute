@@ -28,10 +28,9 @@ export default function Page() {
 	const [isSaving, setIsSaving] = useState(false)
 	const [isPreviewMode, setIsPreviewMode] = useState(false)
 	const [activeTab, setActiveTab] = useState<'site' | 'uses'>('site')
-	const keyInputRef = useRef<HTMLInputElement>(null)
 	const { resolvedTheme } = useTheme()
 
-	const { isAuth, setPrivateKey } = useAuthStore()
+	const { isAuth } = useAuthStore()
 	const { siteContent } = useConfigStore()
 	const [location, setLocation] = useState(siteContent.bentoConfig?.location || '')
 	const { content, loading } = useMarkdownRender(data.content)
@@ -48,22 +47,11 @@ export default function Page() {
 		return { totalBlogs, totalProjects, totalTags }
 	}, [blogsList])
 
-	const handleChoosePrivateKey = async (file: File) => {
-		try {
-			const text = await file.text()
-			setPrivateKey(text)
-			await handleSave()
-		} catch (error) {
-			console.error('Failed to read private key:', error)
-			toast.error('读取密钥文件失败')
-		}
-	}
-
 	const handleSaveClick = () => {
 		if (process.env.NODE_ENV === 'development' || isAuth) {
 			handleSave()
 		} else {
-			keyInputRef.current?.click()
+			toast.error('未授权，请先在顶部导航栏登录作者账户')
 		}
 	}
 
@@ -148,16 +136,9 @@ export default function Page() {
 			})
 		} catch (error: any) {
 			console.error('Failed to save:', error)
-			if (error.message?.includes('auth')) {
-				setPrivateKey('') // 清除无效的 key
-				toast.error('保存失败', {
-					description: 'Private Key 无效或已过期，请重新选择文件'
-				})
-			} else {
-				toast.error('保存失败', {
-					description: error.message || '请检查网络连接后重试'
-				})
-			}
+			toast.error('保存失败', {
+				description: error.message || '请检查网络连接后重试'
+			})
 		} finally {
 			setIsSaving(false)
 		}
@@ -193,17 +174,6 @@ export default function Page() {
 	return (
 		<>
 			<PageTitle title="About" />
-			<input
-				ref={keyInputRef}
-				type='file'
-				accept='.pem'
-				className='hidden'
-				onChange={async e => {
-					const f = e.target.files?.[0]
-					if (f) await handleChoosePrivateKey(f)
-					if (e.currentTarget) e.currentTarget.value = ''
-				}}
-			/>
 
 			<div className='mx-auto max-w-5xl px-6 pt-32 pb-12 flex flex-col gap-12 max-sm:px-0'>
 				{/* 顶部：个人资料 Bento 矩阵 */}
@@ -342,7 +312,7 @@ export default function Page() {
 											项目源码:
 										</span>
 										<motion.a
-											href='https://github.com/lyt04919/myBlog'
+											href='https://github.com/lyt04919/Blog-Yute'
 											target='_blank'
 											rel='noreferrer'
 											whileHover={{ scale: 1.02 }}
