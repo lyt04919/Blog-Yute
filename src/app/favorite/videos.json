@@ -1,13 +1,265 @@
 [
 	{
-		"name": "44 Harsh Truths About The Game Of Life - Naval Ravikant (4K)",
-		"cover": "https://i.ytimg.com/vi/KyfUysrNaco/hqdefault.jpg",
-		"subtitle": "Chris Williamson",
-		"desc": "",
+		"name": "Build Clean UI on Nextjs using MagicUI",
+		"cover": "https://img.youtube.com/vi/qh3NGpYRG3I/maxresdefault.jpg",
+		"subtitle": "Ras Mic",
+		"desc": "20+ free and open-source animated components built with React, TypeScript, Tailwind CSS, and Framer Motion.",
+		"review": "Magic UI 官方演示视频",
+		"link": "https://www.youtube.com/watch?v=qh3NGpYRG3I",
+		"isPinned": true,
+		"isShow": true,
+		"isShowOnHome": true,
+		"stars": 5,
+		"status": "精选演示",
+		"category": "前端工程",
+		"releaseDate": "",
+		"playDate": "2026-09-01",
+		"embedLink": "https://www.youtube.com/embed/qh3NGpYRG3I?autoplay=0&rel=0",
+		"chapters": []
+	},
+	{
+		"name": "50 Action Verbs You NEED to Know in English | Beginner English (Comprehensible Input)",
+		"cover": "https://img.youtube.com/vi/FzjKocVsAqU/maxresdefault.jpg",
+		"subtitle": "Volka English",
+		"desc": "📒 Get the 5000 Most Common English Words PDF here: https://volkaenglish.com/products/new-5000-english-words-vocabulary-textbook-combo-985-pages\n\n📗 Get the 3000 Most Common English Words PDF here: https://volkaenglish.com/en-usd/products/updated-3000-most-common-english-words-textbook-587-pages\n\n📕",
 		"review": "",
-		"link": "https://www.youtube.com/embed/KyfUysrNaco",
+		"link": "https://www.youtube.com/watch?v=FzjKocVsAqU",
 		"isPinned": false,
 		"isShow": true,
-		"category": ""
+		"isShowOnHome": true,
+		"stars": 5,
+		"status": "已追完",
+		"category": "硬核对谈",
+		"releaseDate": "",
+		"playDate": "2026-08-28",
+		"embedLink": "https://www.youtube.com/embed/FzjKocVsAqU?autoplay=0&rel=0",
+		"chapters": [
+			{
+				"time": "0:00",
+				"seconds": 0,
+				"title": "intro"
+			},
+			{
+				"time": "0:08",
+				"seconds": 8,
+				"title": "Verbs 1-10"
+			},
+			{
+				"time": "2:28",
+				"seconds": 148,
+				"title": "11-20"
+			},
+			{
+				"time": "4:31",
+				"seconds": 271,
+				"title": "21-30"
+			},
+			{
+				"time": "6:32",
+				"seconds": 392,
+				"title": "31-40"
+			},
+			{
+				"time": "9:03",
+				"seconds": 543,
+				"title": "41-50"
+			}
+		]
+	},
+	{
+		"name": "What's on my Phone 2026!",
+		"cover": "https://img.youtube.com/vi/KW21q_7U6Ao/maxresdefault.jpg",
+		"subtitle": "Marques Brownlee",
+		"desc": "",
+		"review": "",
+		"link": "https://www.youtube.com/watch?v=KW21q_7U6Ao",
+		"isPinned": false,
+		"isShow": true,
+		"isShowOnHome": true,
+		"stars": 5,
+		"status": "已追完",
+		"category": "硬核对谈",
+		"releaseDate": "",
+		"playDate": "2026-08-28",
+		"embedLink": "https://www.youtube.com/embed/KW21q_7U6Ao?autoplay=0&rel=0"
+	},
+	{
+		"name": "Psychology of Discipline (And How to Trick Your Brain Into Craving It)",
+		"cover": "https://img.youtube.com/vi/CkP_8bkjf1E/maxresdefault.jpg",
+		"subtitle": "PsychToons",
+		"desc": "",
+		"review": "",
+		"link": "https://www.youtube.com/watch?v=CkP_8bkjf1E",
+		"isPinned": false,
+		"isShow": true,
+		"isShowOnHome": true,
+		"category": "",
+		"releaseDate": "",
+		"playDate": "2026-08-28",
+		"embedLink": "https://www.youtube.com/embed/CkP_8bkjf1E?autoplay=0&rel=0"
+	},
+	{
+		"name": "44 Harsh Truths About The Game Of Life - Naval Ravikant",
+		"cover": "https://i.ytimg.com/vi/KyfUysrNaco/hqdefault.jpg",
+		"subtitle": "Chris Williamson x Naval Ravikant",
+		"desc": "硅谷传奇天使投资人 Naval Ravikant 深度拆解人生游戏规则、财富创造杠杆与内心真正的平静。",
+		"review": "关于财富、幸福与自由的最深刻对谈，常听常新的人生底层算法。",
+		"link": "https://www.youtube.com/watch?v=KyfUysrNaco",
+		"isPinned": true,
+		"isShow": true,
+		"stars": 5,
+		"status": "已追完",
+		"category": "硬核对谈",
+		"playDate": "2024-02-28",
+		"chapters": [
+			{
+				"time": "00:00",
+				"seconds": 0,
+				"title": "游戏的人生本质与规则"
+			},
+			{
+				"time": "04:15",
+				"seconds": 255,
+				"title": "代码与媒体：无许可的终极杠杆"
+			},
+			{
+				"time": "28:30",
+				"seconds": 1710,
+				"title": "如何避开零和博弈与地位竞争"
+			},
+			{
+				"time": "1:05:42",
+				"seconds": 3942,
+				"title": "内心平静是真正的顶级超能力"
+			},
+			{
+				"time": "2:14:10",
+				"seconds": 8050,
+				"title": "幸福是一项可以通过练习掌握的技能"
+			},
+			{
+				"time": "3:02:00",
+				"seconds": 10920,
+				"title": "解脱与自由的终极答案"
+			}
+		]
+	},
+	{
+		"name": "双城之战 第一季 (Arcane Season 1)",
+		"cover": "https://images.unsplash.com/photo-1563089145-599997674d42?w=800&auto=format&fit=crop&q=80",
+		"subtitle": "Riot Games & Fortiche",
+		"desc": "皮尔特沃夫与祖安的双城宿命对决，金克丝与蔚的姐妹悲剧。美术与配乐的天花板动画神作。",
+		"review": "动画视效、分镜设计与配乐的终极天花板，每一帧都可以直接作为高分辨率壁纸。",
+		"link": "https://www.bilibili.com/bangumi/play/ep424883",
+		"isPinned": false,
+		"isShow": true,
+		"stars": 5,
+		"status": "已追完",
+		"category": "动画剧集",
+		"playDate": "2023-12-10",
+		"chapters": [
+			{
+				"time": "00:00",
+				"seconds": 0,
+				"title": "祖安与皮城的宿命裂痕"
+			},
+			{
+				"time": "14:20",
+				"seconds": 860,
+				"title": "金克丝的心灵蜕变与微光实验"
+			},
+			{
+				"time": "38:50",
+				"seconds": 2330,
+				"title": "终极决裂与悲剧交响"
+			}
+		]
+	},
+	{
+		"name": "乔布斯 2007 年初代 iPhone 发布会",
+		"cover": "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=800&auto=format&fit=crop&q=80",
+		"subtitle": "Steve Jobs · Macworld 2007",
+		"desc": "“An iPod, a phone, and an internet communicator... are you getting it?” 彻底改变世界科技轨迹的历史时刻。",
+		"review": "科技发布会史上教科书级别的演讲与舞台张力，一人一手定义了整个移动互联网时代。",
+		"link": "https://www.youtube.com/watch?v=vN4U5FqrOdQ",
+		"isPinned": false,
+		"isShow": true,
+		"stars": 5,
+		"status": "已追完",
+		"category": "科技演讲",
+		"playDate": "2024-04-15",
+		"chapters": [
+			{
+				"time": "00:00",
+				"seconds": 0,
+				"title": "历史性的开场与三大革命性产品"
+			},
+			{
+				"time": "03:40",
+				"seconds": 220,
+				"title": "革命性的触屏宽屏 iPod"
+			},
+			{
+				"time": "15:20",
+				"seconds": 920,
+				"title": "颠覆性的移动电话"
+			},
+			{
+				"time": "32:45",
+				"seconds": 1965,
+				"title": "突破性的互联网通讯器"
+			},
+			{
+				"time": "58:10",
+				"seconds": 3490,
+				"title": "Multi-Touch 触控魔术与现场演示"
+			},
+			{
+				"time": "1:15:00",
+				"seconds": 4500,
+				"title": "改变科技世界的一天"
+			}
+		]
+	},
+	{
+		"name": "赛博朋克：边缘行者 (Cyberpunk: Edgerunners)",
+		"cover": "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&auto=format&fit=crop&q=80",
+		"subtitle": "TRIGGER x CD PROJEKT RED",
+		"desc": "在夜之城中挣扎求生的大卫·马丁内斯与露西相遇，谱写了一段璀璨而凄美的月球之约。",
+		"review": "今夜的月亮真美。TRIGGER 工业化顶峰的色彩与节奏，结局后劲极大。",
+		"link": "https://www.netflix.com/title/81054853",
+		"isPinned": false,
+		"isShow": true,
+		"stars": 5,
+		"status": "已追完",
+		"category": "动画剧集",
+		"playDate": "2024-07-22"
+	},
+	{
+		"name": "地球脉动 第三季 (Planet Earth III)",
+		"cover": "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&auto=format&fit=crop&q=80",
+		"subtitle": "BBC Earth · 大卫·爱登堡",
+		"desc": "走遍地球最偏远的角落，见证大自然绝境逢生的生命奇迹与人类活动对星球的深远影响。",
+		"review": "大自然的壮丽与残酷尽收眼底，4K HDR 摄影与 Hans Zimmer 配乐的巅峰呈现。",
+		"link": "https://www.bilibili.com/bangumi/play/ep785669",
+		"isPinned": false,
+		"isShow": true,
+		"stars": 5,
+		"status": "在追",
+		"category": "纪录片",
+		"playDate": "2025-01-20"
+	},
+	{
+		"name": "瑞克和莫蒂 第七季 (Rick and Morty Season 7)",
+		"cover": "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format&fit=crop&q=80",
+		"subtitle": "Adult Swim",
+		"desc": "疯狂科学家瑞克带着外孙莫蒂在多元宇宙中肆无忌惮地穿梭冒险与恶搞哲学思考。",
+		"review": "脑洞依然清奇，邪恶莫蒂的故事线终于迎来重磅推进。",
+		"link": "https://www.adultswim.com/videos/rick-and-morty",
+		"isPinned": false,
+		"isShow": true,
+		"stars": 5,
+		"status": "想看",
+		"category": "科幻喜剧"
 	}
 ]
