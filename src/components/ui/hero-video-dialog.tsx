@@ -153,7 +153,7 @@ export function HeroVideoModal({
   if (!mounted) return null
 
   const selectedAnimation = animationVariants[animationStyle]
-  const { embedUrl } = getEmbedVideoUrl(videoSrc, false)
+  const { embedUrl, canEmbed } = getEmbedVideoUrl(videoSrc, false)
 
   return createPortal(
     <AnimatePresence>
@@ -188,13 +188,31 @@ export function HeroVideoModal({
               style={{ width: "100%", height: "100%" }}
               className="relative isolate z-1 overflow-hidden rounded-2xl border-2 border-white shadow-2xl bg-black"
             >
-              <iframe
-                src={embedUrl}
-                title="Hero Video player"
-                style={{ width: "100%", height: "100%", border: 0 }}
-                allowFullScreen
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              ></iframe>
+              {canEmbed ? (
+                <iframe
+                  src={embedUrl}
+                  title="Hero Video player"
+                  style={{ width: "100%", height: "100%", border: 0 }}
+                  allowFullScreen
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                ></iframe>
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center gap-4 p-8 text-center bg-zinc-950">
+                  <p className="text-base text-zinc-200">
+                    该视频源（如 Netflix / 专属版权站）限制直接内嵌，点击前往官方播放
+                  </p>
+                  <a
+                    href={videoSrc}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-semibold text-sm shadow-xl"
+                  >
+                    <span>前往官方源站观看</span>
+                    <ExternalLink className="size-4" />
+                  </a>
+                </div>
+              )}
             </div>
           </motion.div>
         </motion.div>
@@ -254,6 +272,7 @@ export function HeroVideoDialog({
     </div>
   )
 }
+
 
 
 
