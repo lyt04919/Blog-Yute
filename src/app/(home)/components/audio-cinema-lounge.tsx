@@ -58,7 +58,7 @@ export default function AudioCinemaLounge() {
 	const [currentMusicIndex, setCurrentMusicIndex] = useState<number>(0)
 	const [isArmHovered, setIsArmHovered] = useState<boolean>(false)
 	const [isCopied, setIsCopied] = useState<boolean>(false)
-	const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null)
+	const [activeVideo, setActiveVideo] = useState<{ url: string; title?: string } | null>(null)
 
 	// 选中的详情模态卡片数据
 	const [selectedItem, setSelectedItem] = useState<{
@@ -940,7 +940,7 @@ export default function AudioCinemaLounge() {
 											className="relative rounded-2xl overflow-hidden bg-zinc-950 shadow-[0_8px_20px_rgba(0,0,0,0.16)] dark:shadow-[0_10px_24px_rgba(0,0,0,0.55)] border border-zinc-200/90 dark:border-zinc-800 transition-all duration-300 group-hover/card:scale-104 group-hover/card:-translate-y-1"
 											onClick={(e) => {
 												e.stopPropagation()
-												setActiveVideoUrl(video.link)
+												setActiveVideo({ url: video.link, title: video.title })
 											}}
 											title="点击原地全屏播放"
 										>
@@ -1073,7 +1073,7 @@ export default function AudioCinemaLounge() {
 									} ${selectedItem.type === 'video' ? 'cursor-pointer' : ''}`}
 									onClick={() => {
 										if (selectedItem.type === 'video' && selectedItem.link) {
-											setActiveVideoUrl(selectedItem.link)
+											setActiveVideo({ url: selectedItem.link, title: selectedItem.title })
 										}
 									}}
 								>
@@ -1191,7 +1191,7 @@ export default function AudioCinemaLounge() {
 											{selectedItem.link && (
 												<button
 													type="button"
-													onClick={() => setActiveVideoUrl(selectedItem.link!)}
+													onClick={() => setActiveVideo({ url: selectedItem.link!, title: selectedItem.title })}
 													className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-rose-600 text-white hover:bg-rose-700 transition-all shadow-xs cursor-pointer active:scale-95"
 												>
 													<Play className="w-3 h-3 fill-white" />
@@ -1236,9 +1236,10 @@ export default function AudioCinemaLounge() {
 
 			{/* ════════════════ 影院级 HeroVideoModal 视频播放弹窗 ════════════════ */}
 			<HeroVideoModal
-				isOpen={Boolean(activeVideoUrl)}
-				onClose={() => setActiveVideoUrl(null)}
-				videoSrc={activeVideoUrl || ''}
+				isOpen={Boolean(activeVideo)}
+				onClose={() => setActiveVideo(null)}
+				videoSrc={activeVideo?.url || ''}
+				title={activeVideo?.title}
 				animationStyle="from-center"
 			/>
 		</section>
