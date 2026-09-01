@@ -25,7 +25,7 @@ export interface HeroVideoProps {
   className?: string
 }
 
-export function getEmbedVideoUrl(url: string, autoplay = true): { embedUrl: string; canEmbed: boolean } {
+export function getEmbedVideoUrl(url: string, autoplay = false): { embedUrl: string; canEmbed: boolean } {
   if (!url) return { embedUrl: '', canEmbed: false }
 
   if (url.includes('/embed/')) {
@@ -63,7 +63,7 @@ export function getEmbedVideoUrl(url: string, autoplay = true): { embedUrl: stri
     const bvid = url.match(/video\/(BV\w+)/)?.[1]
     if (bvid) {
       return {
-        embedUrl: `https://player.bilibili.com/player.html?bvid=${bvid}&autoplay=${autoplay ? '1' : '0'}&page=1`,
+        embedUrl: `https://player.bilibili.com/player.html?bvid=${bvid}&page=1`,
         canEmbed: true,
       }
     }
@@ -153,7 +153,7 @@ export function HeroVideoModal({
   if (!mounted) return null
 
   const selectedAnimation = animationVariants[animationStyle]
-  const { embedUrl } = getEmbedVideoUrl(videoSrc, true)
+  const { embedUrl } = getEmbedVideoUrl(videoSrc, false)
 
   return createPortal(
     <AnimatePresence>
