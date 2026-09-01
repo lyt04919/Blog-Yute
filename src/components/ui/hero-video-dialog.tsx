@@ -172,20 +172,20 @@ export function HeroVideoModal({
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0 }}
 					style={{ zIndex: 999999 }}
-					className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-md p-4 md:p-0"
+					className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 sm:p-6 pt-16 sm:pt-20"
 					onClick={onClose}
 				>
 					<motion.div
 						{...selectedAnimation}
 						transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-						className="relative mx-4 aspect-video w-full max-w-4xl md:mx-0"
+						className="relative mx-auto aspect-video w-full max-w-4xl"
 						onClick={(e) => e.stopPropagation()}
 					>
 						{/* 浮动在右上角的圆形关闭按钮 (Magic UI 官方原版结构) */}
 						<motion.button
 							type="button"
 							onClick={onClose}
-							className="absolute -top-14 sm:-top-16 right-0 rounded-full bg-neutral-900/60 p-2 text-white ring-1 ring-white/20 backdrop-blur-md hover:bg-neutral-900/90 cursor-pointer shadow-lg dark:bg-neutral-100/50 dark:text-black"
+							className="absolute -top-12 sm:-top-14 right-0 rounded-full bg-neutral-900/70 p-2 text-white ring-1 ring-white/20 backdrop-blur-md hover:bg-neutral-900/90 cursor-pointer shadow-lg dark:bg-neutral-100/60 dark:text-black"
 							aria-label="关闭视频"
 						>
 							<X className="size-5" />
@@ -199,7 +199,7 @@ export function HeroVideoModal({
 									title="Hero Video player"
 									className="mt-0 size-full rounded-2xl border-0"
 									allowFullScreen
-									allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+									allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
 								/>
 							) : (
 								<div className="size-full flex flex-col items-center justify-center gap-4 p-8 text-center bg-zinc-950">
