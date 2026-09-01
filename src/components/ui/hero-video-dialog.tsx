@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { Play, X, ExternalLink, Loader2 } from 'lucide-react'
+import { Play, X, ExternalLink } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { cn } from '@/lib/utils'
 
@@ -43,7 +43,7 @@ export function getEmbedVideoUrl(url: string, autoplay = true): { embedUrl: stri
 			const v = parsed.searchParams.get('v')
 			if (v) {
 				return {
-					embedUrl: `https://www.youtube-nocookie.com/embed/${v}?autoplay=${autoplay ? '1' : '0'}&rel=0`,
+					embedUrl: `https://www.youtube.com/embed/${v}?autoplay=${autoplay ? '1' : '0'}&rel=0`,
 					canEmbed: true
 				}
 			}
@@ -55,7 +55,7 @@ export function getEmbedVideoUrl(url: string, autoplay = true): { embedUrl: stri
 		const id = url.split('youtu.be/')[1]?.split('?')[0]
 		if (id) {
 			return {
-				embedUrl: `https://www.youtube-nocookie.com/embed/${id}?autoplay=${autoplay ? '1' : '0'}&rel=0`,
+				embedUrl: `https://www.youtube.com/embed/${id}?autoplay=${autoplay ? '1' : '0'}&rel=0`,
 				canEmbed: true
 			}
 		}
@@ -77,51 +77,8 @@ export function getEmbedVideoUrl(url: string, autoplay = true): { embedUrl: stri
 		return { embedUrl: url, canEmbed: true }
 	}
 
-	// 非内嵌支持站点（如 Netflix、某些专属版权站）
+	// 非内嵌支持站点（如 Netflix 等）
 	return { embedUrl: url, canEmbed: false }
-}
-
-const animationVariants = {
-	'from-bottom': {
-		initial: { y: '100%', opacity: 0 },
-		animate: { y: 0, opacity: 1 },
-		exit: { y: '100%', opacity: 0 },
-	},
-	'from-center': {
-		initial: { scale: 0.85, opacity: 0 },
-		animate: { scale: 1, opacity: 1 },
-		exit: { scale: 0.85, opacity: 0 },
-	},
-	'from-top': {
-		initial: { y: '-100%', opacity: 0 },
-		animate: { y: 0, opacity: 1 },
-		exit: { y: '-100%', opacity: 0 },
-	},
-	'from-left': {
-		initial: { x: '-100%', opacity: 0 },
-		animate: { x: 0, opacity: 1 },
-		exit: { x: '-100%', opacity: 0 },
-	},
-	'from-right': {
-		initial: { x: '100%', opacity: 0 },
-		animate: { x: 0, opacity: 1 },
-		exit: { x: '100%', opacity: 0 },
-	},
-	fade: {
-		initial: { opacity: 0 },
-		animate: { opacity: 1 },
-		exit: { opacity: 0 },
-	},
-	'top-in-bottom-out': {
-		initial: { y: '-100%', opacity: 0 },
-		animate: { y: 0, opacity: 1 },
-		exit: { y: '100%', opacity: 0 },
-	},
-	'left-in-right-out': {
-		initial: { x: '-100%', opacity: 0 },
-		animate: { x: 0, opacity: 1 },
-		exit: { x: '100%', opacity: 0 },
-	},
 }
 
 export function HeroVideoModal({
@@ -129,7 +86,6 @@ export function HeroVideoModal({
 	onClose,
 	videoSrc,
 	title,
-	animationStyle = 'from-center',
 }: {
 	isOpen: boolean
 	onClose: () => void
@@ -138,57 +94,56 @@ export function HeroVideoModal({
 	animationStyle?: AnimationStyle
 }) {
 	const [mounted, setMounted] = useState(false)
-	const [isLoading, setIsLoading] = useState(true)
 
 	useEffect(() => {
 		setMounted(true)
 	}, [])
 
 	useEffect(() => {
-		if (isOpen) {
-			setIsLoading(true)
-			const handleKeyDown = (e: KeyboardEvent) => {
-				if (e.key === 'Escape') onClose()
-			}
-			window.addEventListener('keydown', handleKeyDown)
-			return () => window.removeEventListener('keydown', handleKeyDown)
+		if (!isOpen) return
+		const previousOverflow = document.body.style.overflow
+		document.body.style.overflow = 'hidden'
+
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') onClose()
+		}
+		window.addEventListener('keydown', handleKeyDown)
+		return () => {
+			document.body.style.overflow = previousOverflow
+			window.removeEventListener('keydown', handleKeyDown)
 		}
 	}, [isOpen, onClose])
 
 	if (!mounted) return null
 
-	const selectedAnimation = animationVariants[animationStyle]
 	const { embedUrl, canEmbed } = getEmbedVideoUrl(videoSrc, true)
 
-	const modalContent = (
+	return createPortal(
 		<AnimatePresence>
 			{isOpen && (
-				<div
-					className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 sm:p-6 sm:pb-8"
+				<motion.div
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					exit={{ opacity: 0 }}
+					style={{ zIndex: 999999 }}
+					className="fixed inset-0 flex items-center justify-center bg-black/85 backdrop-blur-xl p-3 sm:p-6"
 					onClick={onClose}
 				>
-					{/* 沉浸式暗黑磨砂背景 */}
 					<motion.div
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						exit={{ opacity: 0 }}
-						className="fixed inset-0 bg-black/85 backdrop-blur-xl"
-					/>
-
-					{/* 播放器主体卡片 */}
-					<motion.div
-						{...selectedAnimation}
-						transition={{ type: 'spring', damping: 25, stiffness: 280 }}
-						style={{ width: '100%', maxWidth: '920px', backgroundColor: '#09090B' }}
-						className="relative z-10 mx-auto rounded-2xl sm:rounded-3xl shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden border border-white/15 flex flex-col"
+						initial={{ scale: 0.92, opacity: 0, y: 15 }}
+						animate={{ scale: 1, opacity: 1, y: 0 }}
+						exit={{ scale: 0.92, opacity: 0, y: 15 }}
+						transition={{ type: 'spring', damping: 26, stiffness: 320 }}
+						style={{ width: '100%', maxWidth: '960px', backgroundColor: '#09090b' }}
+						className="relative mx-auto rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-white/20 flex flex-col"
 						onClick={(e) => e.stopPropagation()}
 					>
 						{/* 顶栏控制条 */}
-						<div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10 bg-zinc-900/90">
+						<div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10 bg-zinc-900">
 							<div className="flex items-center gap-2.5 min-w-0 pr-4">
-								<span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse shrink-0" />
-								<h4 className="text-xs sm:text-sm font-medium text-zinc-200 truncate font-serif">
-									{title || '视听视野 · 原地影院播放'}
+								<span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse shrink-0" />
+								<h4 className="text-xs sm:text-sm font-medium text-zinc-100 truncate font-serif">
+									{title || '视听视野 · 原地高清影院'}
 								</h4>
 							</div>
 							<div className="flex items-center gap-2 shrink-0">
@@ -218,25 +173,16 @@ export function HeroVideoModal({
 						{/* 16:9 视频播放区 */}
 						<div 
 							style={{ width: '100%', aspectRatio: '16 / 9' }} 
-							className="relative bg-black flex items-center justify-center overflow-hidden"
+							className="relative w-full bg-black flex items-center justify-center overflow-hidden"
 						>
 							{canEmbed ? (
-								<>
-									{isLoading && (
-										<div className="absolute inset-0 flex flex-col items-center justify-center gap-2.5 text-zinc-400 bg-zinc-950 z-10">
-											<Loader2 className="w-7 h-7 animate-spin text-rose-500" />
-											<span className="text-xs font-mono tracking-wider">正在加载视频流...</span>
-										</div>
-									)}
-									<iframe
-										src={embedUrl}
-										title={title || 'Hero Video Player'}
-										style={{ width: '100%', height: '100%', border: 0 }}
-										allowFullScreen
-										allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-										onLoad={() => setIsLoading(false)}
-									/>
-								</>
+								<iframe
+									src={embedUrl}
+									title={title || 'Hero Video Player'}
+									style={{ width: '100%', height: '100%', border: 0 }}
+									allowFullScreen
+									allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+								/>
 							) : (
 								<div className="p-8 text-center flex flex-col items-center justify-center gap-3">
 									<p className="text-sm text-zinc-300">
@@ -255,12 +201,11 @@ export function HeroVideoModal({
 							)}
 						</div>
 					</motion.div>
-				</div>
+				</motion.div>
 			)}
-		</AnimatePresence>
+		</AnimatePresence>,
+		document.body
 	)
-
-	return createPortal(modalContent, document.body)
 }
 
 export function HeroVideoDialog({
