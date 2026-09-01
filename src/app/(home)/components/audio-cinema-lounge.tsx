@@ -25,6 +25,7 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Marquee } from '@/components/ui/marquee'
+import { HeroVideoModal } from '@/components/ui/hero-video-dialog'
 
 // 数据源引入
 import moviesData from '@/data/movies.json'
@@ -57,6 +58,7 @@ export default function AudioCinemaLounge() {
 	const [currentMusicIndex, setCurrentMusicIndex] = useState<number>(0)
 	const [isArmHovered, setIsArmHovered] = useState<boolean>(false)
 	const [isCopied, setIsCopied] = useState<boolean>(false)
+	const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null)
 
 	// 选中的详情模态卡片数据
 	const [selectedItem, setSelectedItem] = useState<{
@@ -929,28 +931,18 @@ export default function AudioCinemaLounge() {
 								{videosList.map((video) => (
 									<div
 										key={video.id}
-										onClick={() => setSelectedItem({
-											title: video.title,
-											cover: video.cover,
-											type: 'video',
-											categoryName: '视听 · Videos',
-											subtitle: video.subtitle,
-											stars: video.stars,
-											status: video.status,
-											desc: video.desc,
-											tags: [video.category, video.status],
-											quote: video.review,
-											link: video.link,
-											review: video.review,
-											chapters: video.chapters
-										})}
 										style={{ width: '185px' }}
 										className="shrink-0 group/card cursor-pointer flex flex-col items-center mx-1.5"
 									>
-										{/* YouTube 16:9 宽屏相框 */}
+										{/* YouTube 16:9 宽屏相框：点击直接唤起 HeroVideoModal 原地播放 */}
 										<div 
 											style={{ width: '185px', height: '104px' }}
 											className="relative rounded-2xl overflow-hidden bg-zinc-950 shadow-[0_8px_20px_rgba(0,0,0,0.16)] dark:shadow-[0_10px_24px_rgba(0,0,0,0.55)] border border-zinc-200/90 dark:border-zinc-800 transition-all duration-300 group-hover/card:scale-104 group-hover/card:-translate-y-1"
+											onClick={(e) => {
+												e.stopPropagation()
+												setActiveVideoUrl(video.link)
+											}}
+											title="点击原地全屏播放"
 										>
 											<img
 												src={video.cover}
@@ -958,15 +950,38 @@ export default function AudioCinemaLounge() {
 												style={{ width: '100%', height: '100%', objectFit: 'cover' }}
 												className="transition-transform duration-500 group-hover/card:scale-106 select-none pointer-events-none"
 											/>
+											{/* 呼吸光晕 Play 悬浮徽标 */}
+											<div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity bg-black/35">
+												<div className="w-10 h-10 rounded-full bg-rose-600/90 text-white flex items-center justify-center shadow-lg transform group-hover/card:scale-110 transition-transform">
+													<Play className="w-5 h-5 fill-white translate-x-0.5" />
+												</div>
+											</div>
 											<div className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded-md backdrop-blur-md bg-black/70 text-rose-300 text-[8.5px] font-mono font-bold border border-rose-400/30 flex items-center gap-1">
 												<PlayCircle className="w-2.5 h-2.5 text-rose-400" />
-												<span>WATCH</span>
+												<span>PLAY</span>
 											</div>
 										</div>
 
-										{/* 标题与真实星级 */}
-										<div className="pt-2 text-center w-full px-1">
-											<h4 className="text-xs font-serif font-bold text-zinc-900 dark:text-zinc-100 truncate tracking-tight">
+										{/* 标题与真实星级：点击打开详情弹窗 */}
+										<div 
+											className="pt-2 text-center w-full px-1"
+											onClick={() => setSelectedItem({
+												title: video.title,
+												cover: video.cover,
+												type: 'video',
+												categoryName: '视听 · Videos',
+												subtitle: video.subtitle,
+												stars: video.stars,
+												status: video.status,
+												desc: video.desc,
+												tags: [video.category, video.status],
+												quote: video.review,
+												link: video.link,
+												review: video.review,
+												chapters: video.chapters
+											})}
+										>
+											<h4 className="text-xs font-serif font-bold text-zinc-900 dark:text-zinc-100 truncate tracking-tight group-hover/card:text-rose-600 dark:group-hover/card:text-rose-400 transition-colors">
 												{video.title}
 											</h4>
 											<p className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
@@ -1054,8 +1069,13 @@ export default function AudioCinemaLounge() {
 									className={`shrink-0 rounded-2xl overflow-hidden shadow-md border ${
 										selectedItem.type === 'share'
 											? 'bg-white dark:bg-zinc-800 border-black/10 p-2 flex items-center justify-center'
-											: 'bg-zinc-950 border-black/10'
-									}`}
+											: 'bg-zinc-950 border-black/10 relative group/modal-cover'
+									} ${selectedItem.type === 'video' ? 'cursor-pointer' : ''}`}
+									onClick={() => {
+										if (selectedItem.type === 'video' && selectedItem.link) {
+											setActiveVideoUrl(selectedItem.link)
+										}
+									}}
 								>
 									<img
 										src={selectedItem.cover}
@@ -1068,6 +1088,13 @@ export default function AudioCinemaLounge() {
 											}
 										}}
 									/>
+									{selectedItem.type === 'video' && (
+										<div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover/modal-cover:bg-black/60 transition-colors">
+											<div className="w-10 h-10 rounded-full bg-rose-600 text-white flex items-center justify-center shadow-lg">
+												<Play className="w-5 h-5 fill-white translate-x-0.5" />
+											</div>
+										</div>
+									)}
 								</div>
 
 								<div className="flex-1 min-w-0">
@@ -1159,6 +1186,30 @@ export default function AudioCinemaLounge() {
 												</button>
 											)}
 										</div>
+									) : selectedItem.type === 'video' ? (
+										<div className="flex items-center gap-2 pt-1">
+											{selectedItem.link && (
+												<button
+													type="button"
+													onClick={() => setActiveVideoUrl(selectedItem.link!)}
+													className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-rose-600 text-white hover:bg-rose-700 transition-all shadow-xs cursor-pointer active:scale-95"
+												>
+													<Play className="w-3 h-3 fill-white" />
+													<span>原地高清播放</span>
+												</button>
+											)}
+											{selectedItem.link && (
+												<a
+													href={selectedItem.link}
+													target="_blank"
+													rel="noopener noreferrer"
+													className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 text-zinc-700 dark:text-zinc-200 transition-all"
+												>
+													<span>前往源站</span>
+													<ExternalLink className="w-3 h-3" />
+												</a>
+											)}
+										</div>
 									) : (
 										selectedItem.link && (
 											<a
@@ -1170,8 +1221,6 @@ export default function AudioCinemaLounge() {
 												<span>
 													{selectedItem.type === 'game' 
 														? '直达 Steam / 游戏源站' 
-														: selectedItem.type === 'video' 
-														? '前往 YouTube 观看' 
 														: '查看详情 / 直达源站'}
 												</span>
 												<ExternalLink className="w-3 h-3" />
@@ -1184,6 +1233,14 @@ export default function AudioCinemaLounge() {
 					</div>
 				)}
 			</AnimatePresence>
+
+			{/* ════════════════ 影院级 HeroVideoModal 视频播放弹窗 ════════════════ */}
+			<HeroVideoModal
+				isOpen={Boolean(activeVideoUrl)}
+				onClose={() => setActiveVideoUrl(null)}
+				videoSrc={activeVideoUrl || ''}
+				animationStyle="from-center"
+			/>
 		</section>
 	)
 }

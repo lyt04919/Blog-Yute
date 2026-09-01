@@ -144,6 +144,17 @@ function runTests() {
 		assert.ok(loungeContent.includes('Web & Tools · 灵感工具与极客站点'), 'AudioCinemaLounge must have Web & Tools section')
 		assert.ok(loungeContent.includes('mask-image:linear-gradient'), 'AudioCinemaLounge must use CSS mask-image for feathering')
 		assert.ok(loungeContent.includes('handleCopyUrl'), 'AudioCinemaLounge modal must support copy URL for web tools')
+		assert.ok(loungeContent.includes('HeroVideoModal'), 'AudioCinemaLounge must integrate HeroVideoModal for cinema video playback')
+	})
+
+	// 7. Verify HeroVideoDialog component exists and exports functions
+	test('HeroVideoDialog component exists with embed parser and modal exports', () => {
+		const heroVideoPath = path.join(ROOT, 'src/components/ui/hero-video-dialog.tsx')
+		assert.ok(fs.existsSync(heroVideoPath), 'src/components/ui/hero-video-dialog.tsx should exist')
+		const content = fs.readFileSync(heroVideoPath, 'utf8')
+		assert.ok(content.includes('export function HeroVideoDialog'), 'HeroVideoDialog must be exported')
+		assert.ok(content.includes('export function HeroVideoModal'), 'HeroVideoModal must be exported')
+		assert.ok(content.includes('getEmbedVideoUrl'), 'getEmbedVideoUrl helper must be exported')
 	})
 
 	console.log(`\n🏁 Test Results: ${passed}/${total} passed.`)
