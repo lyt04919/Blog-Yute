@@ -30,6 +30,10 @@ export function getEmbedVideoUrl(url: string, autoplay = false): { embedUrl: str
 
   if (url.includes('/embed/')) {
     let embed = url
+    // 自动切换为 nocookie 域名以兼容 Safari 本地开发环境的跨域拦截
+    if (embed.includes('youtube.com/embed/')) {
+      embed = embed.replace('youtube.com/embed/', 'youtube-nocookie.com/embed/')
+    }
     if (autoplay && !embed.includes('autoplay=')) {
       embed = `${embed}${embed.includes('?') ? '&' : '?'}autoplay=1`
     }
@@ -42,7 +46,7 @@ export function getEmbedVideoUrl(url: string, autoplay = false): { embedUrl: str
       const v = parsed.searchParams.get('v')
       if (v) {
         return {
-          embedUrl: `https://www.youtube.com/embed/${v}${autoplay ? '?autoplay=1' : ''}`,
+          embedUrl: `https://www.youtube-nocookie.com/embed/${v}${autoplay ? '?autoplay=1' : ''}`,
           canEmbed: true,
         }
       }
@@ -53,7 +57,7 @@ export function getEmbedVideoUrl(url: string, autoplay = false): { embedUrl: str
     const id = url.split('youtu.be/')[1]?.split('?')[0]
     if (id) {
       return {
-        embedUrl: `https://www.youtube.com/embed/${id}${autoplay ? '?autoplay=1' : ''}`,
+        embedUrl: `https://www.youtube-nocookie.com/embed/${id}${autoplay ? '?autoplay=1' : ''}`,
         canEmbed: true,
       }
     }
