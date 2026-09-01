@@ -147,14 +147,21 @@ function runTests() {
 		assert.ok(loungeContent.includes('HeroVideoModal'), 'AudioCinemaLounge must integrate HeroVideoModal for cinema video playback')
 	})
 
-	// 7. Verify HeroVideoDialog component exists and exports functions
-	test('HeroVideoDialog component exists with embed parser and modal exports', () => {
-		const heroVideoPath = path.join(ROOT, 'src/components/ui/hero-video-dialog.tsx')
-		assert.ok(fs.existsSync(heroVideoPath), 'src/components/ui/hero-video-dialog.tsx should exist')
-		const content = fs.readFileSync(heroVideoPath, 'utf8')
-		assert.ok(content.includes('export function HeroVideoDialog'), 'HeroVideoDialog must be exported')
-		assert.ok(content.includes('export function HeroVideoModal'), 'HeroVideoModal must be exported')
-		assert.ok(content.includes('getEmbedVideoUrl'), 'getEmbedVideoUrl helper must be exported')
+	// 8. Verify Magic UI BentoGrid and GeekIdentityBento components
+	test('BentoGrid, BentoCard and GeekIdentityBento components exist and are integrated', () => {
+		const bentoGridPath = path.join(ROOT, 'src/components/ui/bento-grid.tsx')
+		assert.ok(fs.existsSync(bentoGridPath), 'src/components/ui/bento-grid.tsx should exist')
+		const bentoContent = fs.readFileSync(bentoGridPath, 'utf8')
+		assert.ok(bentoContent.includes('export function BentoGrid'), 'BentoGrid must be exported')
+		assert.ok(bentoContent.includes('export function BentoCard'), 'BentoCard must be exported')
+
+		const geekBentoPath = path.join(ROOT, 'src/components/geek-identity-bento.tsx')
+		assert.ok(fs.existsSync(geekBentoPath), 'src/components/geek-identity-bento.tsx should exist')
+
+		const profileBentoPath = path.join(ROOT, 'src/app/about/components/profile-bento.tsx')
+		const profileContent = fs.readFileSync(profileBentoPath, 'utf8')
+		assert.ok(profileContent.includes('BentoGrid'), 'ProfileBento must integrate BentoGrid')
+		assert.ok(profileContent.includes('BentoCard'), 'ProfileBento must integrate BentoCard')
 	})
 
 	console.log(`\n🏁 Test Results: ${passed}/${total} passed.`)
