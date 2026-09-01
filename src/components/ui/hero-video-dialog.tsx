@@ -40,6 +40,7 @@ export function getEmbedVideoUrl(url: string, autoplay = false): { embedUrl: str
     return { embedUrl: embed, canEmbed: true }
   }
 
+  // 2. YouTube 链接 (watch?v=..., shorts/..., youtu.be/...)
   if (url.includes('youtube.com/watch')) {
     try {
       const parsed = new URL(url.startsWith('http') ? url : `https://${url}`)
@@ -53,8 +54,18 @@ export function getEmbedVideoUrl(url: string, autoplay = false): { embedUrl: str
     } catch {}
   }
 
+  if (url.includes('youtube.com/shorts/')) {
+    const id = url.split('youtube.com/shorts/')[1]?.split('?')[0]?.split('/')[0]
+    if (id) {
+      return {
+        embedUrl: `https://www.youtube-nocookie.com/embed/${id}${autoplay ? '?autoplay=1' : ''}`,
+        canEmbed: true,
+      }
+    }
+  }
+
   if (url.includes('youtu.be/')) {
-    const id = url.split('youtu.be/')[1]?.split('?')[0]
+    const id = url.split('youtu.be/')[1]?.split('?')[0]?.split('/')[0]
     if (id) {
       return {
         embedUrl: `https://www.youtube-nocookie.com/embed/${id}${autoplay ? '?autoplay=1' : ''}`,
