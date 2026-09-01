@@ -191,14 +191,14 @@ export function HeroVideoModal({
             className="relative mx-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* 视频框外右上角悬浮圆形关闭按钮 (右移 + 适中精致尺寸) */}
+            {/* 视频框外右上角悬浮圆形关闭按钮 (精准对角线定位: top -50px, right -50px) */}
             <motion.button
               type="button"
               onClick={onClose}
               style={{
                 position: 'absolute',
-                top: '-58px',
-                right: '-24px',
+                top: '-50px',
+                right: '-50px',
                 width: '46px',
                 height: '46px',
                 zIndex: 50,
