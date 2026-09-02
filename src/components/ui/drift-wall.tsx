@@ -61,21 +61,21 @@ const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffec
 export default function DriftWall({
   items = DEFAULT_ITEMS,
   columns = 5,
-  tileWidth = 100,
-  tileHeight = 150,
+  tileWidth = 105,
+  tileHeight = 158,
   gap = 14,
   radius = 12,
   tilt = 16,
   turn = -14,
   roll = 0,
   perspective = 1200,
-  depth = 100,
-  speed = 36,
+  depth = 90,
+  speed = 32,
   direction = 'up',
-  variance = 0.4,
+  variance = 0.35,
   parallax = 0.6,
   pauseOnHover = true,
-  lift = 55,
+  lift = 50,
   fade = 0.6,
   dim = 0.45,
   grayscale = false,
@@ -181,11 +181,12 @@ export default function DriftWall({
         for (let c = 0; c < trackRefs.current.length; c++) {
           const meta = columnMeta[c]
           if (!meta) continue
-          const paused = wallHoveredRef.current && pauseOnHover
-          const factor = paused && hoveredColRef.current === c ? 0.2 : 1
-          const target = baseVelocities[c] * factor
+          
+          // When a poster in column c is hovered, STOP that column completely (target = 0)
+          const isColHovered = (wallHoveredRef.current && hoveredColRef.current === c) || (activeIdRef.current !== null && hoveredColRef.current === c)
+          const target = isColHovered ? 0 : baseVelocities[c]
 
-          const ease = 1 - Math.exp(-dt / 0.28)
+          const ease = 1 - Math.exp(-dt / (target === 0 ? 0.08 : 0.24))
           velocitiesRef.current[c] += (target - velocitiesRef.current[c]) * ease
           let next = (offsetsRef.current[c] ?? 0) + velocitiesRef.current[c] * dt
           next = ((next % meta.copyHeight) + meta.copyHeight) % meta.copyHeight
@@ -313,7 +314,18 @@ export default function DriftWall({
           const meta = columnMeta[c]
           const copies = Array.from({ length: meta.copies })
           return (
-            <div className="drift-wall__col" key={`col-${c}`}>
+            <div 
+              className="drift-wall__col" 
+              key={`col-${c}`}
+              onMouseEnter={() => {
+                hoveredColRef.current = c
+              }}
+              onMouseLeave={() => {
+                if (hoveredColRef.current === c && !activeIdRef.current) {
+                  hoveredColRef.current = -1
+                }
+              }}
+            >
               <div className="drift-wall__track" ref={el => { trackRefs.current[c] = el }}>
                 {copies.map((_, copyIndex) =>
                   col.map((item, itemIndex) => renderTile(item, `${c}-${copyIndex}-${itemIndex}`, c))
