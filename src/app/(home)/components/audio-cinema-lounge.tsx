@@ -17,7 +17,6 @@ import {
 	Disc, 
 	Sparkles, 
 	PlayCircle,
-	Globe,
 	Copy,
 	Check
 } from 'lucide-react'
@@ -32,23 +31,6 @@ import musicData from '@/app/favorite/music.json'
 import gamesData from '@/app/favorite/games.json'
 import videosData from '@/app/favorite/videos.json'
 import shareData from '@/app/favorite/share/list.json'
-
-function getShareTagStyle(tag: string) {
-	const t = tag.trim().toLowerCase()
-	if (/ai|人工智能|gpt|大模型/i.test(t)) {
-		return { label: tag, emoji: '✨', bg: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20' }
-	}
-	if (/开发|编程|代码|dev|github|api/i.test(t)) {
-		return { label: tag, emoji: '💻', bg: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' }
-	}
-	if (/设计|ui|ux|css|图标|配色|3d/i.test(t)) {
-		return { label: tag, emoji: '🎨', bg: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20' }
-	}
-	if (/工具|效率|生产力|转换|压缩/i.test(t)) {
-		return { label: tag, emoji: '⚡', bg: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20' }
-	}
-	return { label: tag, emoji: '💡', bg: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20' }
-}
 
 export default function AudioCinemaLounge() {
 	// 核心状态：播放中 / 暂停中 (唯一交互为点击拨杆/唱臂切换落针与移开)
@@ -112,33 +94,6 @@ export default function AudioCinemaLounge() {
 	}
 
 
-	// 4. 🌐 网页灵感与极客工具列表 (Web & Geek Tools)
-	const sharesList = useMemo(() => {
-		return (shareData as any[])
-			.filter((s) => s.isShow !== false)
-			.map((s) => {
-				let domain = ''
-				try {
-					const parsed = new URL(s.url?.startsWith('http') ? s.url : `https://${s.url}`)
-					domain = parsed.hostname.replace(/^www\./, '')
-				} catch {
-					domain = s.url || ''
-				}
-				const fallbackLogo = s.url ? `https://www.google.com/s2/favicons?domain=${domain}&sz=128` : ''
-				return {
-					id: `share-${s.name}`,
-					type: 'share' as const,
-					title: s.name,
-					subtitle: domain || '极客工具',
-					cover: s.logo || fallbackLogo,
-					stars: s.stars || 4,
-					desc: s.description,
-					tags: s.tags || ['工具'],
-					link: s.url,
-				}
-			})
-	}, [])
-
 	// 5. 🎮 游戏列表 (16:9 横版 Steam 胶囊)
 	const gamesList = useMemo(() => {
 		return (gamesData as any[])
@@ -179,10 +134,8 @@ export default function AudioCinemaLounge() {
 	}, [])
 
 	const cardPitchHorizontal = 205
-	const cardPitchWeb = 230
 	const speedPxPerSec = 65
 
-	const sharesDuration = `${Math.max(12, Math.round((sharesList.length * cardPitchWeb) / speedPxPerSec))}s`
 	const gamesDuration = `${Math.max(12, Math.round((gamesList.length * cardPitchHorizontal) / speedPxPerSec))}s`
 	const videosDuration = `${Math.max(12, Math.round((videosList.length * cardPitchHorizontal) / speedPxPerSec))}s`
 
@@ -525,101 +478,7 @@ export default function AudioCinemaLounge() {
 				</div>
 
 
-				{/* ════════════════ 3. 🌐 第二层（全新）：网页灵感与极客工具 (Web & Tools Marquee) ════════════════ */}
-				<div className="relative w-full overflow-hidden rounded-3xl p-3.5 sm:p-4.5 bg-black/[0.02] dark:bg-white/[0.02] border border-black/5 dark:border-white/5 shadow-xs">
-					<div className="flex items-center justify-between gap-2 mb-3.5 px-1.5">
-						<div className="flex items-center gap-2">
-							<Globe className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
-							<h3 className="text-xs font-mono font-bold tracking-wider uppercase text-zinc-800 dark:text-zinc-200">
-								Web & Tools · 灵感工具与极客站点
-							</h3>
-						</div>
-						<div className="flex items-center gap-2">
-							<span className="text-[10px] font-mono text-zinc-500 dark:text-zinc-400">
-								{sharesList.length} 款精选
-							</span>
-							<Link
-								href="/favorite/share"
-								className="text-[10px] font-mono font-bold text-cyan-700 dark:text-cyan-400 hover:underline flex items-center gap-0.5"
-							>
-								<span>全部</span>
-								<ArrowUpRight className="w-2.5 h-2.5" />
-							</Link>
-						</div>
-					</div>
-
-					{/* 左右无缝渐变遮罩 */}
-					<div className="relative w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent_0%,black_36px,black_calc(100%-36px),transparent_100%)]">
-						<Marquee pauseOnHover duration={sharesDuration} className="py-1">
-							{sharesList.map((share) => {
-								const tagStyle = getShareTagStyle(share.tags[0] || '工具')
-								return (
-									<div
-										key={share.id}
-										onClick={() => setSelectedItem({
-											title: share.title,
-											cover: share.cover,
-											type: 'share',
-											categoryName: '网页工具 · Web & Tools',
-											subtitle: share.subtitle,
-											stars: share.stars,
-											desc: share.desc,
-											tags: share.tags,
-											link: share.link,
-										})}
-										style={{ width: '230px' }}
-										className="shrink-0 group/card cursor-pointer flex items-center gap-3 p-2.5 rounded-2xl bg-white/80 dark:bg-zinc-900/80 hover:bg-white dark:hover:bg-zinc-850 border border-black/5 dark:border-white/10 hover:border-amber-400/50 dark:hover:border-amber-500/50 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-all duration-300 mx-1.5"
-									>
-										{/* Favicon / Logo 相框 */}
-										<div 
-											style={{ width: '42px', height: '42px' }}
-											className="relative shrink-0 rounded-xl overflow-hidden bg-zinc-50 dark:bg-zinc-800 p-1.5 shadow-2xs border border-black/5 dark:border-white/10 flex items-center justify-center group-hover/card:scale-106 transition-transform"
-										>
-											<img
-												src={share.cover}
-												alt={share.title}
-												style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-												className="select-none pointer-events-none"
-												onError={(e) => {
-													(e.target as HTMLElement).style.display = 'none'
-												}}
-											/>
-										</div>
-
-										{/* 站点名称与精炼描述 */}
-										<div className="flex-1 min-w-0">
-											<div className="flex items-center justify-between gap-1">
-												<h4 className="text-xs font-serif font-bold text-zinc-900 dark:text-zinc-100 truncate tracking-tight group-hover/card:text-amber-600 dark:group-hover/card:text-amber-400 transition-colors">
-													{share.title}
-												</h4>
-												<span className={`text-[8.5px] font-mono px-1.5 py-0.2 rounded-full border ${tagStyle.bg} shrink-0`}>
-													{tagStyle.emoji} {share.tags[0] || '工具'}
-												</span>
-											</div>
-											<p className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
-												{share.desc || share.subtitle}
-											</p>
-											<div className="flex items-center gap-0.5 mt-1">
-												{Array.from({ length: 5 }).map((_, i) => (
-													<Star
-														key={i}
-														className={`w-2 h-2 ${
-															i < (share.stars || 4)
-																? 'fill-amber-400 text-amber-400'
-																: 'fill-transparent text-zinc-300 dark:text-zinc-700'
-														}`}
-													/>
-												))}
-											</div>
-										</div>
-									</div>
-								)
-							})}
-						</Marquee>
-					</div>
-				</div>
-
-				{/* ════════════════ 4. 🎮 第三层：游戏 (左) | 📺 视听 (右) 16:9 横版宽屏双走马灯 ════════════════ */}
+				{/* ════════════════ 3. 🎮 游戏 (左) | 📺 视听 (右) 16:9 横版宽屏双走马灯 ════════════════ */}
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 w-full items-start">
 					
 					{/* 4.1 🎮 左侧：互动游艺长廊 (Games Marquee) */}

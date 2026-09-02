@@ -137,14 +137,15 @@ function runTests() {
 		}
 	})
 
-	// 6. Verify AudioCinemaLounge integrates all 6 categories with CSS mask feathering
-	test('AudioCinemaLounge integrates all 6 categories with CSS mask feathering and geek tools', () => {
+	// 6. Verify AudioCinemaLounge and GeekIdentityBento Web & Tools integration
+	test('AudioCinemaLounge integrates media lounge and GeekIdentityBento integrates InfiniteSpiral web & tools', () => {
 		const loungeContent = fs.readFileSync(path.join(ROOT, 'src/app/(home)/components/audio-cinema-lounge.tsx'), 'utf8')
-		assert.ok(loungeContent.includes("import shareData from '@/app/favorite/share/list.json'"), 'AudioCinemaLounge must import shareData')
-		assert.ok(loungeContent.includes('Web & Tools · 灵感工具与极客站点'), 'AudioCinemaLounge must have Web & Tools section')
 		assert.ok(loungeContent.includes('mask-image:linear-gradient'), 'AudioCinemaLounge must use CSS mask-image for feathering')
-		assert.ok(loungeContent.includes('handleCopyUrl'), 'AudioCinemaLounge modal must support copy URL for web tools')
 		assert.ok(loungeContent.includes('HeroVideoModal'), 'AudioCinemaLounge must integrate HeroVideoModal for cinema video playback')
+
+		const geekBentoContent = fs.readFileSync(path.join(ROOT, 'src/components/geek-identity-bento.tsx'), 'utf8')
+		assert.ok(geekBentoContent.includes("import shareData from '@/app/favorite/share/list.json'"), 'GeekIdentityBento must import shareData for Web & Tools')
+		assert.ok(geekBentoContent.includes('InfiniteSpiral'), 'GeekIdentityBento must integrate InfiniteSpiral')
 	})
 
 	// 8. Verify Magic UI BentoGrid and GeekIdentityBento components
