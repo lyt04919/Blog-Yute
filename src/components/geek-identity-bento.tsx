@@ -154,14 +154,22 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 									<div style={{ width: '122px', height: '122px' }} className="rounded-2xs overflow-hidden bg-zinc-200 shrink-0">
 										<img
 											src="/images/uploads/7ef4d45667098fa8.jpeg"
-											alt="夕阳海滩"
+											alt="Sunset Beach"
 											style={{ width: '100%', height: '100%', objectFit: 'cover' }}
 											loading="lazy"
 										/>
 									</div>
-									<div className="flex-1 flex items-center justify-center pt-1">
-										<p className="text-[9.5px] font-serif font-bold text-zinc-800 tracking-tight truncate">
-											夕阳海滩 · 06.16
+									<div className="flex-1 flex items-center justify-center pt-1.5 overflow-visible">
+										<p 
+											style={{ 
+												fontFamily: 'var(--font-cursive), "Caveat", "Bradley Hand", cursive',
+												fontSize: '15px',
+												color: '#27272a',
+												transform: 'rotate(-0.8deg)'
+											}}
+											className="font-medium tracking-wide whitespace-nowrap select-none opacity-85"
+										>
+											Sunset Beach &apos;24
 										</p>
 									</div>
 								</div>
@@ -180,14 +188,22 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 									<div style={{ width: '132px', height: '132px' }} className="rounded-2xs overflow-hidden bg-zinc-200 shrink-0">
 										<img
 											src="/images/uploads/0c004c6f642839f2.jpeg"
-											alt="雪山湖泊"
+											alt="Lake Tekapo"
 											style={{ width: '100%', height: '100%', objectFit: 'cover' }}
 											loading="lazy"
 										/>
 									</div>
-									<div className="flex-1 flex items-center justify-center pt-1">
-										<p className="text-[9.5px] font-mono font-bold text-zinc-700 tracking-tight truncate">
-											雪山湖泊 · 06.16
+									<div className="flex-1 flex items-center justify-center pt-1.5 overflow-visible">
+										<p 
+											style={{ 
+												fontFamily: 'var(--font-cursive), "Caveat", "Bradley Hand", cursive',
+												fontSize: '15px',
+												color: '#27272a',
+												transform: 'rotate(0.5deg)'
+											}}
+											className="font-medium tracking-wide whitespace-nowrap select-none opacity-85"
+										>
+											Lake Tekapo &apos;24
 										</p>
 									</div>
 								</div>
@@ -205,14 +221,22 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 									<div style={{ width: '122px', height: '122px' }} className="rounded-2xs overflow-hidden bg-zinc-200 shrink-0">
 										<img
 											src="/images/uploads/844b159ea02995f4.jpeg"
-											alt="惬意日常"
+											alt="Queenstown"
 											style={{ width: '100%', height: '100%', objectFit: 'cover' }}
 											loading="lazy"
 										/>
 									</div>
-									<div className="flex-1 flex items-center justify-center pt-1">
-										<p className="text-[9.5px] font-serif font-bold text-zinc-800 tracking-tight truncate">
-											惬意日常 · 06.16
+									<div className="flex-1 flex items-center justify-center pt-1.5 overflow-visible">
+										<p 
+											style={{ 
+												fontFamily: 'var(--font-cursive), "Caveat", "Bradley Hand", cursive',
+												fontSize: '15px',
+												color: '#27272a',
+												transform: 'rotate(-0.5deg)'
+											}}
+											className="font-medium tracking-wide whitespace-nowrap select-none opacity-85"
+										>
+											Queenstown &apos;24
 										</p>
 									</div>
 								</div>
