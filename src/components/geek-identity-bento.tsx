@@ -139,19 +139,19 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					cta="翻阅生活日记"
 					className="col-span-1 md:col-span-2"
 					background={
-						<div className="absolute inset-x-0 top-0 h-[225px] [mask-image:linear-gradient(to_bottom,#000_82%,transparent_100%)] flex items-center justify-center px-4 sm:px-6 overflow-hidden select-none">
-							<div className="flex items-center justify-center gap-3 sm:gap-6">
-								{/* 1. 左侧拍立得：夕阳海滩 (-8°) */}
+						<div className="absolute inset-x-0 top-0 h-[245px] flex items-center justify-center pt-2 px-4 sm:px-6 select-none">
+							<div className="flex items-center justify-center gap-4 sm:gap-7">
+								{/* 1. 左侧拍立得：夕阳海滩 (-7°) */}
 								<div
 									style={{
-										width: '126px',
-										height: '166px',
-										transform: 'rotate(-8deg) translateY(4px)',
+										width: '142px',
+										height: '184px',
+										transform: 'rotate(-7deg) translateY(6px)',
 										transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)'
 									}}
-									className="relative bg-[#FAF9F6] p-2 rounded-sm shadow-md border border-black/10 pointer-events-none group-hover:!-rotate-12 group-hover:!-translate-x-3 group-hover:shadow-xl flex flex-col shrink-0"
+									className="relative bg-[#FAF9F6] p-2.5 pb-6 rounded-sm shadow-lg border border-black/10 pointer-events-none group-hover:!-rotate-[11deg] group-hover:!-translate-x-3 group-hover:shadow-2xl flex flex-col shrink-0"
 								>
-									<div style={{ width: '110px', height: '110px' }} className="rounded-2xs overflow-hidden bg-zinc-200 shrink-0">
+									<div style={{ width: '122px', height: '122px' }} className="rounded-2xs overflow-hidden bg-zinc-200 shrink-0">
 										<img
 											src="/images/uploads/7ef4d45667098fa8.jpeg"
 											alt="夕阳海滩"
@@ -159,25 +159,25 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 											loading="lazy"
 										/>
 									</div>
-									<div className="flex-1 flex items-center justify-center">
-										<p className="text-[8.5px] font-serif font-bold text-zinc-800 tracking-tight truncate">
+									<div className="flex-1 flex items-center justify-center pt-1">
+										<p className="text-[9.5px] font-serif font-bold text-zinc-800 tracking-tight truncate">
 											夕阳海滩 · 06.16
 										</p>
 									</div>
 								</div>
 
-								{/* 2. 中间拍立得：雪山湖泊 (0°) */}
+								{/* 2. 中间拍立得：雪山湖泊 (0° 主位微浮) */}
 								<div
 									style={{
-										width: '134px',
-										height: '174px',
-										transform: 'rotate(0deg) translateY(-6px)',
+										width: '152px',
+										height: '194px',
+										transform: 'rotate(0deg) translateY(-4px)',
 										transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
 										zIndex: 10
 									}}
-									className="relative bg-[#FAF9F6] p-2 rounded-sm shadow-xl border border-black/10 pointer-events-none group-hover:!-translate-y-3 group-hover:!scale-104 group-hover:shadow-2xl flex flex-col shrink-0"
+									className="relative bg-[#FAF9F6] p-2.5 pb-6 rounded-sm shadow-xl border border-black/10 pointer-events-none group-hover:!-translate-y-3 group-hover:!scale-104 group-hover:shadow-2xl flex flex-col shrink-0"
 								>
-									<div style={{ width: '118px', height: '118px' }} className="rounded-2xs overflow-hidden bg-zinc-200 shrink-0">
+									<div style={{ width: '132px', height: '132px' }} className="rounded-2xs overflow-hidden bg-zinc-200 shrink-0">
 										<img
 											src="/images/uploads/0c004c6f642839f2.jpeg"
 											alt="雪山湖泊"
@@ -185,24 +185,24 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 											loading="lazy"
 										/>
 									</div>
-									<div className="flex-1 flex items-center justify-center">
-										<p className="text-[8.5px] font-mono font-bold text-zinc-700 tracking-tight truncate">
+									<div className="flex-1 flex items-center justify-center pt-1">
+										<p className="text-[9.5px] font-mono font-bold text-zinc-700 tracking-tight truncate">
 											雪山湖泊 · 06.16
 										</p>
 									</div>
 								</div>
 
-								{/* 3. 右侧拍立得：惬意日常 (+8°) */}
+								{/* 3. 右侧拍立得：惬意日常 (+7°) */}
 								<div
 									style={{
-										width: '126px',
-										height: '166px',
-										transform: 'rotate(8deg) translateY(4px)',
+										width: '142px',
+										height: '184px',
+										transform: 'rotate(7deg) translateY(6px)',
 										transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)'
 									}}
-									className="relative bg-[#FAF9F6] p-2 rounded-sm shadow-md border border-black/10 pointer-events-none group-hover:!rotate-12 group-hover:!translate-x-3 group-hover:shadow-xl flex flex-col shrink-0"
+									className="relative bg-[#FAF9F6] p-2.5 pb-6 rounded-sm shadow-lg border border-black/10 pointer-events-none group-hover:!rotate-[11deg] group-hover:!translate-x-3 group-hover:shadow-2xl flex flex-col shrink-0"
 								>
-									<div style={{ width: '110px', height: '110px' }} className="rounded-2xs overflow-hidden bg-zinc-200 shrink-0">
+									<div style={{ width: '122px', height: '122px' }} className="rounded-2xs overflow-hidden bg-zinc-200 shrink-0">
 										<img
 											src="/images/uploads/844b159ea02995f4.jpeg"
 											alt="惬意日常"
@@ -210,8 +210,8 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 											loading="lazy"
 										/>
 									</div>
-									<div className="flex-1 flex items-center justify-center">
-										<p className="text-[8.5px] font-serif font-bold text-zinc-800 tracking-tight truncate">
+									<div className="flex-1 flex items-center justify-center pt-1">
+										<p className="text-[9.5px] font-serif font-bold text-zinc-800 tracking-tight truncate">
 											惬意日常 · 06.16
 										</p>
 									</div>
