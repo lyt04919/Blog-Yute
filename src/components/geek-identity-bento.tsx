@@ -193,26 +193,26 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					cta="探索电影全库"
 					className="col-span-1 md:col-span-2"
 					background={
-						<div className="absolute inset-x-0 top-0 h-[210px] [mask-image:linear-gradient(to_bottom,#000_65%,transparent_100%)] overflow-hidden">
+						<div className="absolute inset-x-0 top-0 h-[215px] overflow-hidden">
 							<DriftWall
 								items={movieDriftItems}
-								columns={5}
+								columns={4}
 								tileWidth={115}
-								tileHeight={78}
+								tileHeight={80}
 								gap={10}
 								radius={10}
-								tilt={15}
+								tilt={14}
 								turn={-12}
-								perspective={1000}
-								depth={90}
-								speed={32}
+								perspective={900}
+								depth={70}
+								speed={30}
 								direction="up"
-								variance={0.4}
+								variance={0.35}
 								parallax={0.5}
-								lift={36}
-								fade={0.5}
-								dim={0.65}
-								overlayColor="#0a0a14"
+								lift={30}
+								fade={0.4}
+								dim={0.9}
+								overlayColor="rgba(0, 0, 0, 0.2)"
 							/>
 						</div>
 					}

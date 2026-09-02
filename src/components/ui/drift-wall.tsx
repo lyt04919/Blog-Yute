@@ -43,14 +43,18 @@ export interface DriftWallProps {
   style?: CSSProperties
 }
 
-const DEFAULT_ITEMS: DriftWallItem[] = Array.from({ length: 15 }, (_, i) => {
-  const ids = [1015, 1025, 1039, 1043, 1044, 1050, 1062, 1069, 1074, 1080, 1084, 106, 110, 133, 164]
-  return {
-    image: `https://picsum.photos/id/${ids[i % ids.length]}/600/400`,
-    title: `Tile ${i + 1}`,
-    href: undefined
-  }
-})
+const DEFAULT_ITEMS: DriftWallItem[] = [
+  { image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&q=80', title: '星际穿越' },
+  { image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600&q=80', title: '银翼杀手' },
+  { image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&q=80', title: '盗梦空间' },
+  { image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=600&q=80', title: '奥本海默' },
+  { image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=600&q=80', title: '爱乐之城' },
+  { image: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=600&q=80', title: '楚门的世界' },
+  { image: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&q=80', title: '黑客帝国' },
+  { image: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=600&q=80', title: '千与千寻' },
+  { image: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=600&q=80', title: '泰坦尼克号' },
+  { image: 'https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=600&q=80', title: '海上钢琴师' }
+]
 
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -64,26 +68,26 @@ const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffec
 
 export default function DriftWall({
   items = DEFAULT_ITEMS,
-  columns = 5,
-  tileWidth = 200,
-  tileHeight = 132,
-  gap = 18,
-  radius = 14,
-  tilt = 16,
-  turn = -14,
+  columns = 4,
+  tileWidth = 115,
+  tileHeight = 80,
+  gap = 10,
+  radius = 10,
+  tilt = 14,
+  turn = -12,
   roll = 0,
-  perspective = 1200,
-  depth = 120,
-  speed = 42,
+  perspective = 1000,
+  depth = 80,
+  speed = 32,
   direction = 'up',
-  variance = 0.45,
-  parallax = 0.6,
+  variance = 0.4,
+  parallax = 0.5,
   pauseOnHover = false,
-  lift = 64,
-  fade = 0.6,
-  dim = 0.55,
+  lift = 36,
+  fade = 0.5,
+  dim = 0.85,
   grayscale = false,
-  overlayColor = '#060010',
+  overlayColor = 'rgba(0, 0, 0, 0.25)',
   className = '',
   style
 }: DriftWallProps) {
@@ -100,7 +104,7 @@ export default function DriftWall({
   const pointerDampedRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
   const lastTsRef = useRef<number | null>(null)
 
-  const [containerHeight, setContainerHeight] = useState<number>(600)
+  const [containerHeight, setContainerHeight] = useState<number>(240)
   const [activeId, setActiveId] = useState<string | null>(null)
   const activeIdRef = useRef<string | null>(null)
   const [reduced, setReduced] = useState<boolean>(false)
@@ -114,24 +118,27 @@ export default function DriftWall({
   }, [])
 
   const columnItems = useMemo(() => {
+    const validItems = items.length > 0 ? items : DEFAULT_ITEMS
     const cols: DriftWallItem[][] = Array.from({ length: columns }, () => [])
-    items.forEach((item, i) => cols[i % columns].push(item))
-    return cols.map(col => (col.length ? col : items.slice(0, 1)))
+    validItems.forEach((item, i) => cols[i % columns].push(item))
+    return cols.map(col => (col.length ? col : validItems.slice(0, 1)))
   }, [items, columns])
 
   const columnMeta = useMemo(() => {
     const unit = tileHeight + gap
     return columnItems.map(col => {
       const copyHeight = Math.max(unit, col.length * unit)
-      const copies = Math.max(2, Math.ceil((containerHeight * 1.6) / copyHeight) + 1)
+      const copies = Math.max(3, Math.ceil((containerHeight * 2.0) / copyHeight) + 1)
       return { copyHeight, copies }
-    });
+    })
   }, [columnItems, tileHeight, gap, containerHeight])
 
   useIsomorphicLayoutEffect(() => {
     if (!containerRef.current) return
     const ro = new ResizeObserver(([entry]) => {
-      setContainerHeight(entry.contentRect.height || 600)
+      if (entry.contentRect.height > 0) {
+        setContainerHeight(entry.contentRect.height)
+      }
     })
     ro.observe(containerRef.current)
     return () => ro.disconnect()
@@ -163,6 +170,9 @@ export default function DriftWall({
   )
 
   useEffect(() => {
+    // Apply immediate transform on mount
+    applyPlaneTransform(0, 0)
+
     const animate = (ts: number) => {
       if (lastTsRef.current === null) lastTsRef.current = ts
       const dt = Math.min(0.05, Math.max(0, ts - lastTsRef.current) / 1000)
@@ -272,7 +282,13 @@ export default function DriftWall({
   const renderTile = (item: DriftWallItem, id: string, colIndex: number) => {
     const inner = (
       <span className="drift-wall__inner">
-        <img src={item.image} alt={item.title ?? ''} loading="lazy" decoding="async" draggable={false} />
+        <img 
+          src={item.image} 
+          alt={item.title ?? ''} 
+          loading="eager" 
+          decoding="async" 
+          draggable={false} 
+        />
         <span className="drift-wall__overlay" aria-hidden="true" />
       </span>
     )
