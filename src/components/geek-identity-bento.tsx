@@ -43,22 +43,23 @@ const realBooks: BookItem[] = (booksData as any[])
 		stars: b.stars || 5
 	}))
 
-// Curated top movies with proper image proxy routing
+// Curated top 25 movies for full-bleed 5-column 3D DriftWall
 const topUserMovies: MovieItem[] = (moviesData as any[])
 	.filter((m) => Boolean(m.poster) && m.isShow !== false)
 	.sort((a, b) => (b.stars || b.doubanRating || 0) - (a.stars || a.doubanRating || 0))
-	.slice(0, 16)
+	.slice(0, 25)
 	.map((m) => ({
 		name: m.name,
 		poster: getPosterUrl(m.poster),
 		stars: m.stars || m.doubanRating || 9.0
 	}))
 
-// 4 distinct columns (4 items each) for vertical marquee
-const movieCol1 = topUserMovies.slice(0, 4)
-const movieCol2 = topUserMovies.slice(4, 8)
-const movieCol3 = topUserMovies.slice(8, 12)
-const movieCol4 = topUserMovies.slice(12, 16)
+// 5 distinct columns for full canvas immersion
+const movieCol1 = topUserMovies.slice(0, 5)
+const movieCol2 = topUserMovies.slice(5, 10)
+const movieCol3 = topUserMovies.slice(10, 15)
+const movieCol4 = topUserMovies.slice(15, 20)
+const movieCol5 = topUserMovies.slice(20, 25)
 
 export function GeekIdentityBento({ className }: { className?: string }) {
 	const [currentDay, setCurrentDay] = useState<number>(1)
@@ -131,29 +132,30 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					}
 				/>
 
-				{/* ════════════════ 2. 电影胶片流 · 3D 用户真实海报墙 (Live Vertical Marquee) ════════════════ */}
+				{/* ════════════════ 2. 电影胶片流 · 全景 3D 悬浮海报墙 (Full-Bleed 3D DriftWall) ════════════════ */}
 				<BentoCard
 					name="银幕光影流"
 					description="3D 悬浮流动海报流，沉浸式记录银幕震撼与光影回响。"
 					Icon={Film}
 					href="/favorite"
 					cta="探索电影全库"
-					className="col-span-1 md:col-span-2"
+					className="col-span-1 md:col-span-2 text-white"
 					background={
-						<div className="absolute inset-x-0 top-0 h-[215px] [mask-image:linear-gradient(to_bottom,#000_50%,transparent_100%)] overflow-hidden flex items-center justify-center pointer-events-none">
+						<div className="absolute inset-0 w-full h-full overflow-hidden bg-zinc-950 flex items-center justify-center pointer-events-none">
+							{/* 3D Tilted Perspective Canvas */}
 							<div 
 								style={{
-									transform: 'perspective(1000px) rotateX(15deg) rotateY(-12deg) rotateZ(1deg) scale(1.05)',
+									transform: 'perspective(1200px) rotateX(16deg) rotateY(-14deg) rotateZ(2deg) scale(1.35)',
 									transformStyle: 'preserve-3d',
 								}}
-								className="flex gap-2.5 px-2 justify-center items-center h-[260px]"
+								className="flex gap-3 justify-center items-center h-[520px] w-[140%] shrink-0 select-none pointer-events-none"
 							>
 								{/* Column 1 (Flowing Up) */}
-								<Marquee vertical duration="16s" className="p-0 [gap:10px] h-full overflow-visible">
+								<Marquee vertical duration="18s" className="p-0 [gap:12px] h-full overflow-visible">
 									{movieCol1.map((m, idx) => (
 										<div
 											key={idx}
-											className="relative w-20 h-30 sm:w-24 sm:h-36 rounded-xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-white/10 shrink-0 bg-zinc-900"
+											className="relative w-24 h-36 sm:w-28 sm:h-42 rounded-xl overflow-hidden shadow-2xl border border-white/15 shrink-0 bg-zinc-900"
 										>
 											<img 
 												src={m.poster} 
@@ -167,11 +169,11 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								</Marquee>
 
 								{/* Column 2 (Flowing Down) */}
-								<Marquee vertical reverse duration="20s" className="p-0 [gap:10px] h-full overflow-visible">
+								<Marquee vertical reverse duration="24s" className="p-0 [gap:12px] h-full overflow-visible">
 									{movieCol2.map((m, idx) => (
 										<div
 											key={idx}
-											className="relative w-20 h-30 sm:w-24 sm:h-36 rounded-xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-white/10 shrink-0 bg-zinc-900"
+											className="relative w-24 h-36 sm:w-28 sm:h-42 rounded-xl overflow-hidden shadow-2xl border border-white/15 shrink-0 bg-zinc-900"
 										>
 											<img 
 												src={m.poster} 
@@ -185,11 +187,11 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								</Marquee>
 
 								{/* Column 3 (Flowing Up) */}
-								<Marquee vertical duration="18s" className="p-0 [gap:10px] h-full overflow-visible">
+								<Marquee vertical duration="20s" className="p-0 [gap:12px] h-full overflow-visible">
 									{movieCol3.map((m, idx) => (
 										<div
 											key={idx}
-											className="relative w-20 h-30 sm:w-24 sm:h-36 rounded-xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-white/10 shrink-0 bg-zinc-900"
+											className="relative w-24 h-36 sm:w-28 sm:h-42 rounded-xl overflow-hidden shadow-2xl border border-white/15 shrink-0 bg-zinc-900"
 										>
 											<img 
 												src={m.poster} 
@@ -203,11 +205,29 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								</Marquee>
 
 								{/* Column 4 (Flowing Down) */}
-								<Marquee vertical reverse duration="22s" className="p-0 [gap:10px] h-full overflow-visible">
+								<Marquee vertical reverse duration="26s" className="p-0 [gap:12px] h-full overflow-visible">
 									{movieCol4.map((m, idx) => (
 										<div
 											key={idx}
-											className="relative w-20 h-30 sm:w-24 sm:h-36 rounded-xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-white/10 shrink-0 bg-zinc-900"
+											className="relative w-24 h-36 sm:w-28 sm:h-42 rounded-xl overflow-hidden shadow-2xl border border-white/15 shrink-0 bg-zinc-900"
+										>
+											<img 
+												src={m.poster} 
+												alt={m.name} 
+												referrerPolicy="no-referrer"
+												loading="eager" 
+												className="w-full h-full object-cover" 
+											/>
+										</div>
+									))}
+								</Marquee>
+
+								{/* Column 5 (Flowing Up) */}
+								<Marquee vertical duration="22s" className="p-0 [gap:12px] h-full overflow-visible">
+									{movieCol5.map((m, idx) => (
+										<div
+											key={idx}
+											className="relative w-24 h-36 sm:w-28 sm:h-42 rounded-xl overflow-hidden shadow-2xl border border-white/15 shrink-0 bg-zinc-900"
 										>
 											<img 
 												src={m.poster} 
@@ -220,6 +240,10 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 									))}
 								</Marquee>
 							</div>
+
+							{/* Dark Ambient Gradient Overlays for Cinematic Depth & Contrast */}
+							<div className="absolute inset-0 bg-gradient-to-tr from-black/70 via-black/20 to-transparent pointer-events-none" />
+							<div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-black/95 via-black/60 to-transparent pointer-events-none" />
 						</div>
 					}
 				/>
