@@ -1,14 +1,6 @@
 'use client'
 
-import { 
-  useCallback, 
-  useEffect, 
-  useLayoutEffect, 
-  useMemo, 
-  useRef, 
-  useState, 
-  type CSSProperties 
-} from 'react'
+import { useMemo, useRef, useCallback, type CSSProperties } from 'react'
 import './drift-wall.css'
 
 export interface DriftWallItem {
@@ -48,16 +40,6 @@ const DEFAULT_ITEMS: DriftWallItem[] = [
   { image: '/images/uploads/4e81d4e853b5eb4f.webp', title: '变形金刚2' }
 ]
 
-const prefersReducedMotion = () =>
-  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-const columnFactor = (index: number, variance: number) => {
-  const pseudo = ((index * 0.6180339887 + 0.35) % 1) * 2 - 1
-  return 1 + variance * pseudo
-}
-
-const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect
-
 export default function DriftWall({
   items = DEFAULT_ITEMS,
   columns = 5,
@@ -85,41 +67,6 @@ export default function DriftWall({
 }: DriftWallProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const planeRef = useRef<HTMLDivElement>(null)
-  const trackRefs = useRef<(HTMLDivElement | null)[]>([])
-  const rafRef = useRef<number | null>(null)
-
-  const offsetsRef = useRef<number[]>([])
-  const velocitiesRef = useRef<number[]>([])
-  const hoveredColRef = useRef<number>(-1)
-  const pointerRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
-  const pointerDampedRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
-  const lastTsRef = useRef<number | null>(null)
-  const isVisibleRef = useRef<boolean>(true)
-
-  const [containerHeight, setContainerHeight] = useState<number>(360)
-  const [reduced, setReduced] = useState<boolean>(false)
-
-  useEffect(() => {
-    setReduced(prefersReducedMotion())
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const onChange = (e: MediaQueryListEvent) => setReduced(e.matches)
-    mq.addEventListener('change', onChange)
-    return () => mq.removeEventListener('change', onChange)
-  }, [])
-
-  // IntersectionObserver to freeze RAF when off-screen
-  useEffect(() => {
-    if (!containerRef.current) return
-    const io = new IntersectionObserver(([entry]) => {
-      const wasVisible = isVisibleRef.current
-      isVisibleRef.current = entry.isIntersecting
-      if (!wasVisible && entry.isIntersecting) {
-        lastTsRef.current = null
-      }
-    }, { threshold: 0.05 })
-    io.observe(containerRef.current)
-    return () => io.disconnect()
-  }, [])
 
   const columnItems = useMemo(() => {
     const validItems = items && items.length > 0 ? items : DEFAULT_ITEMS
@@ -128,163 +75,37 @@ export default function DriftWall({
     return cols.map(col => (col.length ? col : validItems.slice(0, 1)))
   }, [items, columns])
 
-  const columnMeta = useMemo(() => {
-    const unit = tileHeight + gap
-    const safeH = Math.max(360, containerHeight || 360)
-    return columnItems.map(col => {
-      const copyHeight = Math.max(unit, col.length * unit)
-      const copies = Math.max(2, Math.ceil((safeH * 2.2) / copyHeight) + 1)
-      return { copyHeight, copies }
+  // Column speed variations for natural, organic drift
+  const columnDurations = useMemo(() => {
+    return Array.from({ length: columns }).map((_, c) => {
+      const baseSec = Math.max(18, Math.round(960 / speed))
+      const factor = 1 + (((c * 0.618) % 1) - 0.5) * variance
+      return Math.round(baseSec * factor)
     })
-  }, [columnItems, tileHeight, gap, containerHeight])
-
-  useIsomorphicLayoutEffect(() => {
-    if (!containerRef.current) return
-    const ro = new ResizeObserver(([entry]) => {
-      if (entry.contentRect.height > 0) {
-        setContainerHeight(Math.max(360, entry.contentRect.height))
-      }
-    })
-    ro.observe(containerRef.current)
-    return () => ro.disconnect()
-  }, [])
-
-  const baseVelocities = useMemo(() => {
-    const dirSign = direction === 'up' ? 1 : -1
-    return columnItems.map((_, c) => {
-      const altSign = c % 2 === 0 ? 1 : -1
-      return speed * columnFactor(c, variance) * dirSign * altSign
-    })
-  }, [columnItems, speed, direction, variance])
-
-  useEffect(() => {
-    offsetsRef.current = columnMeta.map((meta, c) => meta.copyHeight * ((c * 0.37) % 1))
-    velocitiesRef.current = columnItems.map(() => 0)
-  }, [columnMeta, columnItems])
-
-  const applyPlaneTransform = useCallback(
-    (px: number, py: number) => {
-      const plane = planeRef.current
-      if (!plane) return
-      const safePx = Number.isFinite(px) ? px : 0
-      const safePy = Number.isFinite(py) ? py : 0
-      plane.style.transform =
-        `translate(-50%, -50%) scale(1.3) ` +
-        `rotateX(${tilt + safePy}deg) rotateY(${turn + safePx}deg) rotateZ(${roll}deg) ` +
-        `translateZ(${-depth}px)`
-    },
-    [tilt, turn, roll, depth]
-  )
-
-  // Immediate synchronous layout on mount
-  useIsomorphicLayoutEffect(() => {
-    applyPlaneTransform(0, 0)
-  }, [applyPlaneTransform])
-
-  // Tab switching / visibilitychange listener: Pause when tab is backgrounded & resume cleanly
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        if (rafRef.current) {
-          cancelAnimationFrame(rafRef.current)
-          rafRef.current = null
-        }
-        lastTsRef.current = null
-      } else {
-        lastTsRef.current = null
-        pointerDampedRef.current = { x: 0, y: 0 }
-        applyPlaneTransform(0, 0)
-        for (let c = 0; c < offsetsRef.current.length; c++) {
-          if (!Number.isFinite(offsetsRef.current[c])) offsetsRef.current[c] = 0
-          if (!Number.isFinite(velocitiesRef.current[c])) velocitiesRef.current[c] = 0
-        }
-        if (!rafRef.current) {
-          rafRef.current = requestAnimationFrame(animate)
-        }
-      }
-    }
-
-    const animate = (ts: number) => {
-      if (lastTsRef.current === null || !Number.isFinite(lastTsRef.current)) {
-        lastTsRef.current = ts
-      }
-      const rawDt = (ts - lastTsRef.current) / 1000
-      const dt = Number.isFinite(rawDt) && rawDt > 0 ? Math.min(0.05, rawDt) : 0.016
-      lastTsRef.current = ts
-
-      if (isVisibleRef.current && !document.hidden) {
-        const maxTilt = parallax * 8
-        const targetX = (Number.isFinite(pointerRef.current.x) ? pointerRef.current.x : 0) * maxTilt
-        const targetY = -(Number.isFinite(pointerRef.current.y) ? pointerRef.current.y : 0) * maxTilt
-        const damp = 1 - Math.exp(-dt / 0.16)
-
-        if (!Number.isFinite(pointerDampedRef.current.x)) pointerDampedRef.current.x = 0
-        if (!Number.isFinite(pointerDampedRef.current.y)) pointerDampedRef.current.y = 0
-
-        pointerDampedRef.current.x += (targetX - pointerDampedRef.current.x) * damp
-        pointerDampedRef.current.y += (targetY - pointerDampedRef.current.y) * damp
-        applyPlaneTransform(pointerDampedRef.current.x, pointerDampedRef.current.y)
-
-        if (!reduced) {
-          for (let c = 0; c < trackRefs.current.length; c++) {
-            const meta = columnMeta[c]
-            if (!meta || !meta.copyHeight) continue
-            
-            // When hovered, the column is 100% frozen in place
-            if (hoveredColRef.current === c) {
-              velocitiesRef.current[c] = 0
-              continue
-            }
-
-            const target = baseVelocities[c] || 0
-            const ease = 1 - Math.exp(-dt / 0.2)
-            
-            if (!Number.isFinite(velocitiesRef.current[c])) velocitiesRef.current[c] = 0
-            if (!Number.isFinite(offsetsRef.current[c])) offsetsRef.current[c] = 0
-
-            velocitiesRef.current[c] += (target - velocitiesRef.current[c]) * ease
-            let next = offsetsRef.current[c] + velocitiesRef.current[c] * dt
-            next = ((next % meta.copyHeight) + meta.copyHeight) % meta.copyHeight
-            offsetsRef.current[c] = next
-
-            const el = trackRefs.current[c]
-            if (el) el.style.transform = `translate3d(0, ${-next}px, 0)`
-          }
-        }
-      }
-
-      rafRef.current = requestAnimationFrame(animate)
-    }
-
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-    rafRef.current = requestAnimationFrame(animate)
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
-      if (rafRef.current) cancelAnimationFrame(rafRef.current)
-      rafRef.current = null
-      lastTsRef.current = null
-    }
-  }, [baseVelocities, columnMeta, parallax, reduced, applyPlaneTransform])
+  }, [columns, speed, variance])
 
   const handlePointerMove = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
-      const rect = containerRef.current?.getBoundingClientRect()
-      if (!rect || rect.width === 0 || rect.height === 0) return
-      if (parallax > 0 && !reduced) {
-        pointerRef.current = {
-          x: (e.clientX - rect.left) / rect.width - 0.5,
-          y: (e.clientY - rect.top) / rect.height - 0.5
-        }
-      }
+      if (parallax <= 0 || !planeRef.current || !containerRef.current) return
+      const rect = containerRef.current.getBoundingClientRect()
+      if (!rect.width || !rect.height) return
+      const px = ((e.clientX - rect.left) / rect.width - 0.5) * parallax * 8
+      const py = -((e.clientY - rect.top) / rect.height - 0.5) * parallax * 8
+      planeRef.current.style.transform =
+        `translate(-50%, -50%) scale(1.3) ` +
+        `rotateX(${tilt + py}deg) rotateY(${turn + px}deg) rotateZ(${roll}deg) ` +
+        `translateZ(${-depth}px)`
     },
-    [parallax, reduced]
+    [parallax, tilt, turn, roll, depth]
   )
 
-  const handlePointerLeaveWall = useCallback(() => {
-    pointerRef.current = { x: 0, y: 0 }
-    hoveredColRef.current = -1
-  }, [])
+  const handlePointerLeave = useCallback(() => {
+    if (!planeRef.current) return
+    planeRef.current.style.transform =
+      `translate(-50%, -50%) scale(1.3) ` +
+      `rotateX(${tilt}deg) rotateY(${turn}deg) rotateZ(${roll}deg) ` +
+      `translateZ(${-depth}px)`
+  }, [tilt, turn, roll, depth])
 
   const cssVars = useMemo(() => {
     const vars: Record<string, any> = {
@@ -302,74 +123,68 @@ export default function DriftWall({
     return vars as CSSProperties
   }, [tileWidth, tileHeight, gap, radius, perspective, lift, dim, grayscale, overlayColor, style])
 
-  const renderTile = (item: DriftWallItem, id: string, colIndex: number) => {
-    return (
-      <div 
-        key={id} 
-        tabIndex={0} 
-        role="button" 
-        aria-label={item.title ?? 'tile'} 
-        className="drift-wall__tile"
-        onMouseEnter={() => {
-          hoveredColRef.current = colIndex
-        }}
-      >
-        <span 
-          className="drift-wall__inner"
-          onMouseEnter={() => {
-            hoveredColRef.current = colIndex
-          }}
-        >
-          <img 
-            src={item.image} 
-            alt={item.title ?? ''} 
-            referrerPolicy="no-referrer"
-            loading="lazy" 
-            decoding="async" 
-            draggable={false}
-            onError={(e) => {
-              e.currentTarget.style.opacity = '0.2'
-            }}
-          />
-          <span className="drift-wall__overlay" aria-hidden="true" />
-        </span>
-      </div>
-    )
-  }
-
-  const rootClass = ['drift-wall', reduced ? 'drift-wall--reduced' : '', className].filter(Boolean).join(' ')
-
   return (
     <div
       ref={containerRef}
-      className={rootClass}
+      className={`drift-wall ${className}`.trim()}
       style={cssVars}
       onPointerMove={handlePointerMove}
-      onPointerLeave={handlePointerLeaveWall}
+      onPointerLeave={handlePointerLeave}
       role="group"
       aria-label="Drifting wall of tiles"
     >
-      <div ref={planeRef} className="drift-wall__plane">
+      <div 
+        ref={planeRef} 
+        className="drift-wall__plane"
+        style={{
+          transform: `translate(-50%, -50%) scale(1.3) rotateX(${tilt}deg) rotateY(${turn}deg) rotateZ(${roll}deg) translateZ(${-depth}px)`,
+          transition: 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
+        }}
+      >
         {columnItems.map((col, c) => {
-          const meta = columnMeta[c]
-          const copies = Array.from({ length: meta.copies })
+          const isReverse = c % 2 === 1
+          const duration = `${columnDurations[c]}s`
           return (
-            <div 
-              className="drift-wall__col" 
+            <div
               key={`col-${c}`}
-              onMouseEnter={() => {
-                hoveredColRef.current = c
-              }}
-              onMouseLeave={() => {
-                if (hoveredColRef.current === c) {
-                  hoveredColRef.current = -1
-                }
-              }}
+              className="drift-wall__col"
             >
-              <div className="drift-wall__track" ref={el => { trackRefs.current[c] = el }}>
-                {copies.map((_, copyIndex) =>
-                  col.map((item, itemIndex) => renderTile(item, `${c}-${copyIndex}-${itemIndex}`, c))
-                )}
+              <div
+                className="drift-wall__track"
+                style={{
+                  animation: `drift-wall-vertical ${duration} linear infinite`,
+                  animationDirection: isReverse ? 'reverse' : 'normal',
+                }}
+              >
+                {/* 2 seamless loops for infinite vertical scroll */}
+                {[0, 1].map((copyIndex) => (
+                  <div key={copyIndex} className="flex flex-col shrink-0 [gap:var(--dw-gap)]">
+                    {col.map((item, itemIndex) => (
+                      <div
+                        key={`${c}-${copyIndex}-${itemIndex}`}
+                        tabIndex={0}
+                        role="button"
+                        aria-label={item.title ?? 'tile'}
+                        className="drift-wall__tile"
+                      >
+                        <span className="drift-wall__inner">
+                          <img
+                            src={item.image}
+                            alt={item.title ?? ''}
+                            referrerPolicy="no-referrer"
+                            loading="lazy"
+                            decoding="async"
+                            draggable={false}
+                            onError={(e) => {
+                              e.currentTarget.style.opacity = '0.2'
+                            }}
+                          />
+                          <span className="drift-wall__overlay" aria-hidden="true" />
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ))}
               </div>
             </div>
           )

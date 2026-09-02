@@ -47,6 +47,7 @@
 .drift-wall__col {
   position: relative;
   width: calc(var(--dw-tile-w) + var(--dw-gap));
+  flex: 0 0 calc(var(--dw-tile-w) + var(--dw-gap));
   transition: z-index 0.15s;
 }
 
@@ -54,25 +55,41 @@
   z-index: 50;
 }
 
+/* Pure GPU Keyframe vertical scrolling */
+@keyframes drift-wall-vertical {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(calc(-50% - (var(--dw-gap) / 2)));
+  }
+}
+
 .drift-wall__track {
   display: flex;
   flex-direction: column;
   will-change: transform;
+  gap: var(--dw-gap);
+}
+
+/* Instant hardware pause on hovered column */
+.drift-wall__col:hover .drift-wall__track {
+  animation-play-state: paused !important;
 }
 
 .drift-wall__tile {
   position: relative;
   display: block;
   width: 100%;
-  height: calc(var(--dw-tile-h) + var(--dw-gap));
-  flex: 0 0 auto;
+  height: var(--dw-tile-h);
+  flex: 0 0 var(--dw-tile-h);
   outline: none;
   cursor: pointer;
 }
 
 .drift-wall__inner {
   position: absolute;
-  inset: calc(var(--dw-gap) / 2);
+  inset: 0;
   display: block;
   border-radius: var(--dw-radius);
   overflow: hidden;
@@ -117,7 +134,7 @@
   transition: opacity 0.24s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Rock-Solid Hover: Both Tile & Inner support hover stably */
+/* Rock-Solid 3D Hover: Elevated and Spotlit */
 .drift-wall__tile:hover,
 .drift-wall__tile:has(.drift-wall__inner:hover) {
   z-index: 60;
@@ -150,6 +167,7 @@
 @media (prefers-reduced-motion: reduce) {
   .drift-wall__plane,
   .drift-wall__track {
+    animation-play-state: paused !important;
     will-change: auto;
   }
 }
