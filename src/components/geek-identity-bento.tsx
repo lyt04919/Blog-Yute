@@ -13,14 +13,10 @@ import {
 	Zap, 
 	CheckCircle2, 
 	MapPin, 
-	Clock,
 	Code2,
 	GitBranch,
 	Cpu,
-	Sparkles,
-	Layers,
-	FileText,
-	Terminal
+	Layers
 } from 'lucide-react'
 
 const files = [
@@ -34,40 +30,39 @@ const files = [
 const notifications = [
 	{
 		id: 1,
-		title: 'Production Deployed',
-		time: '2m ago',
-		description: 'All static assets synced to global edge CDN',
-		icon: CheckCircle2,
-		color: 'text-emerald-500 bg-emerald-500/10',
-	},
-	{
-		id: 2,
-		title: 'Edge Latency: 12ms',
+		title: 'New message',
 		time: '5m ago',
-		description: 'Cloudflare cached with 100% performance score',
-		icon: Zap,
-		color: 'text-blue-500 bg-blue-500/10',
-	},
-	{
-		id: 3,
-		title: 'Nomad Base Station',
-		time: 'LIVE',
-		description: 'Hangzhou · GMT+8 Active Digital Nomad',
-		icon: MapPin,
+		description: 'Magic UI · 1 new message',
+		icon: CheckCircle2,
 		color: 'text-rose-500 bg-rose-500/10',
 	},
 	{
+		id: 2,
+		title: 'User signed up',
+		time: '10m ago',
+		description: 'Magic UI · Welcome onboard',
+		icon: Zap,
+		color: 'text-amber-500 bg-amber-500/10',
+	},
+	{
+		id: 3,
+		title: 'Payment received',
+		time: '15m ago',
+		description: 'Magic UI · $99.00 USD',
+		icon: MapPin,
+		color: 'text-emerald-500 bg-emerald-500/10',
+	},
+	{
 		id: 4,
-		title: 'GitHub Commit Pushed',
-		time: 'Just now',
-		description: 'main branch updated with zero downtime',
+		title: 'Production Deployed',
+		time: '2m ago',
+		description: 'All static assets synced to edge',
 		icon: GitBranch,
 		color: 'text-purple-500 bg-purple-500/10',
 	},
 ]
 
 export function GeekIdentityBento({ className }: { className?: string }) {
-	const [timeString, setTimeString] = useState<string>('')
 	const [currentDay, setCurrentDay] = useState<number>(1)
 	const [currentMonth, setCurrentMonth] = useState<string>('September')
 	const [currentYear, setCurrentYear] = useState<number>(2026)
@@ -84,23 +79,10 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 
 	useEffect(() => {
 		setMounted(true)
-		const update = () => {
-			const now = new Date()
-			setTimeString(
-				now.toLocaleTimeString('en-US', {
-					hour12: false,
-					hour: '2-digit',
-					minute: '2-digit',
-					second: '2-digit',
-				})
-			)
-			setCurrentDay(now.getDate())
-			setCurrentMonth(now.toLocaleDateString('en-US', { month: 'long' }))
-			setCurrentYear(now.getFullYear())
-		}
-		update()
-		const timer = setInterval(update, 1000)
-		return () => clearInterval(timer)
+		const now = new Date()
+		setCurrentDay(now.getDate())
+		setCurrentMonth(now.toLocaleDateString('en-US', { month: 'long' }))
+		setCurrentYear(now.getFullYear())
 	}, [])
 
 	return (
@@ -115,7 +97,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					cta="Learn more"
 					className="col-span-1"
 					background={
-						<div className="size-full flex items-center justify-center overflow-hidden [mask-image:linear-gradient(to_right,transparent,white_20%,white_80%,transparent)]">
+						<div className="absolute right-0 top-3 h-[280px] w-full [mask-image:linear-gradient(to_top,transparent_30%,#000_100%)] transition-all duration-300 ease-out group-hover:scale-105 overflow-hidden">
 							<Marquee pauseOnHover duration="18s" className="py-2">
 								{files.map((file, idx) => {
 									const IconComp = file.icon
@@ -152,7 +134,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					cta="Learn more"
 					className="col-span-1 md:col-span-2"
 					background={
-						<div className="size-full flex flex-col justify-start px-6 pt-3 overflow-hidden select-none">
+						<div className="absolute right-0 top-3 h-[280px] w-full [mask-image:linear-gradient(to_top,transparent_30%,#000_100%)] transition-all duration-300 ease-out group-hover:scale-105 px-6 overflow-hidden">
 							<AnimatedList delay={2000}>
 								{notifications.map((item) => {
 									const IconComp = item.icon
@@ -190,9 +172,9 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					background={
 						<div
 							ref={containerRef}
-							className="relative size-full flex items-center justify-between px-10 overflow-hidden select-none"
+							className="absolute right-0 top-2 h-[280px] w-full [mask-image:linear-gradient(to_top,transparent_25%,#000_100%)] transition-all duration-300 ease-out group-hover:scale-105 flex items-center justify-between px-10 overflow-hidden"
 						>
-							{/* Left Node: YOU */}
+							{/* Left Node: User */}
 							<div
 								ref={div1Ref}
 								className="size-11 rounded-2xl bg-white dark:bg-zinc-800 border-2 border-zinc-200 dark:border-zinc-700 shadow-lg flex items-center justify-center text-xs font-bold font-mono text-zinc-800 dark:text-zinc-100 z-10"
@@ -214,29 +196,29 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 									ref={div3Ref}
 									className="size-8 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md flex items-center justify-center text-[10px] font-bold text-blue-500 font-mono"
 								>
-									React
+									Drive
 								</div>
 								<div
 									ref={div4Ref}
 									className="size-8 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md flex items-center justify-center text-[10px] font-bold text-zinc-800 dark:text-zinc-100 font-mono"
 								>
-									Next
+									Docs
 								</div>
 								<div
 									ref={div5Ref}
-									className="size-8 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md flex items-center justify-center text-[10px] font-bold text-blue-600 font-mono"
+									className="size-8 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md flex items-center justify-center text-[10px] font-bold text-emerald-500 font-mono"
 								>
-									TS
+									Chat
 								</div>
 								<div
 									ref={div6Ref}
-									className="size-8 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md flex items-center justify-center text-[10px] font-bold text-emerald-500 font-mono"
+									className="size-8 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md flex items-center justify-center text-[10px] font-bold text-purple-600 font-mono"
 								>
-									Git
+									Notion
 								</div>
 							</div>
 
-							{/* Animated Beams connecting nodes */}
+							{/* Animated Beams */}
 							<AnimatedBeam
 								containerRef={containerRef}
 								fromRef={div1Ref}
@@ -273,7 +255,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								delay={0.6}
 								curvature={8}
 								gradientStartColor="#8b5cf6"
-								gradientStopColor="#3b82f6"
+								gradientStopColor="#10b981"
 							/>
 							<AnimatedBeam
 								containerRef={containerRef}
@@ -283,13 +265,13 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								delay={0.8}
 								curvature={25}
 								gradientStartColor="#8b5cf6"
-								gradientStopColor="#10b981"
+								gradientStopColor="#a855f7"
 							/>
 						</div>
 					}
 				/>
 
-				{/* ════════════════ 4. Calendar & Time (Interactive Calendar) ════════════════ */}
+				{/* ════════════════ 4. Calendar (Live Calendar) ════════════════ */}
 				<BentoCard
 					name="Calendar"
 					description="Use the calendar to filter your files by date."
@@ -298,25 +280,32 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					cta="Learn more"
 					className="col-span-1"
 					background={
-						<div className="size-full flex flex-col items-center justify-center pt-2 select-none">
-							<div className="w-full max-w-[200px] rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 p-3 shadow-md">
+						<div className="absolute right-0 top-3 h-[280px] w-full [mask-image:linear-gradient(to_top,transparent_30%,#000_100%)] transition-all duration-300 ease-out group-hover:scale-105 flex items-start justify-center pt-2 overflow-hidden">
+							<div className="w-full max-w-[210px] rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 p-3.5 shadow-md">
 								<div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-700/80 pb-2 mb-2">
-									<span className="text-xs font-bold text-rose-500 font-mono">{currentMonth} {currentYear}</span>
-									<span className="text-[10px] font-mono font-bold text-zinc-400">{timeString || '00:00:00'}</span>
+									<span className="text-xs font-bold text-zinc-700 dark:text-zinc-200 font-mono">{currentMonth} {currentYear}</span>
+									<span className="text-[10px] font-mono font-bold text-zinc-400">2026</span>
 								</div>
 								<div className="grid grid-cols-7 gap-1 text-center text-[10px] font-mono text-zinc-400 mb-1">
-									<span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+									<span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
 								</div>
 								<div className="grid grid-cols-7 gap-1 text-center text-[10px] font-mono text-zinc-600 dark:text-zinc-300">
 									<span className="opacity-30">30</span>
 									<span className="opacity-30">31</span>
 									<span className="font-semibold">1</span>
-									<span className="size-5 mx-auto rounded-full bg-rose-500 text-white font-bold flex items-center justify-center shadow-xs animate-pulse">
+									<span className="size-5 mx-auto rounded-full bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-bold flex items-center justify-center shadow-xs">
 										{mounted ? currentDay : 2}
 									</span>
 									<span className="font-semibold">3</span>
 									<span className="font-semibold">4</span>
 									<span className="font-semibold">5</span>
+									<span className="font-semibold">6</span>
+									<span className="font-semibold">7</span>
+									<span className="font-semibold">8</span>
+									<span className="font-semibold">9</span>
+									<span className="font-semibold">10</span>
+									<span className="font-semibold">11</span>
+									<span className="font-semibold">12</span>
 								</div>
 							</div>
 						</div>

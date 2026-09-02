@@ -55,8 +55,8 @@ export function BentoCard({
       )}
       {...props}
     >
-      {/* Top Visual Area (scales slightly on hover) */}
-      <div className="relative w-full h-[58%] overflow-hidden flex items-center justify-center transition-transform duration-300 ease-out group-hover:scale-[1.02]">
+      {/* Background layer spanning upper/full container */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         {background}
       </div>
 
@@ -68,7 +68,7 @@ export function BentoCard({
         <h3 className="text-xl font-semibold text-zinc-800 dark:text-zinc-100">
           {name}
         </h3>
-        <p className="max-w-lg text-sm text-zinc-400 dark:text-zinc-400">
+        <p className="max-w-lg text-sm text-zinc-500 dark:text-zinc-400">
           {description}
         </p>
       </div>
@@ -76,7 +76,7 @@ export function BentoCard({
       {/* Slide-in CTA Button (slides UP from bottom on hover) */}
       <div
         className={cn(
-          "pointer-events-none absolute bottom-0 left-0 flex w-full translate-y-10 transform-gpu flex-row items-center px-6 py-4 opacity-0 transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100 z-20"
+          "pointer-events-none absolute bottom-0 left-0 flex w-full translate-y-10 transform-gpu flex-row items-center p-6 opacity-0 transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100 z-20"
         )}
       >
         <a
@@ -89,7 +89,7 @@ export function BentoCard({
       </div>
 
       {/* Background graying / dimming overlay on hover (Magic UI official effect) */}
-      <div className="pointer-events-none absolute inset-0 transform-gpu transition-all duration-300 group-hover:bg-black/[0.04] dark:group-hover:bg-white/[0.04]" />
+      <div className="pointer-events-none absolute inset-0 z-1 transform-gpu transition-all duration-300 group-hover:bg-neutral-900/[0.04] dark:group-hover:bg-white/[0.04]" />
     </div>
   )
 }
