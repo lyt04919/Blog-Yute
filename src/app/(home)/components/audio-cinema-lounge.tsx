@@ -12,8 +12,6 @@ import {
 	Star, 
 	X, 
 	ExternalLink, 
-	Film, 
-	BookOpen, 
 	Gamepad2, 
 	Tv, 
 	Disc, 
@@ -113,45 +111,6 @@ export default function AudioCinemaLounge() {
 		setTimeout(() => setIsCopied(false), 2000)
 	}
 
-	// 2. 🎬 电影列表 (2:3 竖版海报)
-	const moviesList = useMemo(() => {
-		return (moviesData as any[])
-			.filter((m) => m.isShow !== false && m.poster)
-			.map((m) => ({
-				id: `movie-${m.name}`,
-				type: 'movie' as const,
-				title: m.name,
-				subtitle: m.englishName || m.director || '经典光影',
-				cover: m.poster,
-				stars: m.stars ? Math.min(5, Math.max(1, Math.round(m.stars / 2))) : 5,
-				score: m.doubanRating || m.stars || '9.0',
-				desc: m.description,
-				tags: m.tags || ['电影', '光影'],
-				quote: m.quote,
-				link: m.doubanUrl || '/favorite/movies',
-				review: m.myReview || m.recommendation,
-			}))
-	}, [])
-
-	// 3. 📚 书籍列表 (2:3 竖版书卷)
-	const booksList = useMemo(() => {
-		return (booksData as any[])
-			.filter((b) => b.isShow !== false && b.cover)
-			.map((b) => ({
-				id: `book-${b.name}`,
-				type: 'book' as const,
-				title: b.name,
-				subtitle: b.author || '精选读物',
-				cover: b.cover,
-				stars: b.stars || 5,
-				score: b.stars ? (b.stars * 2).toFixed(1) : '9.5',
-				desc: b.description,
-				tags: b.tags || ['文学', '读物'],
-				quote: b.recommendation,
-				link: '/favorite/books',
-				review: b.recommendation,
-			}))
-	}, [])
 
 	// 4. 🌐 网页灵感与极客工具列表 (Web & Geek Tools)
 	const sharesList = useMemo(() => {
@@ -219,14 +178,6 @@ export default function AudioCinemaLounge() {
 			}))
 	}, [])
 
-	// 7. 精确物理像素漫游速率同步测算：竖版、横版与网页卡片等速漫游
-	const cardPitchVertical = 159
-	const cardPitchHorizontal = 205
-	const cardPitchWeb = 230
-	const speedPxPerSec = 65
-
-	const moviesDuration = `${Math.max(10, Math.round((moviesList.length * cardPitchVertical) / speedPxPerSec))}s`
-	const booksDuration = `${Math.max(10, Math.round((booksList.length * cardPitchVertical) / speedPxPerSec))}s`
 	const sharesDuration = `${Math.max(12, Math.round((sharesList.length * cardPitchWeb) / speedPxPerSec))}s`
 	const gamesDuration = `${Math.max(12, Math.round((gamesList.length * cardPitchHorizontal) / speedPxPerSec))}s`
 	const videosDuration = `${Math.max(12, Math.round((videosList.length * cardPitchHorizontal) / speedPxPerSec))}s`
@@ -569,170 +520,6 @@ export default function AudioCinemaLounge() {
 
 				</div>
 
-				{/* ════════════════ 2. 🎬 第一层：电影 (左) | 📚 书籍 (右) 2:3 竖版海报双走马灯 ════════════════ */}
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 w-full items-start">
-					
-					{/* 2.1 🎬 左侧：电影光影长廊 (Cinema Marquee) */}
-					<div className="relative w-full overflow-hidden rounded-3xl p-3.5 sm:p-4.5 bg-black/[0.02] dark:bg-white/[0.02] border border-black/5 dark:border-white/5 shadow-xs">
-						<div className="flex items-center justify-between gap-2 mb-3.5 px-1">
-							<div className="flex items-center gap-2">
-								<Film className="w-4 h-4 text-amber-700 dark:text-amber-400" />
-								<h3 className="text-xs font-mono font-bold tracking-wider uppercase text-zinc-800 dark:text-zinc-200">
-									Cinema · 经典光影
-								</h3>
-							</div>
-							<span className="text-[10px] font-mono text-zinc-500 dark:text-zinc-400">
-								{moviesList.length} 部精选
-							</span>
-						</div>
-
-						{/* 左右无缝渐变遮罩 */}
-						<div className="relative w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent_0%,black_36px,black_calc(100%-36px),transparent_100%)]">
-							<Marquee pauseOnHover duration={moviesDuration} className="py-1">
-								{moviesList.map((movie) => (
-									<div
-										key={movie.id}
-										onClick={() => setSelectedItem({
-											title: movie.title,
-											cover: movie.cover,
-											type: 'movie',
-											categoryName: '电影 · Cinema',
-											subtitle: movie.subtitle,
-											stars: movie.stars,
-											score: String(movie.score),
-											desc: movie.desc,
-											tags: movie.tags,
-											quote: movie.quote,
-											link: movie.link,
-											review: movie.review
-										})}
-										style={{ width: '135px' }}
-										className="shrink-0 group/card cursor-pointer flex flex-col items-center mx-1.5"
-									>
-										{/* 海报相框 */}
-										<div 
-											style={{ width: '135px', height: '200px' }}
-											className="relative rounded-2xl overflow-hidden bg-zinc-950 shadow-[0_10px_24px_rgba(0,0,0,0.16)] dark:shadow-[0_12px_28px_rgba(0,0,0,0.55)] border border-zinc-200/90 dark:border-zinc-800 transition-all duration-300 group-hover/card:scale-104 group-hover/card:-translate-y-1"
-										>
-											<img
-												src={movie.cover}
-												alt={movie.title}
-												style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-												className="transition-transform duration-500 group-hover/card:scale-106 select-none pointer-events-none"
-											/>
-											{movie.score && (
-												<div className="absolute top-2 right-2 px-1.5 py-0.5 rounded-full backdrop-blur-md bg-black/60 text-amber-300 text-[9px] font-mono font-bold border border-white/20">
-													★ {movie.score}
-												</div>
-											)}
-										</div>
-
-										{/* 标题与真实星级 */}
-										<div className="pt-2 text-center w-full px-1">
-											<h4 className="text-xs font-serif font-bold text-zinc-900 dark:text-zinc-100 truncate tracking-tight">
-												{movie.title}
-											</h4>
-											<p className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
-												{movie.subtitle}
-											</p>
-											<div className="flex items-center justify-center gap-0.5 mt-1">
-												{Array.from({ length: 5 }).map((_, i) => (
-													<Star 
-														key={i} 
-														className={`w-2.5 h-2.5 ${
-															i < (movie.stars || 5) 
-																? 'fill-amber-400 text-amber-400' 
-																: 'fill-transparent text-zinc-300 dark:text-zinc-700'
-														}`} 
-													/>
-												))}
-											</div>
-										</div>
-									</div>
-								))}
-							</Marquee>
-						</div>
-					</div>
-
-					{/* 2.2 📚 右侧：精选典籍书架 (Literature Marquee) */}
-					<div className="relative w-full overflow-hidden rounded-3xl p-3.5 sm:p-4.5 bg-black/[0.02] dark:bg-white/[0.02] border border-black/5 dark:border-white/5 shadow-xs">
-						<div className="flex items-center justify-between gap-2 mb-3.5 px-1">
-							<div className="flex items-center gap-2">
-								<BookOpen className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-								<h3 className="text-xs font-mono font-bold tracking-wider uppercase text-zinc-800 dark:text-zinc-200">
-									Literature · 精选典籍
-								</h3>
-							</div>
-							<span className="text-[10px] font-mono text-zinc-500 dark:text-zinc-400">
-								{booksList.length} 本馆藏
-							</span>
-						</div>
-
-						{/* 左右无缝渐变遮罩 */}
-						<div className="relative w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent_0%,black_36px,black_calc(100%-36px),transparent_100%)]">
-							<Marquee reverse pauseOnHover duration={booksDuration} className="py-1">
-								{booksList.map((book) => (
-									<div
-										key={book.id}
-										onClick={() => setSelectedItem({
-											title: book.title,
-											cover: book.cover,
-											type: 'book',
-											categoryName: '典籍 · Literature',
-											subtitle: book.subtitle,
-											stars: book.stars,
-											score: String(book.score),
-											desc: book.desc,
-											tags: book.tags,
-											quote: book.quote,
-											link: book.link,
-											review: book.review
-										})}
-										style={{ width: '135px' }}
-										className="shrink-0 group/card cursor-pointer flex flex-col items-center mx-1.5"
-									>
-										{/* 3D 实体书卷 */}
-										<div 
-											style={{ width: '135px', height: '200px' }}
-											className="relative rounded-r-2xl rounded-l-xs overflow-hidden bg-[#2D241E] shadow-[0_10px_24px_rgba(0,0,0,0.18)] dark:shadow-[0_12px_28px_rgba(0,0,0,0.6)] border-l-4 border-amber-700/60 border-r border-y border-[#3A2E26] transition-all duration-300 group-hover/card:scale-104 group-hover/card:-translate-y-1"
-										>
-											<img
-												src={book.cover}
-												alt={book.title}
-												style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-												className="transition-transform duration-500 group-hover/card:scale-106 select-none pointer-events-none"
-											/>
-											<div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/20 pointer-events-none" />
-										</div>
-
-										{/* 标题与真实星级 */}
-										<div className="pt-2 text-center w-full px-1">
-											<h4 className="text-xs font-serif font-bold text-zinc-900 dark:text-zinc-100 truncate tracking-tight">
-												{book.title}
-											</h4>
-											<p className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
-												{book.subtitle}
-											</p>
-											<div className="flex items-center justify-center gap-0.5 mt-1">
-												{Array.from({ length: 5 }).map((_, i) => (
-													<Star 
-														key={i} 
-														className={`w-2.5 h-2.5 ${
-															i < (book.stars || 5) 
-																? 'fill-amber-400 text-amber-400' 
-																: 'fill-transparent text-zinc-300 dark:text-zinc-700'
-														}`} 
-													/>
-												))}
-											</div>
-										</div>
-									</div>
-								))}
-							</Marquee>
-						</div>
-					</div>
-
-				</div>
 
 				{/* ════════════════ 3. 🌐 第二层（全新）：网页灵感与极客工具 (Web & Tools Marquee) ════════════════ */}
 				<div className="relative w-full overflow-hidden rounded-3xl p-3.5 sm:p-4.5 bg-black/[0.02] dark:bg-white/[0.02] border border-black/5 dark:border-white/5 shadow-xs">
