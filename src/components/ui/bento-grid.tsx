@@ -10,14 +10,15 @@ export interface BentoGridProps extends ComponentPropsWithoutRef<"div"> {
 }
 
 export interface BentoCardProps extends ComponentPropsWithoutRef<"div"> {
-  name: string
+  name?: string
   className?: string
-  background: ReactNode
+  background?: ReactNode
   Icon?: React.ElementType
-  description: string
+  description?: string
   href?: string
   cta?: string
   darkTheme?: boolean
+  children?: ReactNode
 }
 
 export function BentoGrid({ children, className, ...props }: BentoGridProps) {
@@ -43,9 +44,44 @@ export function BentoCard({
   href,
   cta = "Learn more",
   darkTheme = false,
+  children,
   ...props
 }: BentoCardProps) {
   const [isHovered, setIsHovered] = useState(false)
+
+  // When custom children are provided, render the full-bleed custom layout
+  if (children) {
+    return (
+      <div
+        key={name || 'custom-card'}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        style={{ minHeight: '360px' }}
+        className={cn(
+          "group relative col-span-3 flex overflow-hidden rounded-2xl cursor-pointer select-none min-h-[360px]",
+          darkTheme
+            ? "bg-zinc-950 border border-zinc-800 text-white shadow-xl dark:bg-zinc-950 dark:border-zinc-800"
+            : "bg-white [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)] border border-zinc-200/80 dark:bg-zinc-900/90 transform-gpu dark:[box-shadow:0_-20px_80px_-20px_#ffffff1f_inset] dark:[border:1px_solid_rgba(255,255,255,.1)] dark:border-zinc-800",
+          "transition-all duration-300",
+          className
+        )}
+        {...props}
+      >
+        {children}
+        {/* Hover overlay */}
+        <div 
+          style={{
+            opacity: isHovered ? 1 : 0,
+            transition: 'opacity 0.35s ease',
+          }}
+          className={cn(
+            "pointer-events-none absolute inset-0 z-1",
+            darkTheme ? "bg-white/[0.03]" : "bg-black/[0.03] dark:bg-white/[0.03]"
+          )}
+        />
+      </div>
+    )
+  }
 
   return (
     <div
