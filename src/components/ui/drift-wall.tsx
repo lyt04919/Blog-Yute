@@ -107,11 +107,15 @@ export default function DriftWall({
     return () => mq.removeEventListener('change', onChange)
   }, [])
 
-  // IntersectionObserver to freeze RAF when off-screen (0 CPU & 0 GPU leak)
+  // IntersectionObserver to pause RAF when off-screen
   useEffect(() => {
     if (!containerRef.current) return
     const io = new IntersectionObserver(([entry]) => {
+      const wasVisible = isVisibleRef.current
       isVisibleRef.current = entry.isIntersecting
+      if (!wasVisible && entry.isIntersecting) {
+        lastTsRef.current = null
+      }
     }, { threshold: 0.05 })
     io.observe(containerRef.current)
     return () => io.disconnect()
@@ -169,7 +173,13 @@ export default function DriftWall({
     [tilt, turn, roll, depth]
   )
 
+  // Immediate synchronous layout on mount
+  useIsomorphicLayoutEffect(() => {
+    applyPlaneTransform(0, 0)
+  }, [applyPlaneTransform])
+
   useEffect(() => {
+    lastTsRef.current = null
     applyPlaneTransform(0, 0)
 
     const animate = (ts: number) => {
@@ -177,7 +187,6 @@ export default function DriftWall({
       const dt = Math.min(0.05, Math.max(0, ts - lastTsRef.current) / 1000)
       lastTsRef.current = ts
 
-      // Only perform transforms and animations when element is in viewport
       if (isVisibleRef.current) {
         const maxTilt = parallax * 8
         const targetX = pointerRef.current.x * maxTilt
