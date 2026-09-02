@@ -7,11 +7,11 @@ import { motion, AnimatePresence } from 'motion/react'
 import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
 import { useConfigStore } from '@/app/(home)/stores/config-store'
-import { useAuthStore } from '@/hooks/use-auth'
 import { useTheme } from '@/hooks/use-theme'
 import { toast } from 'sonner'
 import { Dock, DockIcon } from '@/components/magicui/dock'
 import { Sun, Moon, ChevronDown, ChevronUp, Globe } from 'lucide-react'
+import { useMusicPlayerStore } from '@/hooks/use-music-player'
 
 // Nav Icons
 import ScrollOutlineSVG from '@/svgs/scroll-outline.svg'
@@ -94,13 +94,7 @@ const TooltipWrapper = ({ children, content, href, onClick, external }: { childr
 export default function TopNav() {
 	const pathname = usePathname()
 	const { siteContent } = useConfigStore()
-	const { isAuth } = useAuthStore()
-	const canSeeDiary = isAuth
-	
-	const activeNavList = useMemo(() => {
-		if (canSeeDiary) return navList
-		return navList.filter(item => item.href !== '/vault/diary')
-	}, [canSeeDiary])
+	const activeNavList = navList
 
 	const { resolvedTheme, toggleTheme } = useTheme()
 
@@ -144,6 +138,8 @@ export default function TopNav() {
 		}
 	}, [openDropdowns])
 
+	const currentTrack = useMusicPlayerStore((s) => s.currentTrack)
+
 	return (
 		<>
 			{/* Dock */}
@@ -154,11 +150,11 @@ export default function TopNav() {
 						animate={{ y: 0, opacity: 1 }}
 						exit={{ y: 100, opacity: 0 }}
 						transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-						className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50"
+						className={cn('dock-nav-container fixed left-1/2 -translate-x-1/2 z-50 transition-all duration-300', currentTrack ? 'bottom-[72px] sm:bottom-[78px]' : 'bottom-8')}
 						onMouseEnter={() => setIsDockHovered(true)}
 						onMouseLeave={() => setIsDockHovered(false)}
 					>
-						<Dock style={{ height: 56 }} iconMagnification={64} iconDistance={140} className="relative flex p-2 w-fit gap-2 bg-white dark:bg-[var(--color-card)]/90 border border-[#e4e4e7] dark:border-[var(--color-border)] backdrop-blur-3xl shadow-[0_0_10px_3px] shadow-black/5 rounded-full">
+						<Dock style={{ height: currentTrack ? 48 : 56 }} iconMagnification={currentTrack ? 54 : 64} iconDistance={140} className="relative flex p-1.5 sm:p-2 w-fit gap-1.5 sm:gap-2 bg-white/95 dark:bg-[var(--color-card)]/90 border border-[#e4e4e7] dark:border-[var(--color-border)] backdrop-blur-3xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] shadow-black/5 rounded-full">
 
 							{/* Home */}
 							<DockIcon className="rounded-3xl cursor-pointer bg-white dark:bg-[var(--color-card)] border border-[#e4e4e7] dark:border-[var(--color-border)] shadow-sm">
@@ -303,7 +299,7 @@ export default function TopNav() {
 			{/* 底部触发区域 - 当dock隐藏时，鼠标移到底部显示小指示器 */}
 			{!isDockVisible && (
 				<div
-					className="fixed bottom-0 left-1/2 -translate-x-1/2 z-40 w-32 h-6 flex items-end justify-center"
+					className="dock-nav-indicator fixed bottom-0 left-1/2 -translate-x-1/2 z-40 w-32 h-6 flex items-end justify-center"
 					onMouseEnter={() => setIsBottomHovered(true)}
 					onMouseLeave={() => setIsBottomHovered(false)}
 				>
