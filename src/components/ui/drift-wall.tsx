@@ -94,6 +94,7 @@ export default function DriftWall({
   const pointerRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
   const pointerDampedRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
   const lastTsRef = useRef<number | null>(null)
+  const isVisibleRef = useRef<boolean>(true)
 
   const [containerHeight, setContainerHeight] = useState<number>(360)
   const [reduced, setReduced] = useState<boolean>(false)
@@ -104,6 +105,16 @@ export default function DriftWall({
     const onChange = (e: MediaQueryListEvent) => setReduced(e.matches)
     mq.addEventListener('change', onChange)
     return () => mq.removeEventListener('change', onChange)
+  }, [])
+
+  // IntersectionObserver to freeze RAF when off-screen (0 CPU & 0 GPU leak)
+  useEffect(() => {
+    if (!containerRef.current) return
+    const io = new IntersectionObserver(([entry]) => {
+      isVisibleRef.current = entry.isIntersecting
+    }, { threshold: 0.05 })
+    io.observe(containerRef.current)
+    return () => io.disconnect()
   }, [])
 
   const columnItems = useMemo(() => {
@@ -117,7 +128,7 @@ export default function DriftWall({
     const unit = tileHeight + gap
     return columnItems.map(col => {
       const copyHeight = Math.max(unit, col.length * unit)
-      const copies = Math.max(3, Math.ceil((containerHeight * 2.5) / copyHeight) + 1)
+      const copies = Math.max(2, Math.ceil((containerHeight * 2.2) / copyHeight) + 1)
       return { copyHeight, copies }
     })
   }, [columnItems, tileHeight, gap, containerHeight])
@@ -166,34 +177,37 @@ export default function DriftWall({
       const dt = Math.min(0.05, Math.max(0, ts - lastTsRef.current) / 1000)
       lastTsRef.current = ts
 
-      const maxTilt = parallax * 8
-      const targetX = pointerRef.current.x * maxTilt
-      const targetY = -pointerRef.current.y * maxTilt
-      const damp = 1 - Math.exp(-dt / 0.16)
-      pointerDampedRef.current.x += (targetX - pointerDampedRef.current.x) * damp
-      pointerDampedRef.current.y += (targetY - pointerDampedRef.current.y) * damp
-      applyPlaneTransform(pointerDampedRef.current.x, pointerDampedRef.current.y)
+      // Only perform transforms and animations when element is in viewport
+      if (isVisibleRef.current) {
+        const maxTilt = parallax * 8
+        const targetX = pointerRef.current.x * maxTilt
+        const targetY = -pointerRef.current.y * maxTilt
+        const damp = 1 - Math.exp(-dt / 0.16)
+        pointerDampedRef.current.x += (targetX - pointerDampedRef.current.x) * damp
+        pointerDampedRef.current.y += (targetY - pointerDampedRef.current.y) * damp
+        applyPlaneTransform(pointerDampedRef.current.x, pointerDampedRef.current.y)
 
-      if (!reduced) {
-        for (let c = 0; c < trackRefs.current.length; c++) {
-          const meta = columnMeta[c]
-          if (!meta) continue
-          
-          // When hovered, the column is 100% frozen in place
-          if (hoveredColRef.current === c) {
-            velocitiesRef.current[c] = 0
-            continue
+        if (!reduced) {
+          for (let c = 0; c < trackRefs.current.length; c++) {
+            const meta = columnMeta[c]
+            if (!meta) continue
+            
+            // When hovered, the column is 100% frozen in place
+            if (hoveredColRef.current === c) {
+              velocitiesRef.current[c] = 0
+              continue
+            }
+
+            const target = baseVelocities[c]
+            const ease = 1 - Math.exp(-dt / 0.2)
+            velocitiesRef.current[c] += (target - velocitiesRef.current[c]) * ease
+            let next = (offsetsRef.current[c] ?? 0) + velocitiesRef.current[c] * dt
+            next = ((next % meta.copyHeight) + meta.copyHeight) % meta.copyHeight
+            offsetsRef.current[c] = next
+
+            const el = trackRefs.current[c]
+            if (el) el.style.transform = `translate3d(0, ${-next}px, 0)`
           }
-
-          const target = baseVelocities[c]
-          const ease = 1 - Math.exp(-dt / 0.2)
-          velocitiesRef.current[c] += (target - velocitiesRef.current[c]) * ease
-          let next = (offsetsRef.current[c] ?? 0) + velocitiesRef.current[c] * dt
-          next = ((next % meta.copyHeight) + meta.copyHeight) % meta.copyHeight
-          offsetsRef.current[c] = next
-
-          const el = trackRefs.current[c]
-          if (el) el.style.transform = `translate3d(0, ${-next}px, 0)`
         }
       }
 
@@ -265,7 +279,7 @@ export default function DriftWall({
             src={item.image} 
             alt={item.title ?? ''} 
             referrerPolicy="no-referrer"
-            loading="eager" 
+            loading="lazy" 
             decoding="async" 
             draggable={false} 
           />
