@@ -130,7 +130,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					}
 				/>
 
-				{/* ════════════════ 3. 📸 私享随笔 · 富士拍立得三联画廊 (纯净版：保留比例工艺，无水印) ════════════════ */}
+				{/* ════════════════ 3. 📸 私享随笔 · 富士拍立得三联画廊 (纯净版：自然下移居中排布) ════════════════ */}
 				<BentoCard
 					name="私享随笔"
 					description="记录日常思绪、旅途快照与那些触动心弦的生活切片。"
@@ -139,18 +139,18 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					cta="翻阅生活日记"
 					className="col-span-1 md:col-span-2"
 					background={
-						<div className="absolute inset-x-0 top-0 h-[245px] flex items-center justify-center pt-2 px-4 sm:px-6 select-none">
+						<div className="absolute inset-x-0 top-0 h-[260px] flex items-center justify-center pt-6 sm:pt-7 px-4 sm:px-6 select-none">
 							<div className="flex items-center justify-center gap-4 sm:gap-7">
 								{/* 1. 左侧富士相纸：奥克兰黄昏 (-7°) */}
 								<div
 									style={{
 										width: '134px',
 										height: '196px',
-										transform: 'rotate(-7deg) translateY(4px)',
+										transform: 'rotate(-7deg) translateY(12px)',
 										transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
 										boxShadow: '0 4px 6px -1px rgba(0,0,0,0.06), 0 14px 28px -4px rgba(0,0,0,0.13), 0 0 0 1px rgba(0,0,0,0.07)'
 									}}
-									className="relative bg-gradient-to-b from-[#FFFFFF] via-[#FDFDFD] to-[#F8F8F8] p-2 pb-6 rounded-[9px] pointer-events-none group-hover:!-rotate-[11deg] group-hover:!-translate-x-3 group-hover:shadow-2xl flex flex-col shrink-0"
+									className="relative bg-gradient-to-b from-[#FFFFFF] via-[#FDFDFD] to-[#F8F8F8] p-2 pb-6 rounded-[9px] pointer-events-none group-hover:!-rotate-[11deg] group-hover:!-translate-x-3 group-hover:!translate-y-2 group-hover:shadow-2xl flex flex-col shrink-0"
 								>
 									{/* 富士特有内嵌倒角压痕相框 */}
 									<div 
@@ -192,12 +192,12 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 									style={{
 										width: '140px',
 										height: '204px',
-										transform: 'rotate(0deg) translateY(-5px)',
+										transform: 'rotate(0deg) translateY(2px)',
 										transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
 										zIndex: 10,
 										boxShadow: '0 8px 12px -2px rgba(0,0,0,0.08), 0 20px 38px -6px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.07)'
 									}}
-									className="relative bg-gradient-to-b from-[#FFFFFF] via-[#FDFDFD] to-[#F8F8F8] p-2 pb-6 rounded-[9px] pointer-events-none group-hover:!-translate-y-3 group-hover:!scale-104 group-hover:shadow-2xl flex flex-col shrink-0"
+									className="relative bg-gradient-to-b from-[#FFFFFF] via-[#FDFDFD] to-[#F8F8F8] p-2 pb-6 rounded-[9px] pointer-events-none group-hover:!-translate-y-2 group-hover:!scale-104 group-hover:shadow-2xl flex flex-col shrink-0"
 								>
 									{/* 富士特有内嵌倒角压痕相框 */}
 									<div 
@@ -239,11 +239,11 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 									style={{
 										width: '134px',
 										height: '196px',
-										transform: 'rotate(7deg) translateY(4px)',
+										transform: 'rotate(7deg) translateY(12px)',
 										transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
 										boxShadow: '0 4px 6px -1px rgba(0,0,0,0.06), 0 14px 28px -4px rgba(0,0,0,0.13), 0 0 0 1px rgba(0,0,0,0.07)'
 									}}
-									className="relative bg-gradient-to-b from-[#FFFFFF] via-[#FDFDFD] to-[#F8F8F8] p-2 pb-6 rounded-[9px] pointer-events-none group-hover:!rotate-[11deg] group-hover:!translate-x-3 group-hover:shadow-2xl flex flex-col shrink-0"
+									className="relative bg-gradient-to-b from-[#FFFFFF] via-[#FDFDFD] to-[#F8F8F8] p-2 pb-6 rounded-[9px] pointer-events-none group-hover:!rotate-[11deg] group-hover:!translate-x-3 group-hover:!translate-y-2 group-hover:shadow-2xl flex flex-col shrink-0"
 								>
 									{/* 富士特有内嵌倒角压痕相框 */}
 									<div 
