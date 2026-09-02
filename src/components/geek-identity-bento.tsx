@@ -2,23 +2,20 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { BentoGrid, BentoCard } from '@/components/ui/bento-grid'
-import { AnimatedList } from '@/components/ui/animated-list'
+import DriftWall, { type DriftWallItem } from '@/components/ui/drift-wall'
 import { AnimatedBeam } from '@/components/ui/animated-beam'
 import { Marquee } from '@/components/ui/marquee'
 import { 
 	BookOpen, 
-	Sparkles, 
+	Film, 
 	Compass, 
 	CalendarDays, 
-	Music, 
-	Film, 
-	Gamepad2, 
 	Star,
 	Disc3,
-	Bookmark
+	Clapperboard
 } from 'lucide-react'
 
-// Curated items from Favorites data
+// Curated items from Favorites data for Marquee
 const featuredFavorites = [
 	{ 
 		name: '小王子', 
@@ -57,43 +54,68 @@ const featuredFavorites = [
 	},
 ]
 
-const activityLogs = [
+// Curated movie posters for DriftWall
+const movieDriftItems: DriftWallItem[] = [
 	{
-		id: 1,
-		title: '单曲循环 · 光辉岁月 (Beyond)',
-		time: '刚刚',
-		description: '精选粤语经典 · 殿堂级摇滚旋律',
-		icon: Disc3,
-		color: 'text-rose-500 bg-rose-500/10',
-		badge: '音乐'
+		image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&q=80',
+		title: '星际穿越 · Interstellar',
+		href: '/favorite'
 	},
 	{
-		id: 2,
-		title: '深度重温 · 《掌控习惯》',
-		time: '2小时前',
-		description: '詹姆斯·克莱尔 · 评分 5.0 ★★★★★',
-		icon: BookOpen,
-		color: 'text-amber-500 bg-amber-500/10',
-		badge: '书籍'
+		image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600&q=80',
+		title: '银翼杀手 2049 · Blade Runner',
+		href: '/favorite'
 	},
 	{
-		id: 3,
-		title: '观影打卡 · 《星际穿越》',
-		time: '昨天',
-		description: '科幻神作 · 诺兰硬核宇宙浪漫',
-		icon: Film,
-		color: 'text-blue-500 bg-blue-500/10',
-		badge: '电影'
+		image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&q=80',
+		title: '盗梦空间 · Inception',
+		href: '/favorite'
 	},
 	{
-		id: 4,
-		title: '通关沉浸 · 艾尔登法环',
-		time: '3天前',
-		description: '年度最佳开放世界 · 极客探索之旅',
-		icon: Gamepad2,
-		color: 'text-emerald-500 bg-emerald-500/10',
-		badge: '游戏'
+		image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=600&q=80',
+		title: '奥本海默 · Oppenheimer',
+		href: '/favorite'
 	},
+	{
+		image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=600&q=80',
+		title: '爱乐之城 · La La Land',
+		href: '/favorite'
+	},
+	{
+		image: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=600&q=80',
+		title: '楚门的世界 · The Truman Show',
+		href: '/favorite'
+	},
+	{
+		image: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&q=80',
+		title: '黑客帝国 · The Matrix',
+		href: '/favorite'
+	},
+	{
+		image: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=600&q=80',
+		title: '千与千寻 · Spirited Away',
+		href: '/favorite'
+	},
+	{
+		image: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=600&q=80',
+		title: '泰坦尼克号 · Titanic',
+		href: '/favorite'
+	},
+	{
+		image: 'https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=600&q=80',
+		title: '海上钢琴师 · The Legend of 1900',
+		href: '/favorite'
+	},
+	{
+		image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&q=80',
+		title: '辛德勒的名单 · Schindler\'s List',
+		href: '/favorite'
+	},
+	{
+		image: 'https://images.unsplash.com/photo-1505686994434-e3cc5abf1330?w=600&q=80',
+		title: '机器人总动员 · WALL-E',
+		href: '/favorite'
+	}
 ]
 
 export function GeekIdentityBento({ className }: { className?: string }) {
@@ -162,38 +184,36 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					}
 				/>
 
-				{/* ════════════════ 2. 收藏动态脉冲 (Live AnimatedList) ════════════════ */}
+				{/* ════════════════ 2. 电影胶片流 · 银幕展廊 (React Bits DriftWall) ════════════════ */}
 				<BentoCard
-					name="收藏脉冲"
-					description="持续记录阅读、观影、黑胶与极客探索动态。"
-					Icon={Sparkles}
+					name="银幕光影流"
+					description="3D 悬浮流动胶片流，沉浸式记录银幕震撼与光影回响。"
+					Icon={Film}
 					href="/favorite"
-					cta="查看全部收藏"
+					cta="探索电影全库"
 					className="col-span-1 md:col-span-2"
 					background={
-						<div className="absolute inset-x-0 top-0 h-[210px] [mask-image:linear-gradient(to_bottom,#000_55%,transparent_100%)] px-6 overflow-hidden pt-2">
-							<AnimatedList delay={2200}>
-								{activityLogs.map((item) => {
-									const IconComp = item.icon
-									return (
-										<div
-											key={item.id}
-											className="flex items-center gap-3 p-2.5 px-4 rounded-xl bg-white/95 dark:bg-zinc-800/95 border border-zinc-200/90 dark:border-zinc-700/90 shadow-sm"
-										>
-											<div className={`size-7 rounded-lg flex items-center justify-center shrink-0 ${item.color}`}>
-												<IconComp className="size-4" />
-											</div>
-											<div className="flex flex-col flex-1 min-w-0">
-												<div className="flex items-center justify-between">
-													<span className="text-xs font-bold text-zinc-800 dark:text-zinc-100 truncate">{item.title}</span>
-													<span className="text-[9.5px] text-zinc-400 font-mono">{item.time}</span>
-												</div>
-												<span className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">{item.description}</span>
-											</div>
-										</div>
-									)
-								})}
-							</AnimatedList>
+						<div className="absolute inset-x-0 top-0 h-[210px] [mask-image:linear-gradient(to_bottom,#000_65%,transparent_100%)] overflow-hidden">
+							<DriftWall
+								items={movieDriftItems}
+								columns={5}
+								tileWidth={115}
+								tileHeight={78}
+								gap={10}
+								radius={10}
+								tilt={15}
+								turn={-12}
+								perspective={1000}
+								depth={90}
+								speed={32}
+								direction="up"
+								variance={0.4}
+								parallax={0.5}
+								lift={36}
+								fade={0.5}
+								dim={0.65}
+								overlayColor="#0a0a14"
+							/>
 						</div>
 					}
 				/>
