@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { BentoGrid, BentoCard } from '@/components/ui/bento-grid'
 import { AnimatedBeam } from '@/components/ui/animated-beam'
 import { Marquee } from '@/components/ui/marquee'
+import DriftWall, { type DriftWallItem } from '@/components/ui/drift-wall'
 import { getPosterUrl } from '@/app/favorite/components/movie-card'
 import { 
 	BookOpen, 
@@ -16,12 +17,6 @@ import {
 // Import user's authentic data
 import moviesData from '@/data/movies.json'
 import booksData from '@/data/books.json'
-
-interface MovieItem {
-	name: string
-	poster: string
-	stars?: number | string
-}
 
 interface BookItem {
 	name: string
@@ -43,23 +38,16 @@ const realBooks: BookItem[] = (booksData as any[])
 		stars: b.stars || 5
 	}))
 
-// Curated top 25 movies for full-bleed 5-column 3D DriftWall
-const topUserMovies: MovieItem[] = (moviesData as any[])
+// Curated top 25 movies for full-bleed 5-column 3D DriftWall (strictly 2:3 vertical posters)
+const movieDriftItems: DriftWallItem[] = (moviesData as any[])
 	.filter((m) => Boolean(m.poster) && m.isShow !== false)
 	.sort((a, b) => (b.stars || b.doubanRating || 0) - (a.stars || a.doubanRating || 0))
-	.slice(0, 25)
+	.slice(0, 30)
 	.map((m) => ({
-		name: m.name,
-		poster: getPosterUrl(m.poster),
-		stars: m.stars || m.doubanRating || 9.0
+		title: m.name,
+		image: getPosterUrl(m.poster),
+		href: '/favorite'
 	}))
-
-// 5 distinct columns for full canvas immersion
-const movieCol1 = topUserMovies.slice(0, 5)
-const movieCol2 = topUserMovies.slice(5, 10)
-const movieCol3 = topUserMovies.slice(10, 15)
-const movieCol4 = topUserMovies.slice(15, 20)
-const movieCol5 = topUserMovies.slice(20, 25)
 
 export function GeekIdentityBento({ className }: { className?: string }) {
 	const [currentDay, setCurrentDay] = useState<number>(1)
@@ -132,7 +120,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					}
 				/>
 
-				{/* ════════════════ 2. 电影胶片流 · 全景 3D 悬浮海报墙 (Full-Bleed 3D DriftWall with Hover Lift) ════════════════ */}
+				{/* ════════════════ 2. 电影胶片流 · React Bits 3D DriftWall (Pure 2:3 Vertical Posters) ════════════════ */}
 				<BentoCard
 					name="银幕光影流"
 					description="3D 悬浮流动海报流，沉浸式记录银幕震撼与光影回响。"
@@ -141,114 +129,30 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					cta="探索电影全库"
 					className="col-span-1 md:col-span-2 text-white"
 					background={
-						<div className="absolute inset-0 w-full h-full overflow-hidden bg-zinc-950 flex items-center justify-center">
-							{/* 3D Tilted Perspective Canvas */}
-							<div 
-								style={{
-									transform: 'perspective(1200px) rotateX(16deg) rotateY(-14deg) rotateZ(2deg) scale(1.35)',
-									transformStyle: 'preserve-3d',
-								}}
-								className="flex gap-3.5 justify-center items-center h-[520px] w-[140%] shrink-0 select-none"
-							>
-								{/* Column 1 (Flowing Up) */}
-								<Marquee vertical duration="18s" className="p-0 [gap:14px] h-full overflow-visible">
-									{movieCol1.map((m, idx) => (
-										<div
-											key={idx}
-											className="group/tile relative w-36 h-24 sm:w-44 sm:h-28 rounded-2xl overflow-hidden shrink-0 cursor-pointer border border-white/10 bg-zinc-900 shadow-lg transition-all duration-300 ease-out hover:z-30 hover:scale-105 hover:shadow-[0_24px_60px_-18px_rgba(0,0,0,0.95)] hover:border-white/40"
-										>
-											<img 
-												src={m.poster} 
-												alt={m.name} 
-												referrerPolicy="no-referrer"
-												loading="eager" 
-												className="w-full h-full object-cover transition-all duration-300 opacity-55 group-hover/tile:opacity-100 group-hover/tile:saturate-110" 
-											/>
-											<div className="absolute inset-0 bg-[#060010] opacity-40 group-hover/tile:opacity-0 transition-opacity duration-300 pointer-events-none" />
-										</div>
-									))}
-								</Marquee>
-
-								{/* Column 2 (Flowing Down) */}
-								<Marquee vertical reverse duration="24s" className="p-0 [gap:14px] h-full overflow-visible">
-									{movieCol2.map((m, idx) => (
-										<div
-											key={idx}
-											className="group/tile relative w-36 h-24 sm:w-44 sm:h-28 rounded-2xl overflow-hidden shrink-0 cursor-pointer border border-white/10 bg-zinc-900 shadow-lg transition-all duration-300 ease-out hover:z-30 hover:scale-105 hover:shadow-[0_24px_60px_-18px_rgba(0,0,0,0.95)] hover:border-white/40"
-										>
-											<img 
-												src={m.poster} 
-												alt={m.name} 
-												referrerPolicy="no-referrer"
-												loading="eager" 
-												className="w-full h-full object-cover transition-all duration-300 opacity-55 group-hover/tile:opacity-100 group-hover/tile:saturate-110" 
-											/>
-											<div className="absolute inset-0 bg-[#060010] opacity-40 group-hover/tile:opacity-0 transition-opacity duration-300 pointer-events-none" />
-										</div>
-									))}
-								</Marquee>
-
-								{/* Column 3 (Flowing Up) */}
-								<Marquee vertical duration="20s" className="p-0 [gap:14px] h-full overflow-visible">
-									{movieCol3.map((m, idx) => (
-										<div
-											key={idx}
-											className="group/tile relative w-36 h-24 sm:w-44 sm:h-28 rounded-2xl overflow-hidden shrink-0 cursor-pointer border border-white/10 bg-zinc-900 shadow-lg transition-all duration-300 ease-out hover:z-30 hover:scale-105 hover:shadow-[0_24px_60px_-18px_rgba(0,0,0,0.95)] hover:border-white/40"
-										>
-											<img 
-												src={m.poster} 
-												alt={m.name} 
-												referrerPolicy="no-referrer"
-												loading="eager" 
-												className="w-full h-full object-cover transition-all duration-300 opacity-55 group-hover/tile:opacity-100 group-hover/tile:saturate-110" 
-											/>
-											<div className="absolute inset-0 bg-[#060010] opacity-40 group-hover/tile:opacity-0 transition-opacity duration-300 pointer-events-none" />
-										</div>
-									))}
-								</Marquee>
-
-								{/* Column 4 (Flowing Down) */}
-								<Marquee vertical reverse duration="26s" className="p-0 [gap:14px] h-full overflow-visible">
-									{movieCol4.map((m, idx) => (
-										<div
-											key={idx}
-											className="group/tile relative w-36 h-24 sm:w-44 sm:h-28 rounded-2xl overflow-hidden shrink-0 cursor-pointer border border-white/10 bg-zinc-900 shadow-lg transition-all duration-300 ease-out hover:z-30 hover:scale-105 hover:shadow-[0_24px_60px_-18px_rgba(0,0,0,0.95)] hover:border-white/40"
-										>
-											<img 
-												src={m.poster} 
-												alt={m.name} 
-												referrerPolicy="no-referrer"
-												loading="eager" 
-												className="w-full h-full object-cover transition-all duration-300 opacity-55 group-hover/tile:opacity-100 group-hover/tile:saturate-110" 
-											/>
-											<div className="absolute inset-0 bg-[#060010] opacity-40 group-hover/tile:opacity-0 transition-opacity duration-300 pointer-events-none" />
-										</div>
-									))}
-								</Marquee>
-
-								{/* Column 5 (Flowing Up) */}
-								<Marquee vertical duration="22s" className="p-0 [gap:14px] h-full overflow-visible">
-									{movieCol5.map((m, idx) => (
-										<div
-											key={idx}
-											className="group/tile relative w-36 h-24 sm:w-44 sm:h-28 rounded-2xl overflow-hidden shrink-0 cursor-pointer border border-white/10 bg-zinc-900 shadow-lg transition-all duration-300 ease-out hover:z-30 hover:scale-105 hover:shadow-[0_24px_60px_-18px_rgba(0,0,0,0.95)] hover:border-white/40"
-										>
-											<img 
-												src={m.poster} 
-												alt={m.name} 
-												referrerPolicy="no-referrer"
-												loading="eager" 
-												className="w-full h-full object-cover transition-all duration-300 opacity-55 group-hover/tile:opacity-100 group-hover/tile:saturate-110" 
-											/>
-											<div className="absolute inset-0 bg-[#060010] opacity-40 group-hover/tile:opacity-0 transition-opacity duration-300 pointer-events-none" />
-										</div>
-									))}
-								</Marquee>
-							</div>
-
-							{/* Dark Ambient Gradient Overlays for Cinematic Depth & Contrast */}
-							<div className="absolute inset-0 bg-gradient-to-tr from-black/70 via-black/20 to-transparent pointer-events-none" />
-							<div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-black/95 via-black/60 to-transparent pointer-events-none" />
+						<div className="absolute inset-0 w-full h-full overflow-hidden bg-[#08080f]">
+							<DriftWall
+								items={movieDriftItems}
+								columns={5}
+								tileWidth={105}
+								tileHeight={155}
+								gap={14}
+								radius={12}
+								tilt={16}
+								turn={-14}
+								perspective={1200}
+								depth={90}
+								speed={34}
+								direction="up"
+								variance={0.35}
+								parallax={0.6}
+								pauseOnHover={true}
+								lift={55}
+								fade={0.6}
+								dim={0.45}
+								overlayColor="#060010"
+							/>
+							{/* Ambient Dark Bottom Fade for Text Contrast */}
+							<div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-black/95 via-black/50 to-transparent pointer-events-none" />
 						</div>
 					}
 				/>

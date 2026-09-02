@@ -44,16 +44,8 @@ export interface DriftWallProps {
 }
 
 const DEFAULT_ITEMS: DriftWallItem[] = [
-  { image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&q=80', title: '星际穿越' },
-  { image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600&q=80', title: '银翼杀手' },
-  { image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&q=80', title: '盗梦空间' },
-  { image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=600&q=80', title: '奥本海默' },
-  { image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=600&q=80', title: '爱乐之城' },
-  { image: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=600&q=80', title: '楚门的世界' },
-  { image: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&q=80', title: '黑客帝国' },
-  { image: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=600&q=80', title: '千与千寻' },
-  { image: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=600&q=80', title: '泰坦尼克号' },
-  { image: 'https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=600&q=80', title: '海上钢琴师' }
+  { image: '/images/movies/coco.jpg', title: '寻梦环游记' },
+  { image: '/images/uploads/4e81d4e853b5eb4f.webp', title: '变形金刚2' }
 ]
 
 const prefersReducedMotion = () =>
@@ -68,26 +60,26 @@ const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffec
 
 export default function DriftWall({
   items = DEFAULT_ITEMS,
-  columns = 4,
-  tileWidth = 115,
-  tileHeight = 80,
-  gap = 10,
-  radius = 10,
-  tilt = 14,
-  turn = -12,
+  columns = 5,
+  tileWidth = 100,
+  tileHeight = 150,
+  gap = 14,
+  radius = 12,
+  tilt = 16,
+  turn = -14,
   roll = 0,
-  perspective = 1000,
-  depth = 80,
-  speed = 32,
+  perspective = 1200,
+  depth = 100,
+  speed = 36,
   direction = 'up',
   variance = 0.4,
-  parallax = 0.5,
-  pauseOnHover = false,
-  lift = 36,
-  fade = 0.5,
-  dim = 0.85,
+  parallax = 0.6,
+  pauseOnHover = true,
+  lift = 55,
+  fade = 0.6,
+  dim = 0.45,
   grayscale = false,
-  overlayColor = 'rgba(0, 0, 0, 0.25)',
+  overlayColor = '#060010',
   className = '',
   style
 }: DriftWallProps) {
@@ -104,7 +96,7 @@ export default function DriftWall({
   const pointerDampedRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
   const lastTsRef = useRef<number | null>(null)
 
-  const [containerHeight, setContainerHeight] = useState<number>(240)
+  const [containerHeight, setContainerHeight] = useState<number>(360)
   const [activeId, setActiveId] = useState<string | null>(null)
   const activeIdRef = useRef<string | null>(null)
   const [reduced, setReduced] = useState<boolean>(false)
@@ -128,7 +120,7 @@ export default function DriftWall({
     const unit = tileHeight + gap
     return columnItems.map(col => {
       const copyHeight = Math.max(unit, col.length * unit)
-      const copies = Math.max(3, Math.ceil((containerHeight * 2.0) / copyHeight) + 1)
+      const copies = Math.max(3, Math.ceil((containerHeight * 2.5) / copyHeight) + 1)
       return { copyHeight, copies }
     })
   }, [columnItems, tileHeight, gap, containerHeight])
@@ -162,7 +154,7 @@ export default function DriftWall({
       const plane = planeRef.current
       if (!plane) return
       plane.style.transform =
-        `translate(-50%, -50%) scale(1.18) ` +
+        `translate(-50%, -50%) scale(1.3) ` +
         `rotateX(${tilt + py}deg) rotateY(${turn + px}deg) rotateZ(${roll}deg) ` +
         `translateZ(${-depth}px)`
     },
@@ -170,7 +162,6 @@ export default function DriftWall({
   )
 
   useEffect(() => {
-    // Apply immediate transform on mount
     applyPlaneTransform(0, 0)
 
     const animate = (ts: number) => {
@@ -191,10 +182,10 @@ export default function DriftWall({
           const meta = columnMeta[c]
           if (!meta) continue
           const paused = wallHoveredRef.current && pauseOnHover
-          const factor = paused || hoveredColRef.current === c ? 0 : 1
+          const factor = paused && hoveredColRef.current === c ? 0.2 : 1
           const target = baseVelocities[c] * factor
 
-          const ease = 1 - Math.exp(-dt / (target === 0 ? 0.16 : 0.28))
+          const ease = 1 - Math.exp(-dt / 0.28)
           velocitiesRef.current[c] += (target - velocitiesRef.current[c]) * ease
           let next = (offsetsRef.current[c] ?? 0) + velocitiesRef.current[c] * dt
           next = ((next % meta.copyHeight) + meta.copyHeight) % meta.copyHeight
@@ -202,12 +193,6 @@ export default function DriftWall({
 
           const el = trackRefs.current[c]
           if (el) el.style.transform = `translate3d(0, ${-next}px, 0)`
-        }
-      } else {
-        for (let c = 0; c < trackRefs.current.length; c++) {
-          const el = trackRefs.current[c]
-          const meta = columnMeta[c]
-          if (el && meta) el.style.transform = `translate3d(0, ${-(offsetsRef.current[c] ?? 0)}px, 0)`
         }
       }
 
@@ -273,10 +258,9 @@ export default function DriftWall({
       '--dw-dim': dim,
       '--dw-gray': grayscale ? 1 : 0,
       '--dw-overlay': overlayColor,
-      '--dw-edge': `${Math.max(0, (1 - fade) * 100)}%`,
       ...style
     } as CSSProperties),
-    [tileWidth, tileHeight, gap, radius, perspective, lift, dim, grayscale, overlayColor, fade, style]
+    [tileWidth, tileHeight, gap, radius, perspective, lift, dim, grayscale, overlayColor, style]
   )
 
   const renderTile = (item: DriftWallItem, id: string, colIndex: number) => {
@@ -285,6 +269,7 @@ export default function DriftWall({
         <img 
           src={item.image} 
           alt={item.title ?? ''} 
+          referrerPolicy="no-referrer"
           loading="eager" 
           decoding="async" 
           draggable={false} 
@@ -296,15 +281,10 @@ export default function DriftWall({
       className: `drift-wall__tile${activeId === id ? ' is-active' : ''}`,
       'data-tile-id': id,
       'data-col': colIndex,
+      onMouseEnter: () => activate(id, colIndex),
+      onMouseLeave: release,
       onFocus: () => activate(id, colIndex),
       onBlur: release
-    }
-    if (item.href) {
-      return (
-        <a key={id} href={item.href} target="_blank" rel="noreferrer noopener" {...commonProps}>
-          {inner}
-        </a>
-      )
     }
     return (
       <div key={id} tabIndex={0} role="button" aria-label={item.title ?? 'tile'} {...commonProps}>

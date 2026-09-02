@@ -3,23 +3,23 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-  perspective: var(--dw-perspective, 1000px);
+  perspective: var(--dw-perspective, 1200px);
   perspective-origin: 50% 50%;
-  --dw-tile-w: 115px;
-  --dw-tile-h: 80px;
-  --dw-gap: 10px;
-  --dw-radius: 10px;
-  --dw-lift: 36px;
-  --dw-dim: 0.85;
+  --dw-tile-w: 100px;
+  --dw-tile-h: 150px;
+  --dw-gap: 14px;
+  --dw-radius: 12px;
+  --dw-lift: 55px;
+  --dw-dim: 0.45;
   --dw-gray: 0;
-  --dw-overlay: rgba(0, 0, 0, 0.25);
-  -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
+  --dw-overlay: #060010;
+  --dw-edge: 40%;
+  background: #08080f;
 }
 
 .drift-wall__plane {
   position: absolute;
-  top: 48%;
+  top: 50%;
   left: 50%;
   display: flex;
   flex-direction: row;
@@ -58,16 +58,17 @@
   display: block;
   border-radius: var(--dw-radius);
   overflow: hidden;
-  background: #18181b;
+  background: #12121c;
   opacity: var(--dw-dim);
   transform: translateZ(0);
   pointer-events: none;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
   transition:
     transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
     opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .drift-wall__tile img {
@@ -75,7 +76,7 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  filter: grayscale(var(--dw-gray)) saturate(1);
+  filter: grayscale(var(--dw-gray)) saturate(0.85);
   transition: filter 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   user-select: none;
   -webkit-user-drag: none;
@@ -85,27 +86,37 @@
   position: absolute;
   inset: 0;
   background: var(--dw-overlay);
-  opacity: 0.25;
+  opacity: 0.45;
   pointer-events: none;
   transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* Hover Lift Physics */
+.drift-wall__tile:hover,
+.drift-wall__tile.is-active,
+.drift-wall__tile:focus-visible {
+  z-index: 40;
+}
+
+.drift-wall__tile:hover .drift-wall__inner,
 .drift-wall__tile.is-active .drift-wall__inner,
 .drift-wall__tile:focus-visible .drift-wall__inner {
-  opacity: 1;
-  transform: translateZ(var(--dw-lift));
-  box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.6);
-  border-color: rgba(255, 255, 255, 0.4);
+  opacity: 1 !important;
+  transform: translateZ(var(--dw-lift)) scale(1.08) !important;
+  box-shadow: 0 24px 60px -15px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.35) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
 }
 
+.drift-wall__tile:hover img,
 .drift-wall__tile.is-active img,
 .drift-wall__tile:focus-visible img {
-  filter: grayscale(0) saturate(1.1);
+  filter: grayscale(0) saturate(1.15) !important;
 }
 
+.drift-wall__tile:hover .drift-wall__overlay,
 .drift-wall__tile.is-active .drift-wall__overlay,
 .drift-wall__tile:focus-visible .drift-wall__overlay {
-  opacity: 0;
+  opacity: 0 !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
