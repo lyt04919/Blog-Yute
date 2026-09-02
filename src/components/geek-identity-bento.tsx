@@ -30,7 +30,7 @@ interface BookItem {
 	stars?: number
 }
 
-// Extract real books
+// Extract real books from user's books.json
 const realBooks: BookItem[] = (booksData as any[])
 	.filter((b) => Boolean(b.cover))
 	.slice(0, 10)
@@ -42,21 +42,22 @@ const realBooks: BookItem[] = (booksData as any[])
 		stars: b.stars || 5
 	}))
 
-// Extract real movies from user's movies.json
-const realMovies: MovieItem[] = (moviesData as any[])
+// Curated top movies from user's movies.json sorted by rating
+const topUserMovies: MovieItem[] = (moviesData as any[])
 	.filter((m) => Boolean(m.poster) && m.isShow !== false)
+	.sort((a, b) => (b.stars || b.doubanRating || 0) - (a.stars || a.doubanRating || 0))
+	.slice(0, 16)
 	.map((m) => ({
 		name: m.name,
 		poster: m.poster,
 		stars: m.stars || m.doubanRating || 9.0
 	}))
 
-// Distribute user's movie posters into 4 columns
-const colSize = Math.max(1, Math.ceil(realMovies.length / 4))
-const movieCol1 = realMovies.slice(0, colSize)
-const movieCol2 = realMovies.slice(colSize, colSize * 2)
-const movieCol3 = realMovies.slice(colSize * 2, colSize * 3)
-const movieCol4 = realMovies.slice(colSize * 3, colSize * 4)
+// 4 distinct columns (4 items each) for smooth looping
+const movieCol1 = topUserMovies.slice(0, 4)
+const movieCol2 = topUserMovies.slice(4, 8)
+const movieCol3 = topUserMovies.slice(8, 12)
+const movieCol4 = topUserMovies.slice(12, 16)
 
 export function GeekIdentityBento({ className }: { className?: string }) {
 	const [currentDay, setCurrentDay] = useState<number>(1)
@@ -104,6 +105,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 											<img 
 												src={item.cover} 
 												alt={item.name} 
+												referrerPolicy="no-referrer"
 												className="w-full h-full object-cover" 
 											/>
 										</div>
@@ -140,21 +142,22 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 						<div className="absolute inset-x-0 top-0 h-[215px] [mask-image:linear-gradient(to_bottom,#000_50%,transparent_100%)] overflow-hidden flex items-center justify-center pointer-events-none">
 							<div 
 								style={{
-									transform: 'perspective(1000px) rotateX(16deg) rotateY(-12deg) rotateZ(1deg) scale(1.04)',
+									transform: 'perspective(1000px) rotateX(14deg) rotateY(-10deg) rotateZ(1deg) scale(1.05)',
 									transformStyle: 'preserve-3d',
 								}}
 								className="flex gap-2.5 px-2 py-1"
 							>
 								{/* Column 1 (Flowing Up) */}
-								<div className="flex flex-col gap-2.5 animate-marquee-vertical [animation-duration:15s]">
+								<div className="flex flex-col gap-2.5 animate-marquee-vertical [animation-duration:22s]">
 									{[...movieCol1, ...movieCol1].map((m, idx) => (
 										<div
 											key={idx}
-											className="relative w-22 h-33 sm:w-24 sm:h-36 rounded-xl overflow-hidden shadow-lg border border-black/10 dark:border-white/10 shrink-0 bg-zinc-900"
+											className="relative w-20 h-30 sm:w-24 sm:h-36 rounded-xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-white/10 shrink-0 bg-zinc-900"
 										>
 											<img 
 												src={m.poster} 
 												alt={m.name} 
+												referrerPolicy="no-referrer"
 												loading="eager" 
 												className="w-full h-full object-cover" 
 											/>
@@ -163,15 +166,16 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								</div>
 
 								{/* Column 2 (Flowing Down) */}
-								<div className="flex flex-col gap-2.5 animate-marquee-vertical [animation-duration:19s] [animation-direction:reverse]">
+								<div className="flex flex-col gap-2.5 animate-marquee-vertical [animation-duration:26s] [animation-direction:reverse]">
 									{[...movieCol2, ...movieCol2].map((m, idx) => (
 										<div
 											key={idx}
-											className="relative w-22 h-33 sm:w-24 sm:h-36 rounded-xl overflow-hidden shadow-lg border border-black/10 dark:border-white/10 shrink-0 bg-zinc-900"
+											className="relative w-20 h-30 sm:w-24 sm:h-36 rounded-xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-white/10 shrink-0 bg-zinc-900"
 										>
 											<img 
 												src={m.poster} 
 												alt={m.name} 
+												referrerPolicy="no-referrer"
 												loading="eager" 
 												className="w-full h-full object-cover" 
 											/>
@@ -180,15 +184,16 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								</div>
 
 								{/* Column 3 (Flowing Up) */}
-								<div className="flex flex-col gap-2.5 animate-marquee-vertical [animation-duration:17s]">
+								<div className="flex flex-col gap-2.5 animate-marquee-vertical [animation-duration:24s]">
 									{[...movieCol3, ...movieCol3].map((m, idx) => (
 										<div
 											key={idx}
-											className="relative w-22 h-33 sm:w-24 sm:h-36 rounded-xl overflow-hidden shadow-lg border border-black/10 dark:border-white/10 shrink-0 bg-zinc-900"
+											className="relative w-20 h-30 sm:w-24 sm:h-36 rounded-xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-white/10 shrink-0 bg-zinc-900"
 										>
 											<img 
 												src={m.poster} 
 												alt={m.name} 
+												referrerPolicy="no-referrer"
 												loading="eager" 
 												className="w-full h-full object-cover" 
 											/>
@@ -197,15 +202,16 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								</div>
 
 								{/* Column 4 (Flowing Down) */}
-								<div className="flex flex-col gap-2.5 animate-marquee-vertical [animation-duration:21s] [animation-direction:reverse]">
+								<div className="flex flex-col gap-2.5 animate-marquee-vertical [animation-duration:28s] [animation-direction:reverse]">
 									{[...movieCol4, ...movieCol4].map((m, idx) => (
 										<div
 											key={idx}
-											className="relative w-22 h-33 sm:w-24 sm:h-36 rounded-xl overflow-hidden shadow-lg border border-black/10 dark:border-white/10 shrink-0 bg-zinc-900"
+											className="relative w-20 h-30 sm:w-24 sm:h-36 rounded-xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-white/10 shrink-0 bg-zinc-900"
 										>
 											<img 
 												src={m.poster} 
 												alt={m.name} 
+												referrerPolicy="no-referrer"
 												loading="eager" 
 												className="w-full h-full object-cover" 
 											/>
