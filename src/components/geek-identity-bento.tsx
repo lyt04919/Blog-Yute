@@ -103,16 +103,17 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					}
 				/>
 
-				{/* ════════════════ 2. 电影胶片流 · React Bits 3D DriftWall (Dual Theme: White in Light Mode, Black in Dark Mode) ════════════════ */}
+				{/* ════════════════ 2. 电影胶片流 · React Bits 3D DriftWall (Dedicated Cinematic Dark Theater) ════════════════ */}
 				<BentoCard
 					name="光影放映厅"
 					description="3D 悬浮流动胶片流，收录 130+ 部影史高分神作与心灵共鸣。"
 					Icon={Film}
 					href="/favorite"
 					cta="进入放映厅"
-					className="col-span-1 md:col-span-2"
+					darkTheme={true}
+					className="col-span-1 md:col-span-2 text-white bg-zinc-950 dark:bg-zinc-950 border-zinc-800"
 					background={
-						<div className="absolute inset-0 w-full h-full overflow-hidden bg-slate-100/70 dark:bg-[#08080f]">
+						<div className="absolute inset-0 w-full h-full overflow-hidden bg-[#08080f]">
 							<DriftWall
 								items={movieDriftItems}
 								columns={5}
@@ -130,9 +131,11 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								parallax={0.35}
 								pauseOnHover={true}
 								lift={40}
+								dim={0.45}
+								overlayColor="#060010"
 							/>
-							{/* Ambient Bottom Fade: Exactly covers text area without eating into the movie posters */}
-							<div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-white via-white/95 via-45% to-transparent dark:from-black dark:via-black/95 dark:via-45% dark:to-transparent pointer-events-none z-10" />
+							{/* Cinematic Ambient Bottom Fade */}
+							<div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-black from-30% via-black/95 via-65% to-transparent pointer-events-none z-10" />
 						</div>
 					}
 				/>

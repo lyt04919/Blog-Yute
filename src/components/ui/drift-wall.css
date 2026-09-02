@@ -10,14 +10,8 @@
   --dw-gap: 14px;
   --dw-radius: 12px;
   --dw-lift: 40px;
-  --dw-dim: 0.75;
+  --dw-dim: 0.45;
   --dw-gray: 0;
-  --dw-overlay: rgba(255, 255, 255, 0.25);
-  background: transparent;
-}
-
-:is(.dark, [data-theme='dark'], html.dark) .drift-wall {
-  --dw-dim: 0.55;
   --dw-overlay: #060010;
   background: transparent;
 }
@@ -84,25 +78,19 @@
   display: block;
   border-radius: var(--dw-radius);
   overflow: hidden;
-  background: #e4e4e7;
+  background: #12121c;
   opacity: var(--dw-dim);
   transform: translateZ(0);
   transform-style: preserve-3d;
   pointer-events: auto;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
   will-change: transform, opacity, box-shadow;
   transition:
     transform 0.24s cubic-bezier(0.16, 1, 0.3, 1),
     opacity 0.24s ease-out,
     box-shadow 0.24s ease-out,
     border-color 0.24s ease-out;
-}
-
-:is(.dark, [data-theme='dark'], html.dark) .drift-wall__inner {
-  background: #12121c;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
 }
 
 .drift-wall__tile img {
@@ -136,12 +124,6 @@
 .drift-wall__inner:hover {
   opacity: 1 !important;
   transform: translateZ(var(--dw-lift)) scale(1.08) !important;
-  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.15) !important;
-  border-color: rgba(0, 0, 0, 0.2) !important;
-}
-
-:is(.dark, [data-theme='dark'], html.dark) .drift-wall__tile:hover .drift-wall__inner,
-:is(.dark, [data-theme='dark'], html.dark) .drift-wall__inner:hover {
   box-shadow: 0 24px 60px -15px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.45) !important;
   border-color: rgba(255, 255, 255, 0.6) !important;
 }
