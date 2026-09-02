@@ -122,11 +122,12 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 
 				{/* ════════════════ 2. 电影胶片流 · React Bits 3D DriftWall (Pure 2:3 Vertical Posters) ════════════════ */}
 				<BentoCard
-					name="银幕光影流"
-					description="3D 悬浮流动海报流，沉浸式记录银幕震撼与光影回响。"
+					name="光影放映厅"
+					description="3D 悬浮流动胶片流，收录 130+ 部影史高分神作与心灵共鸣。"
 					Icon={Film}
 					href="/favorite"
-					cta="探索电影全库"
+					cta="进入放映厅"
+					darkTheme={true}
 					className="col-span-1 md:col-span-2 text-white bg-zinc-950 dark:bg-zinc-950 border-zinc-800"
 					background={
 						<div className="absolute inset-0 w-full h-full overflow-hidden bg-[#08080f]">
@@ -144,15 +145,15 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								speed={32}
 								direction="up"
 								variance={0.35}
-								parallax={0.6}
+								parallax={0.4}
 								pauseOnHover={true}
 								lift={50}
 								fade={0.6}
 								dim={0.45}
 								overlayColor="#060010"
 							/>
-							{/* Ambient Dark Bottom Fade for Text Contrast */}
-							<div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-black/95 via-black/50 to-transparent pointer-events-none" />
+							{/* Ambient Dark Bottom Fade for Crystal Clear Text Contrast */}
+							<div className="absolute inset-x-0 bottom-0 h-52 bg-gradient-to-t from-black/98 via-black/80 to-transparent pointer-events-none" />
 						</div>
 					}
 				/>

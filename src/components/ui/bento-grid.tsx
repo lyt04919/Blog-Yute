@@ -17,6 +17,7 @@ export interface BentoCardProps extends ComponentPropsWithoutRef<"div"> {
   description: string
   href?: string
   cta?: string
+  darkTheme?: boolean
 }
 
 export function BentoGrid({ children, className, ...props }: BentoGridProps) {
@@ -41,6 +42,7 @@ export function BentoCard({
   description,
   href,
   cta = "Learn more",
+  darkTheme = false,
   ...props
 }: BentoCardProps) {
   const [isHovered, setIsHovered] = useState(false)
@@ -54,9 +56,9 @@ export function BentoCard({
       className={cn(
         "group relative col-span-3 flex flex-col justify-end overflow-hidden rounded-2xl cursor-pointer select-none min-h-[360px]",
         // light styles
-        "bg-white [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]",
+        darkTheme ? "bg-zinc-950 border border-zinc-800 shadow-xl" : "bg-white [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)] border border-zinc-200/80 dark:border-zinc-800",
         // dark styles
-        "dark:bg-zinc-900/90 transform-gpu dark:[box-shadow:0_-20px_80px_-20px_#ffffff1f_inset] dark:[border:1px_solid_rgba(255,255,255,.1)] border border-zinc-200/80 dark:border-zinc-800",
+        darkTheme ? "dark:bg-zinc-950 dark:border-zinc-800" : "dark:bg-zinc-900/90 transform-gpu dark:[box-shadow:0_-20px_80px_-20px_#ffffff1f_inset] dark:[border:1px_solid_rgba(255,255,255,.1)]",
         "transition-all duration-300",
         className
       )}
@@ -90,13 +92,22 @@ export function BentoCard({
             }}
             className="mb-1"
           >
-            <Icon className="h-10 w-10 text-zinc-700 dark:text-zinc-300" />
+            <Icon className={cn(
+              "h-10 w-10 transition-colors",
+              darkTheme ? "text-amber-400 drop-shadow-md" : "text-zinc-700 dark:text-zinc-300"
+            )} />
           </div>
         )}
-        <h3 className="text-xl font-semibold text-zinc-800 dark:text-zinc-100">
+        <h3 className={cn(
+          "text-xl font-bold tracking-tight",
+          darkTheme ? "text-white drop-shadow-md" : "text-zinc-800 dark:text-zinc-100"
+        )}>
           {name}
         </h3>
-        <p className="max-w-lg text-sm text-zinc-500 dark:text-zinc-400">
+        <p className={cn(
+          "max-w-lg text-sm font-medium leading-relaxed",
+          darkTheme ? "text-zinc-200 drop-shadow-sm" : "text-zinc-500 dark:text-zinc-400"
+        )}>
           {description}
         </p>
       </div>
@@ -112,7 +123,12 @@ export function BentoCard({
       >
         <a
           href={href || "#"}
-          className="pointer-events-auto inline-flex items-center gap-1.5 text-sm font-semibold text-zinc-900 dark:text-zinc-100 hover:text-[var(--color-brand)] dark:hover:text-[var(--color-brand)] transition-colors"
+          className={cn(
+            "pointer-events-auto inline-flex items-center gap-1.5 text-sm font-semibold transition-colors",
+            darkTheme 
+              ? "text-amber-400 hover:text-amber-300 drop-shadow-md" 
+              : "text-zinc-900 dark:text-zinc-100 hover:text-[var(--color-brand)] dark:hover:text-[var(--color-brand)]"
+          )}
         >
           <span>{cta}</span>
           <ArrowRight className="h-4 w-4 ms-1 transition-transform group-hover:translate-x-1" />
@@ -125,7 +141,10 @@ export function BentoCard({
           opacity: isHovered ? 1 : 0,
           transition: 'opacity 0.35s ease',
         }}
-        className="pointer-events-none absolute inset-0 z-1 bg-black/[0.04] dark:bg-white/[0.04]" 
+        className={cn(
+          "pointer-events-none absolute inset-0 z-1",
+          darkTheme ? "bg-white/[0.03]" : "bg-black/[0.04] dark:bg-white/[0.04]"
+        )} 
       />
     </div>
   )
