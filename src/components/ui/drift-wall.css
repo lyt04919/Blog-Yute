@@ -9,27 +9,17 @@
   --dw-tile-h: 158px;
   --dw-gap: 14px;
   --dw-radius: 12px;
-  --dw-lift: 50px;
-  --dw-dim: 0.65;
+  --dw-lift: 40px;
+  --dw-dim: 0.75;
   --dw-gray: 0;
-  --dw-overlay: rgba(255, 255, 255, 0.3);
-  background: #f8f8fa;
+  --dw-overlay: rgba(255, 255, 255, 0.25);
+  background: transparent;
 }
 
 :is(.dark, [data-theme='dark'], html.dark) .drift-wall {
-  --dw-dim: 0.45;
+  --dw-dim: 0.55;
   --dw-overlay: #060010;
-  background: #08080f;
-}
-
-.drift-wall__plane,
-.drift-wall__col,
-.drift-wall__track,
-.drift-wall__tile,
-.drift-wall__inner {
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+  background: transparent;
 }
 
 .drift-wall__plane {
@@ -40,8 +30,9 @@
   flex-direction: row;
   cursor: pointer;
   transform-origin: 50% 50%;
+  transform-style: preserve-3d;
   will-change: transform;
-  transform: translate(-50%, -50%) scale(1.3) rotateX(16deg) rotateY(-14deg) translateZ(-90px);
+  transform: translate(-50%, -50%) scale(1.15) rotateX(16deg) rotateY(-14deg) translateZ(0);
 }
 
 .drift-wall__col {
@@ -96,6 +87,7 @@
   background: #e4e4e7;
   opacity: var(--dw-dim);
   transform: translateZ(0);
+  transform-style: preserve-3d;
   pointer-events: auto;
   border: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -129,7 +121,7 @@
   position: absolute;
   inset: 0;
   background: var(--dw-overlay);
-  opacity: 0.45;
+  opacity: 0.4;
   pointer-events: none;
   transition: opacity 0.24s cubic-bezier(0.16, 1, 0.3, 1);
 }

@@ -51,13 +51,13 @@ export default function DriftWall({
   turn = -14,
   roll = 0,
   perspective = 1200,
-  depth = 90,
+  depth = 0,
   speed = 32,
   direction = 'up',
   variance = 0.35,
-  parallax = 0.4,
+  parallax = 0.35,
   pauseOnHover = true,
-  lift = 50,
+  lift = 40,
   fade = 0.6,
   dim,
   grayscale = false,
@@ -92,20 +92,20 @@ export default function DriftWall({
       const px = ((e.clientX - rect.left) / rect.width - 0.5) * parallax * 8
       const py = -((e.clientY - rect.top) / rect.height - 0.5) * parallax * 8
       planeRef.current.style.transform =
-        `translate(-50%, -50%) scale(1.3) ` +
+        `translate(-50%, -50%) scale(1.15) ` +
         `rotateX(${tilt + py}deg) rotateY(${turn + px}deg) rotateZ(${roll}deg) ` +
-        `translateZ(${-depth}px)`
+        `translateZ(0)`
     },
-    [parallax, tilt, turn, roll, depth]
+    [parallax, tilt, turn, roll]
   )
 
   const handlePointerLeave = useCallback(() => {
     if (!planeRef.current) return
     planeRef.current.style.transform =
-      `translate(-50%, -50%) scale(1.3) ` +
+      `translate(-50%, -50%) scale(1.15) ` +
       `rotateX(${tilt}deg) rotateY(${turn}deg) rotateZ(${roll}deg) ` +
-      `translateZ(${-depth}px)`
-  }, [tilt, turn, roll, depth])
+      `translateZ(0)`
+  }, [tilt, turn, roll])
 
   const cssVars = useMemo(() => {
     const vars: Record<string, any> = {
@@ -137,7 +137,7 @@ export default function DriftWall({
         ref={planeRef} 
         className="drift-wall__plane"
         style={{
-          transform: `translate(-50%, -50%) scale(1.3) rotateX(${tilt}deg) rotateY(${turn}deg) rotateZ(${roll}deg) translateZ(${-depth}px)`,
+          transform: `translate(-50%, -50%) scale(1.15) rotateX(${tilt}deg) rotateY(${turn}deg) rotateZ(${roll}deg) translateZ(0)`,
           transition: 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
         }}
       >

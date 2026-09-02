@@ -112,7 +112,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					cta="进入放映厅"
 					className="col-span-1 md:col-span-2"
 					background={
-						<div className="absolute inset-0 w-full h-full overflow-hidden bg-slate-50 dark:bg-[#08080f]">
+						<div className="absolute inset-0 w-full h-full overflow-hidden bg-slate-100/70 dark:bg-[#08080f]">
 							<DriftWall
 								items={movieDriftItems}
 								columns={5}
@@ -123,16 +123,16 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								tilt={16}
 								turn={-14}
 								perspective={1200}
-								depth={90}
+								depth={0}
 								speed={32}
 								direction="up"
 								variance={0.35}
-								parallax={0.4}
+								parallax={0.35}
 								pauseOnHover={true}
-								lift={50}
+								lift={40}
 							/>
-							{/* Solid Ambient Bottom Fade: Completely eliminates background poster clash for 100% crisp typography */}
-							<div className="absolute inset-x-0 bottom-0 h-60 bg-gradient-to-t from-white from-35% via-white/95 via-65% to-transparent dark:from-black dark:from-35% dark:via-black/95 dark:via-65% dark:to-transparent pointer-events-none" />
+							{/* Ambient Bottom Fade: Exactly covers text area without eating into the movie posters */}
+							<div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-white via-white/95 via-45% to-transparent dark:from-black dark:via-black/95 dark:via-45% dark:to-transparent pointer-events-none z-10" />
 						</div>
 					}
 				/>
