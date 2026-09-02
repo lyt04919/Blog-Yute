@@ -178,6 +178,10 @@ export default function AudioCinemaLounge() {
 			}))
 	}, [])
 
+	const cardPitchHorizontal = 205
+	const cardPitchWeb = 230
+	const speedPxPerSec = 65
+
 	const sharesDuration = `${Math.max(12, Math.round((sharesList.length * cardPitchWeb) / speedPxPerSec))}s`
 	const gamesDuration = `${Math.max(12, Math.round((gamesList.length * cardPitchHorizontal) / speedPxPerSec))}s`
 	const videosDuration = `${Math.max(12, Math.round((videosList.length * cardPitchHorizontal) / speedPxPerSec))}s`

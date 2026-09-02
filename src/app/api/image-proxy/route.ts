@@ -52,7 +52,7 @@ export async function GET(request: Request) {
 	// 1. Check memory cache first (instant < 0.1ms response)
 	const cached = getFromCache(imageUrl)
 	if (cached) {
-		return new NextResponse(cached.buffer, {
+		return new NextResponse(new Uint8Array(cached.buffer), {
 			headers: {
 				'Content-Type': cached.contentType,
 				'Cache-Control': 'public, max-age=31536000, immutable',
@@ -141,7 +141,7 @@ export async function GET(request: Request) {
 		// Save to memory cache
 		setToCache(imageUrl, buffer, contentType)
 
-		return new NextResponse(buffer, {
+		return new NextResponse(new Uint8Array(buffer), {
 			headers: {
 				'Content-Type': contentType,
 				'Cache-Control': 'public, max-age=31536000, immutable',
