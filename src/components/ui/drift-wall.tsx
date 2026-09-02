@@ -73,7 +73,7 @@ export default function DriftWall({
   speed = 32,
   direction = 'up',
   variance = 0.35,
-  parallax = 0.6,
+  parallax = 0.4,
   pauseOnHover = true,
   lift = 50,
   fade = 0.6,
@@ -169,7 +169,7 @@ export default function DriftWall({
       const maxTilt = parallax * 8
       const targetX = pointerRef.current.x * maxTilt
       const targetY = -pointerRef.current.y * maxTilt
-      const damp = 1 - Math.exp(-dt / 0.12)
+      const damp = 1 - Math.exp(-dt / 0.16)
       pointerDampedRef.current.x += (targetX - pointerDampedRef.current.x) * damp
       pointerDampedRef.current.y += (targetY - pointerDampedRef.current.y) * damp
       applyPlaneTransform(pointerDampedRef.current.x, pointerDampedRef.current.y)
@@ -179,10 +179,8 @@ export default function DriftWall({
           const meta = columnMeta[c]
           if (!meta) continue
           
-          // Instantly freeze column motion when hovered
-          const isColHovered = hoveredColRef.current === c
-          
-          if (isColHovered) {
+          // When hovered, the column is 100% frozen in place
+          if (hoveredColRef.current === c) {
             velocitiesRef.current[c] = 0
             continue
           }
@@ -220,14 +218,6 @@ export default function DriftWall({
           y: (e.clientY - rect.top) / rect.height - 0.5
         }
       }
-      // Instant column hit-test on pointer move
-      const hit = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null
-      const colEl = hit && hit.closest ? hit.closest('[data-col]') as HTMLElement | null : null
-      if (colEl && colEl.dataset.col !== undefined) {
-        hoveredColRef.current = Number(colEl.dataset.col)
-      } else {
-        hoveredColRef.current = -1
-      }
     },
     [parallax, reduced]
   )
@@ -261,9 +251,16 @@ export default function DriftWall({
         role="button" 
         aria-label={item.title ?? 'tile'} 
         className="drift-wall__tile"
-        data-col={colIndex}
+        onMouseEnter={() => {
+          hoveredColRef.current = colIndex
+        }}
       >
-        <span className="drift-wall__inner">
+        <span 
+          className="drift-wall__inner"
+          onMouseEnter={() => {
+            hoveredColRef.current = colIndex
+          }}
+        >
           <img 
             src={item.image} 
             alt={item.title ?? ''} 
@@ -298,7 +295,14 @@ export default function DriftWall({
             <div 
               className="drift-wall__col" 
               key={`col-${c}`}
-              data-col={c}
+              onMouseEnter={() => {
+                hoveredColRef.current = c
+              }}
+              onMouseLeave={() => {
+                if (hoveredColRef.current === c) {
+                  hoveredColRef.current = -1
+                }
+              }}
             >
               <div className="drift-wall__track" ref={el => { trackRefs.current[c] = el }}>
                 {copies.map((_, copyIndex) =>
