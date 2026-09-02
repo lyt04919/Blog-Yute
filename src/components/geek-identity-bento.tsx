@@ -46,26 +46,29 @@ const featuredFavorites = [
 	},
 ]
 
-// Curated movie stills & posters for 3D Movie DriftWall
+// Curated vertical movie posters (2:3 aspect ratio)
 const movieCol1 = [
-	{ title: '星际穿越', rating: '9.4', image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&q=80' },
-	{ title: '银翼杀手 2049', rating: '8.8', image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&q=80' },
-	{ title: '盗梦空间', rating: '9.3', image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400&q=80' },
-	{ title: '沙丘 II', rating: '8.9', image: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=400&q=80' },
+	{ title: '星际穿越', image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&q=80' },
+	{ title: '银翼杀手 2049', image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&q=80' },
+	{ title: '盗梦空间', image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400&q=80' },
 ]
 
 const movieCol2 = [
-	{ title: '奥本海默', rating: '8.8', image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=400&q=80' },
-	{ title: '爱乐之城', rating: '8.7', image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400&q=80' },
-	{ title: '楚门的世界', rating: '9.3', image: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=400&q=80' },
-	{ title: '海上钢琴师', rating: '9.3', image: 'https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=400&q=80' },
+	{ title: '奥本海默', image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=400&q=80' },
+	{ title: '爱乐之城', image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400&q=80' },
+	{ title: '楚门的世界', image: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=400&q=80' },
 ]
 
 const movieCol3 = [
-	{ title: '黑客帝国', rating: '9.1', image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&q=80' },
-	{ title: '千与千寻', rating: '9.4', image: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=400&q=80' },
-	{ title: '泰坦尼克号', rating: '9.4', image: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400&q=80' },
-	{ title: '辛德勒名单', rating: '9.5', image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400&q=80' },
+	{ title: '黑客帝国', image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&q=80' },
+	{ title: '千与千寻', image: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=400&q=80' },
+	{ title: '泰坦尼克号', image: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400&q=80' },
+]
+
+const movieCol4 = [
+	{ title: '沙丘 II', image: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=400&q=80' },
+	{ title: '海上钢琴师', image: 'https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=400&q=80' },
+	{ title: '辛德勒名单', image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400&q=80' },
 ]
 
 export function GeekIdentityBento({ className }: { className?: string }) {
@@ -134,19 +137,19 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					}
 				/>
 
-				{/* ════════════════ 2. 电影胶片流 · 3D 光影展廊 (3D DriftWall) ════════════════ */}
+				{/* ════════════════ 2. 电影胶片流 · 3D 原始比例海报墙 (Pure 2:3 Posters) ════════════════ */}
 				<BentoCard
 					name="银幕光影流"
-					description="3D 悬浮流动胶片流，沉浸式记录银幕震撼与光影回响。"
+					description="3D 悬浮流动海报流，沉浸式记录银幕震撼与光影回响。"
 					Icon={Film}
 					href="/favorite"
 					cta="探索电影全库"
 					className="col-span-1 md:col-span-2"
 					background={
-						<div className="absolute inset-x-0 top-0 h-[210px] [mask-image:linear-gradient(to_bottom,#000_50%,transparent_100%)] overflow-hidden flex items-center justify-center pointer-events-none">
+						<div className="absolute inset-x-0 top-0 h-[215px] [mask-image:linear-gradient(to_bottom,#000_50%,transparent_100%)] overflow-hidden flex items-center justify-center pointer-events-none">
 							<div 
 								style={{
-									transform: 'perspective(1000px) rotateX(15deg) rotateY(-12deg) rotateZ(1deg) scale(1.05)',
+									transform: 'perspective(1000px) rotateX(16deg) rotateY(-12deg) rotateZ(1deg) scale(1.04)',
 									transformStyle: 'preserve-3d',
 								}}
 								className="flex gap-2.5 px-2 py-1"
@@ -156,7 +159,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 									{[...movieCol1, ...movieCol1].map((m, idx) => (
 										<div
 											key={idx}
-											className="relative w-28 h-20 sm:w-32 sm:h-22 rounded-xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-white/15 shrink-0 bg-zinc-900"
+											className="relative w-22 h-33 sm:w-24 sm:h-36 rounded-xl overflow-hidden shadow-lg border border-black/10 dark:border-white/10 shrink-0 bg-zinc-900"
 										>
 											<img 
 												src={m.image} 
@@ -164,15 +167,6 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 												loading="eager" 
 												className="w-full h-full object-cover" 
 											/>
-											<div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent p-2 flex flex-col justify-end">
-												<div className="flex items-center justify-between">
-													<span className="text-[10px] font-bold text-white truncate drop-shadow-xs">{m.title}</span>
-													<span className="text-[8.5px] font-bold text-amber-400 font-mono flex items-center shrink-0">
-														<Star className="size-2 fill-current mr-0.5" />
-														{m.rating}
-													</span>
-												</div>
-											</div>
 										</div>
 									))}
 								</div>
@@ -182,7 +176,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 									{[...movieCol2, ...movieCol2].map((m, idx) => (
 										<div
 											key={idx}
-											className="relative w-28 h-20 sm:w-32 sm:h-22 rounded-xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-white/15 shrink-0 bg-zinc-900"
+											className="relative w-22 h-33 sm:w-24 sm:h-36 rounded-xl overflow-hidden shadow-lg border border-black/10 dark:border-white/10 shrink-0 bg-zinc-900"
 										>
 											<img 
 												src={m.image} 
@@ -190,15 +184,6 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 												loading="eager" 
 												className="w-full h-full object-cover" 
 											/>
-											<div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent p-2 flex flex-col justify-end">
-												<div className="flex items-center justify-between">
-													<span className="text-[10px] font-bold text-white truncate drop-shadow-xs">{m.title}</span>
-													<span className="text-[8.5px] font-bold text-amber-400 font-mono flex items-center shrink-0">
-														<Star className="size-2 fill-current mr-0.5" />
-														{m.rating}
-													</span>
-												</div>
-											</div>
 										</div>
 									))}
 								</div>
@@ -208,7 +193,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 									{[...movieCol3, ...movieCol3].map((m, idx) => (
 										<div
 											key={idx}
-											className="relative w-28 h-20 sm:w-32 sm:h-22 rounded-xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-white/15 shrink-0 bg-zinc-900"
+											className="relative w-22 h-33 sm:w-24 sm:h-36 rounded-xl overflow-hidden shadow-lg border border-black/10 dark:border-white/10 shrink-0 bg-zinc-900"
 										>
 											<img 
 												src={m.image} 
@@ -216,15 +201,23 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 												loading="eager" 
 												className="w-full h-full object-cover" 
 											/>
-											<div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent p-2 flex flex-col justify-end">
-												<div className="flex items-center justify-between">
-													<span className="text-[10px] font-bold text-white truncate drop-shadow-xs">{m.title}</span>
-													<span className="text-[8.5px] font-bold text-amber-400 font-mono flex items-center shrink-0">
-														<Star className="size-2 fill-current mr-0.5" />
-														{m.rating}
-													</span>
-												</div>
-											</div>
+										</div>
+									))}
+								</div>
+
+								{/* Column 4 (Flowing Down) */}
+								<div className="flex flex-col gap-2.5 animate-marquee-vertical [animation-duration:21s] [animation-direction:reverse]">
+									{[...movieCol4, ...movieCol4].map((m, idx) => (
+										<div
+											key={idx}
+											className="relative w-22 h-33 sm:w-24 sm:h-36 rounded-xl overflow-hidden shadow-lg border border-black/10 dark:border-white/10 shrink-0 bg-zinc-900"
+										>
+											<img 
+												src={m.image} 
+												alt={m.title} 
+												loading="eager" 
+												className="w-full h-full object-cover" 
+											/>
 										</div>
 									))}
 								</div>
