@@ -23,7 +23,7 @@ export function BentoGrid({ children, className, ...props }: BentoGridProps) {
   return (
     <div
       className={cn(
-        "grid w-full auto-rows-[44rem] grid-cols-1 md:grid-cols-3 gap-4",
+        "grid w-full grid-cols-1 md:grid-cols-3 gap-4",
         className
       )}
       {...props}
@@ -50,8 +50,9 @@ export function BentoCard({
       key={name}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      style={{ minHeight: '360px' }}
       className={cn(
-        "group relative col-span-3 flex flex-col justify-between overflow-hidden rounded-2xl cursor-pointer select-none",
+        "group relative col-span-3 flex flex-col justify-end overflow-hidden rounded-2xl cursor-pointer select-none min-h-[360px]",
         // light styles
         "bg-white [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]",
         // dark styles
@@ -61,7 +62,7 @@ export function BentoCard({
       )}
       {...props}
     >
-      {/* Background layer spanning upper/full container */}
+      {/* Background layer spanning upper container */}
       <div 
         style={{
           transform: isHovered ? 'scale(1.04)' : 'scale(1)',
@@ -72,10 +73,10 @@ export function BentoCard({
         {background}
       </div>
 
-      {/* Info Content Block (slides UP on hover) */}
+      {/* Info Content Block (anchored to bottom, slides UP on hover) */}
       <div 
         style={{
-          transform: isHovered ? 'translateY(-38px)' : 'translateY(0)',
+          transform: isHovered ? 'translateY(-36px)' : 'translateY(0)',
           transition: 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
         className="pointer-events-none z-10 flex transform-gpu flex-col gap-1 p-6"
@@ -87,11 +88,12 @@ export function BentoCard({
               transformOrigin: 'left center',
               transition: 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
             }}
+            className="mb-1"
           >
-            <Icon className="h-12 w-12 text-zinc-700 dark:text-zinc-300" />
+            <Icon className="h-10 w-10 text-zinc-700 dark:text-zinc-300" />
           </div>
         )}
-        <h3 className="text-xl font-semibold text-zinc-800 dark:text-zinc-100 mt-1">
+        <h3 className="text-xl font-semibold text-zinc-800 dark:text-zinc-100">
           {name}
         </h3>
         <p className="max-w-lg text-sm text-zinc-500 dark:text-zinc-400">
@@ -123,7 +125,7 @@ export function BentoCard({
           opacity: isHovered ? 1 : 0,
           transition: 'opacity 0.35s ease',
         }}
-        className="pointer-events-none absolute inset-0 z-1 bg-black/[0.045] dark:bg-white/[0.05]" 
+        className="pointer-events-none absolute inset-0 z-1 bg-black/[0.04] dark:bg-white/[0.04]" 
       />
     </div>
   )
