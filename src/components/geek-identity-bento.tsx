@@ -293,24 +293,26 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					cta="探索精选工具"
 					className="col-span-1 md:col-span-1"
 					background={
-						<div className="absolute inset-x-0 top-0 h-[225px] [mask-image:linear-gradient(to_bottom,transparent_0%,#000_12%,#000_82%,transparent_100%)] flex items-center justify-center overflow-hidden">
+						<div className="absolute inset-0 w-full h-full overflow-hidden">
 							<InfiniteSpiral
 								items={webToolsSpiralItems}
 								animationMode="auto"
-								speed={0.42}
-								radius={76}
+								speed={0.4}
+								radius={82}
 								cardWidth={52}
 								cardHeight={52}
 								verticalSpacing={44}
-								perspective={850}
+								perspective={900}
 								cardRadius={12}
-								centerScale={1.15}
-								edgeFade={0.25}
-								edgeBlur={3}
-								cardsPerTurn={6}
+								centerScale={1.18}
+								edgeFade={0.15}
+								edgeBlur={2}
+								cardsPerTurn={7}
 								pauseOnHover={true}
 								imageFit="contain"
 							/>
+							{/* Soft Ambient Bottom Gradient Fade for readable typography */}
+							<div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-white via-white/85 to-transparent dark:from-zinc-900 dark:via-zinc-900/85 dark:to-transparent pointer-events-none z-5" />
 						</div>
 					}
 				/>
