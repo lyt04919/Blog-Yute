@@ -79,7 +79,7 @@ export function BentoCard({
           transform: isHovered ? 'translateY(-36px)' : 'translateY(0)',
           transition: 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
-        className="pointer-events-none z-10 flex transform-gpu flex-col gap-1 p-6"
+        className="pointer-events-none z-10 flex transform-gpu flex-col gap-1.5 p-6"
       >
         {Icon && (
           <div
@@ -90,13 +90,13 @@ export function BentoCard({
             }}
             className="mb-1"
           >
-            <Icon className="h-10 w-10 text-zinc-700 dark:text-amber-400 transition-colors drop-shadow-sm" />
+            <Icon className="h-10 w-10 text-zinc-900 dark:text-amber-400 transition-colors drop-shadow-xs" />
           </div>
         )}
-        <h3 className="text-xl font-bold tracking-tight text-zinc-800 dark:text-white drop-shadow-xs">
+        <h3 className="text-xl font-extrabold tracking-tight text-zinc-900 dark:text-white drop-shadow-xs">
           {name}
         </h3>
-        <p className="max-w-lg text-sm font-medium leading-relaxed text-zinc-600 dark:text-zinc-200 drop-shadow-xs">
+        <p className="max-w-lg text-sm font-semibold leading-relaxed text-zinc-700 dark:text-zinc-200 drop-shadow-xs">
           {description}
         </p>
       </div>
@@ -112,7 +112,7 @@ export function BentoCard({
       >
         <a
           href={href || "#"}
-          className="pointer-events-auto inline-flex items-center gap-1.5 text-sm font-semibold text-zinc-900 dark:text-amber-400 hover:text-[var(--color-brand)] dark:hover:text-amber-300 transition-colors"
+          className="pointer-events-auto inline-flex items-center gap-1.5 text-sm font-bold text-zinc-900 dark:text-amber-400 hover:text-[var(--color-brand)] dark:hover:text-amber-300 transition-colors"
         >
           <span>{cta}</span>
           <ArrowRight className="h-4 w-4 ms-1 transition-transform group-hover:translate-x-1" />

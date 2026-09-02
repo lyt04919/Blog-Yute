@@ -131,8 +131,8 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								pauseOnHover={true}
 								lift={50}
 							/>
-							{/* Ambient Bottom Fade: Clean Pure White in Light Mode, Deep Space Black in Dark Mode */}
-							<div className="absolute inset-x-0 bottom-0 h-52 bg-gradient-to-t from-white/95 via-white/80 to-transparent dark:from-black/98 dark:via-black/80 dark:to-transparent pointer-events-none" />
+							{/* Solid Ambient Bottom Fade: Completely eliminates background poster clash for 100% crisp typography */}
+							<div className="absolute inset-x-0 bottom-0 h-60 bg-gradient-to-t from-white from-35% via-white/95 via-65% to-transparent dark:from-black dark:from-35% dark:via-black/95 dark:via-65% dark:to-transparent pointer-events-none" />
 						</div>
 					}
 				/>
