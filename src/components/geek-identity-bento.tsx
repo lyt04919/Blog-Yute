@@ -130,7 +130,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					}
 				/>
 
-				{/* ════════════════ 3. 📸 私享随笔 · 纯粹三联拍立得画廊 (Triple Polaroid Gallery) ════════════════ */}
+				{/* ════════════════ 3. 📸 私享随笔 · 富士拍立得三联画廊 (Fujifilm Instax Mini Gallery) ════════════════ */}
 				<BentoCard
 					name="私享随笔"
 					description="记录日常思绪、旅途快照与那些触动心弦的生活切片。"
@@ -141,103 +141,154 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					background={
 						<div className="absolute inset-x-0 top-0 h-[245px] flex items-center justify-center pt-2 px-4 sm:px-6 select-none">
 							<div className="flex items-center justify-center gap-4 sm:gap-7">
-								{/* 1. 左侧拍立得：夕阳海滩 (-7°) */}
+								{/* 1. 左侧富士相纸：奥克兰黄昏 (-7°) */}
 								<div
 									style={{
-										width: '142px',
-										height: '184px',
-										transform: 'rotate(-7deg) translateY(6px)',
-										transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)'
+										width: '134px',
+										height: '198px',
+										transform: 'rotate(-7deg) translateY(4px)',
+										transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+										boxShadow: '0 4px 6px -1px rgba(0,0,0,0.06), 0 14px 28px -4px rgba(0,0,0,0.13), 0 0 0 1px rgba(0,0,0,0.07)'
 									}}
-									className="relative bg-[#FAF9F6] p-2.5 pb-6 rounded-sm shadow-lg border border-black/10 pointer-events-none group-hover:!-rotate-[11deg] group-hover:!-translate-x-3 group-hover:shadow-2xl flex flex-col shrink-0"
+									className="relative bg-gradient-to-b from-[#FFFFFF] via-[#FDFDFD] to-[#F8F8F8] p-2 pb-8 rounded-[9px] pointer-events-none group-hover:!-rotate-[11deg] group-hover:!-translate-x-3 group-hover:shadow-2xl flex flex-col shrink-0"
 								>
-									<div style={{ width: '122px', height: '122px' }} className="rounded-2xs overflow-hidden bg-zinc-200 shrink-0">
+									{/* 富士特有内嵌倒角压痕相框 */}
+									<div 
+										style={{ 
+											width: '118px', 
+											height: '144px',
+											boxShadow: 'inset 0 1.5px 3px rgba(0,0,0,0.22), inset 0 0 0 1px rgba(0,0,0,0.08)'
+										}} 
+										className="relative rounded-[5px] overflow-hidden bg-zinc-900 shrink-0"
+									>
 										<img
 											src="/images/uploads/7ef4d45667098fa8.jpeg"
-											alt="Sunset Beach"
+											alt="Auckland Sunset"
 											style={{ width: '100%', height: '100%', objectFit: 'cover' }}
 											loading="lazy"
 										/>
+										{/* 富士高光胶片反光膜 */}
+										<div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/20 pointer-events-none" />
 									</div>
-									<div className="flex-1 flex items-center justify-center pt-1.5 overflow-visible">
+
+									{/* 富士相纸底部手写留白与微水印 */}
+									<div className="flex-1 flex flex-col justify-between pt-1.5 px-0.5 overflow-visible">
 										<p 
 											style={{ 
 												fontFamily: 'var(--font-cursive), "Caveat", "Bradley Hand", cursive',
-												fontSize: '15px',
-												color: '#27272a',
+												fontSize: '14px',
+												color: '#262626',
 												transform: 'rotate(-0.8deg)'
 											}}
-											className="font-medium tracking-wide whitespace-nowrap select-none opacity-85"
+											className="font-medium tracking-wide text-center whitespace-nowrap select-none opacity-90"
 										>
 											Sunset Beach &apos;24
 										</p>
+										<div className="flex items-center justify-between px-1 -mb-1 opacity-40">
+											<span className="text-[6.5px] font-mono tracking-widest uppercase text-zinc-500 font-semibold">FUJIFILM</span>
+											<span className="text-[6px] font-sans tracking-tight text-zinc-500 italic">instax</span>
+										</div>
 									</div>
 								</div>
 
-								{/* 2. 中间拍立得：雪山湖泊 (0° 主位微浮) */}
+								{/* 2. 中间富士相纸：蒂卡波湖 (0° 视觉主位微浮) */}
 								<div
 									style={{
-										width: '152px',
-										height: '194px',
-										transform: 'rotate(0deg) translateY(-4px)',
+										width: '140px',
+										height: '206px',
+										transform: 'rotate(0deg) translateY(-5px)',
 										transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
-										zIndex: 10
+										zIndex: 10,
+										boxShadow: '0 8px 12px -2px rgba(0,0,0,0.08), 0 20px 38px -6px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.07)'
 									}}
-									className="relative bg-[#FAF9F6] p-2.5 pb-6 rounded-sm shadow-xl border border-black/10 pointer-events-none group-hover:!-translate-y-3 group-hover:!scale-104 group-hover:shadow-2xl flex flex-col shrink-0"
+									className="relative bg-gradient-to-b from-[#FFFFFF] via-[#FDFDFD] to-[#F8F8F8] p-2 pb-8 rounded-[9px] pointer-events-none group-hover:!-translate-y-3 group-hover:!scale-104 group-hover:shadow-2xl flex flex-col shrink-0"
 								>
-									<div style={{ width: '132px', height: '132px' }} className="rounded-2xs overflow-hidden bg-zinc-200 shrink-0">
+									{/* 富士特有内嵌倒角压痕相框 */}
+									<div 
+										style={{ 
+											width: '124px', 
+											height: '150px',
+											boxShadow: 'inset 0 1.5px 3px rgba(0,0,0,0.22), inset 0 0 0 1px rgba(0,0,0,0.08)'
+										}} 
+										className="relative rounded-[5px] overflow-hidden bg-zinc-900 shrink-0"
+									>
 										<img
 											src="/images/uploads/0c004c6f642839f2.jpeg"
 											alt="Lake Tekapo"
 											style={{ width: '100%', height: '100%', objectFit: 'cover' }}
 											loading="lazy"
 										/>
+										{/* 富士高光胶片反光膜 */}
+										<div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/20 pointer-events-none" />
 									</div>
-									<div className="flex-1 flex items-center justify-center pt-1.5 overflow-visible">
+
+									{/* 富士相纸底部手写留白与微水印 */}
+									<div className="flex-1 flex flex-col justify-between pt-1.5 px-0.5 overflow-visible">
 										<p 
 											style={{ 
 												fontFamily: 'var(--font-cursive), "Caveat", "Bradley Hand", cursive',
-												fontSize: '15px',
-												color: '#27272a',
+												fontSize: '14px',
+												color: '#262626',
 												transform: 'rotate(0.5deg)'
 											}}
-											className="font-medium tracking-wide whitespace-nowrap select-none opacity-85"
+											className="font-medium tracking-wide text-center whitespace-nowrap select-none opacity-90"
 										>
 											Lake Tekapo &apos;24
 										</p>
+										<div className="flex items-center justify-between px-1 -mb-1 opacity-40">
+											<span className="text-[6.5px] font-mono tracking-widest uppercase text-zinc-500 font-semibold">FUJIFILM</span>
+											<span className="text-[6px] font-sans tracking-tight text-zinc-500 italic">instax</span>
+										</div>
 									</div>
 								</div>
 
-								{/* 3. 右侧拍立得：惬意日常 (+7°) */}
+								{/* 3. 右侧富士相纸：皇后镇日落 (+7°) */}
 								<div
 									style={{
-										width: '142px',
-										height: '184px',
-										transform: 'rotate(7deg) translateY(6px)',
-										transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)'
+										width: '134px',
+										height: '198px',
+										transform: 'rotate(7deg) translateY(4px)',
+										transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+										boxShadow: '0 4px 6px -1px rgba(0,0,0,0.06), 0 14px 28px -4px rgba(0,0,0,0.13), 0 0 0 1px rgba(0,0,0,0.07)'
 									}}
-									className="relative bg-[#FAF9F6] p-2.5 pb-6 rounded-sm shadow-lg border border-black/10 pointer-events-none group-hover:!rotate-[11deg] group-hover:!translate-x-3 group-hover:shadow-2xl flex flex-col shrink-0"
+									className="relative bg-gradient-to-b from-[#FFFFFF] via-[#FDFDFD] to-[#F8F8F8] p-2 pb-8 rounded-[9px] pointer-events-none group-hover:!rotate-[11deg] group-hover:!translate-x-3 group-hover:shadow-2xl flex flex-col shrink-0"
 								>
-									<div style={{ width: '122px', height: '122px' }} className="rounded-2xs overflow-hidden bg-zinc-200 shrink-0">
+									{/* 富士特有内嵌倒角压痕相框 */}
+									<div 
+										style={{ 
+											width: '118px', 
+											height: '144px',
+											boxShadow: 'inset 0 1.5px 3px rgba(0,0,0,0.22), inset 0 0 0 1px rgba(0,0,0,0.08)'
+										}} 
+										className="relative rounded-[5px] overflow-hidden bg-zinc-900 shrink-0"
+									>
 										<img
 											src="/images/uploads/844b159ea02995f4.jpeg"
 											alt="Queenstown"
 											style={{ width: '100%', height: '100%', objectFit: 'cover' }}
 											loading="lazy"
 										/>
+										{/* 富士高光胶片反光膜 */}
+										<div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/20 pointer-events-none" />
 									</div>
-									<div className="flex-1 flex items-center justify-center pt-1.5 overflow-visible">
+
+									{/* 富士相纸底部手写留白与微水印 */}
+									<div className="flex-1 flex flex-col justify-between pt-1.5 px-0.5 overflow-visible">
 										<p 
 											style={{ 
 												fontFamily: 'var(--font-cursive), "Caveat", "Bradley Hand", cursive',
-												fontSize: '15px',
-												color: '#27272a',
+												fontSize: '14px',
+												color: '#262626',
 												transform: 'rotate(-0.5deg)'
 											}}
-											className="font-medium tracking-wide whitespace-nowrap select-none opacity-85"
+											className="font-medium tracking-wide text-center whitespace-nowrap select-none opacity-90"
 										>
 											Queenstown &apos;24
 										</p>
+										<div className="flex items-center justify-between px-1 -mb-1 opacity-40">
+											<span className="text-[6.5px] font-mono tracking-widest uppercase text-zinc-500 font-semibold">FUJIFILM</span>
+											<span className="text-[6px] font-sans tracking-tight text-zinc-500 italic">instax</span>
+										</div>
 									</div>
 								</div>
 							</div>
@@ -279,7 +330,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 									<span className="font-semibold text-emerald-500 font-bold">9</span>
 									<span className="font-semibold text-super-emerald-500 font-bold">10</span>
 									<span className="font-semibold">11</span>
-									<span className="font-semibold">12</span>
+									<span className="font-semibold text-info-blue font-bold">12</span>
 								</div>
 							</div>
 						</div>
