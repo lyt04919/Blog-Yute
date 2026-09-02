@@ -87,7 +87,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 
 	return (
 		<div className={className}>
-			<BentoGrid className="grid-cols-1 md:grid-cols-3 auto-rows-[22rem]">
+			<BentoGrid className="grid-cols-1 md:grid-cols-3 auto-rows-[26rem] sm:auto-rows-[28rem] md:auto-rows-[29rem] gap-5">
 				{/* ════════════════ 1. Save your files (Live Marquee) ════════════════ */}
 				<BentoCard
 					name="Save your files"
@@ -97,24 +97,24 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					cta="Learn more"
 					className="col-span-1"
 					background={
-						<div className="absolute right-0 top-3 h-[280px] w-full [mask-image:linear-gradient(to_top,transparent_30%,#000_100%)] transition-all duration-300 ease-out group-hover:scale-105 overflow-hidden">
-							<Marquee pauseOnHover duration="18s" className="py-2">
+						<div className="absolute right-0 top-6 h-[330px] w-full [mask-image:linear-gradient(to_top,transparent_30%,#000_100%)] transition-all duration-300 ease-out group-hover:scale-105 overflow-hidden">
+							<Marquee pauseOnHover duration="18s" className="py-3">
 								{files.map((file, idx) => {
 									const IconComp = file.icon
 									return (
 										<div
 											key={idx}
-											className="w-28 h-32 rounded-xl bg-zinc-50 dark:bg-zinc-800/90 border border-zinc-200/90 dark:border-zinc-700/80 p-3 shadow-md flex flex-col justify-between shrink-0 select-none transition-all duration-300 hover:scale-105 hover:shadow-lg"
+											className="w-32 h-38 rounded-2xl bg-zinc-50 dark:bg-zinc-800/90 border border-zinc-200/90 dark:border-zinc-700/80 p-3.5 shadow-md flex flex-col justify-between shrink-0 select-none transition-all duration-300 hover:scale-105 hover:shadow-lg"
 										>
 											<div className="flex items-center justify-between">
-												<IconComp className={`size-4 ${file.color}`} />
-												<span className="text-[9px] font-mono font-bold text-zinc-400">{file.ext}</span>
+												<IconComp className={`size-5 ${file.color}`} />
+												<span className="text-[10px] font-mono font-bold text-zinc-400">{file.ext}</span>
 											</div>
-											<div className="space-y-1">
-												<div className="h-1.5 w-14 bg-zinc-300 dark:bg-zinc-600 rounded-full" />
-												<div className="h-1.5 w-8 bg-zinc-200 dark:bg-zinc-700 rounded-full" />
+											<div className="space-y-1.5">
+												<div className="h-2 w-16 bg-zinc-300 dark:bg-zinc-600 rounded-full" />
+												<div className="h-2 w-10 bg-zinc-200 dark:bg-zinc-700 rounded-full" />
 											</div>
-											<span className="text-[9.5px] font-mono font-bold text-zinc-700 dark:text-zinc-200 truncate">
+											<span className="text-[10.5px] font-mono font-bold text-zinc-700 dark:text-zinc-200 truncate">
 												{file.name}
 											</span>
 										</div>
@@ -134,24 +134,24 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					cta="Learn more"
 					className="col-span-1 md:col-span-2"
 					background={
-						<div className="absolute right-0 top-3 h-[280px] w-full [mask-image:linear-gradient(to_top,transparent_30%,#000_100%)] transition-all duration-300 ease-out group-hover:scale-105 px-6 overflow-hidden">
+						<div className="absolute right-0 top-6 h-[330px] w-full [mask-image:linear-gradient(to_top,transparent_30%,#000_100%)] transition-all duration-300 ease-out group-hover:scale-105 px-8 overflow-hidden">
 							<AnimatedList delay={2000}>
 								{notifications.map((item) => {
 									const IconComp = item.icon
 									return (
 										<div
 											key={item.id}
-											className="flex items-center gap-3 p-2.5 px-4 rounded-xl bg-white/95 dark:bg-zinc-800/95 border border-zinc-200/90 dark:border-zinc-700/90 shadow-sm"
+											className="flex items-center gap-3.5 p-3 px-4.5 rounded-2xl bg-white/95 dark:bg-zinc-800/95 border border-zinc-200/90 dark:border-zinc-700/90 shadow-sm"
 										>
-											<div className={`size-7 rounded-lg flex items-center justify-center shrink-0 ${item.color}`}>
-												<IconComp className="size-4" />
+											<div className={`size-8 rounded-xl flex items-center justify-center shrink-0 ${item.color}`}>
+												<IconComp className="size-4.5" />
 											</div>
 											<div className="flex flex-col flex-1 min-w-0">
 												<div className="flex items-center justify-between">
-													<span className="text-xs font-bold text-zinc-800 dark:text-zinc-100 truncate">{item.title}</span>
+													<span className="text-sm font-bold text-zinc-800 dark:text-zinc-100 truncate">{item.title}</span>
 													<span className="text-[10px] text-zinc-400 font-mono">{item.time}</span>
 												</div>
-												<span className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">{item.description}</span>
+												<span className="text-xs text-zinc-500 dark:text-zinc-400 truncate">{item.description}</span>
 											</div>
 										</div>
 									)
@@ -172,12 +172,12 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					background={
 						<div
 							ref={containerRef}
-							className="absolute right-0 top-2 h-[280px] w-full [mask-image:linear-gradient(to_top,transparent_25%,#000_100%)] transition-all duration-300 ease-out group-hover:scale-105 flex items-center justify-between px-10 overflow-hidden"
+							className="absolute right-0 top-4 h-[330px] w-full [mask-image:linear-gradient(to_top,transparent_25%,#000_100%)] transition-all duration-300 ease-out group-hover:scale-105 flex items-center justify-between px-14 overflow-hidden"
 						>
 							{/* Left Node: User */}
 							<div
 								ref={div1Ref}
-								className="size-11 rounded-2xl bg-white dark:bg-zinc-800 border-2 border-zinc-200 dark:border-zinc-700 shadow-lg flex items-center justify-center text-xs font-bold font-mono text-zinc-800 dark:text-zinc-100 z-10"
+								className="size-13 rounded-2xl bg-white dark:bg-zinc-800 border-2 border-zinc-200 dark:border-zinc-700 shadow-lg flex items-center justify-center text-xs font-bold font-mono text-zinc-800 dark:text-zinc-100 z-10"
 							>
 								YOU
 							</div>
@@ -185,34 +185,34 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 							{/* Center Hub Node */}
 							<div
 								ref={div2Ref}
-								className="size-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white shadow-xl flex items-center justify-center text-xs font-extrabold font-mono z-10"
+								className="size-14 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white shadow-xl flex items-center justify-center text-xs font-extrabold font-mono z-10"
 							>
 								HUB
 							</div>
 
 							{/* Right Stack Column Nodes */}
-							<div className="flex flex-col gap-2 z-10">
+							<div className="flex flex-col gap-2.5 z-10">
 								<div
 									ref={div3Ref}
-									className="size-8 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md flex items-center justify-center text-[10px] font-bold text-blue-500 font-mono"
+									className="size-9 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md flex items-center justify-center text-[10.5px] font-bold text-blue-500 font-mono"
 								>
 									Drive
 								</div>
 								<div
 									ref={div4Ref}
-									className="size-8 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md flex items-center justify-center text-[10px] font-bold text-zinc-800 dark:text-zinc-100 font-mono"
+									className="size-9 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md flex items-center justify-center text-[10.5px] font-bold text-zinc-800 dark:text-zinc-100 font-mono"
 								>
 									Docs
 								</div>
 								<div
 									ref={div5Ref}
-									className="size-8 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md flex items-center justify-center text-[10px] font-bold text-emerald-500 font-mono"
+									className="size-9 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md flex items-center justify-center text-[10.5px] font-bold text-emerald-500 font-mono"
 								>
 									Chat
 								</div>
 								<div
 									ref={div6Ref}
-									className="size-8 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md flex items-center justify-center text-[10px] font-bold text-purple-600 font-mono"
+									className="size-9 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md flex items-center justify-center text-[10.5px] font-bold text-purple-600 font-mono"
 								>
 									Notion
 								</div>
@@ -233,7 +233,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								toRef={div3Ref}
 								duration={3}
 								delay={0.2}
-								curvature={-25}
+								curvature={-30}
 								gradientStartColor="#8b5cf6"
 								gradientStopColor="#3b82f6"
 							/>
@@ -243,7 +243,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								toRef={div4Ref}
 								duration={3}
 								delay={0.4}
-								curvature={-8}
+								curvature={-10}
 								gradientStartColor="#8b5cf6"
 								gradientStopColor="#06b6d4"
 							/>
@@ -253,7 +253,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								toRef={div5Ref}
 								duration={3}
 								delay={0.6}
-								curvature={8}
+								curvature={10}
 								gradientStartColor="#8b5cf6"
 								gradientStopColor="#10b981"
 							/>
@@ -263,7 +263,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								toRef={div6Ref}
 								duration={3}
 								delay={0.8}
-								curvature={25}
+								curvature={30}
 								gradientStartColor="#8b5cf6"
 								gradientStopColor="#a855f7"
 							/>
@@ -280,20 +280,20 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					cta="Learn more"
 					className="col-span-1"
 					background={
-						<div className="absolute right-0 top-3 h-[280px] w-full [mask-image:linear-gradient(to_top,transparent_30%,#000_100%)] transition-all duration-300 ease-out group-hover:scale-105 flex items-start justify-center pt-2 overflow-hidden">
-							<div className="w-full max-w-[210px] rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 p-3.5 shadow-md">
-								<div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-700/80 pb-2 mb-2">
-									<span className="text-xs font-bold text-zinc-700 dark:text-zinc-200 font-mono">{currentMonth} {currentYear}</span>
-									<span className="text-[10px] font-mono font-bold text-zinc-400">2026</span>
+						<div className="absolute right-0 top-5 h-[330px] w-full [mask-image:linear-gradient(to_top,transparent_30%,#000_100%)] transition-all duration-300 ease-out group-hover:scale-105 flex items-start justify-center pt-2 overflow-hidden">
+							<div className="w-full max-w-[240px] rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 p-4 shadow-md">
+								<div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-700/80 pb-2.5 mb-2.5">
+									<span className="text-sm font-bold text-zinc-700 dark:text-zinc-200 font-mono">{currentMonth} {currentYear}</span>
+									<span className="text-xs font-mono font-bold text-zinc-400">2026</span>
 								</div>
-								<div className="grid grid-cols-7 gap-1 text-center text-[10px] font-mono text-zinc-400 mb-1">
+								<div className="grid grid-cols-7 gap-1.5 text-center text-xs font-mono text-zinc-400 mb-1.5">
 									<span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
 								</div>
-								<div className="grid grid-cols-7 gap-1 text-center text-[10px] font-mono text-zinc-600 dark:text-zinc-300">
+								<div className="grid grid-cols-7 gap-1.5 text-center text-xs font-mono text-zinc-600 dark:text-zinc-300">
 									<span className="opacity-30">30</span>
 									<span className="opacity-30">31</span>
 									<span className="font-semibold">1</span>
-									<span className="size-5 mx-auto rounded-full bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-bold flex items-center justify-center shadow-xs">
+									<span className="size-6 mx-auto rounded-full bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-bold flex items-center justify-center shadow-xs">
 										{mounted ? currentDay : 2}
 									</span>
 									<span className="font-semibold">3</span>

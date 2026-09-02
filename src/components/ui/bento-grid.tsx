@@ -23,7 +23,7 @@ export function BentoGrid({ children, className, ...props }: BentoGridProps) {
   return (
     <div
       className={cn(
-        "grid w-full auto-rows-[22rem] grid-cols-1 md:grid-cols-3 gap-4",
+        "grid w-full auto-rows-[26rem] sm:auto-rows-[28rem] md:auto-rows-[29rem] grid-cols-1 md:grid-cols-3 gap-5",
         className
       )}
       {...props}
