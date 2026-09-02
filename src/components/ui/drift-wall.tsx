@@ -182,11 +182,16 @@ export default function DriftWall({
           const meta = columnMeta[c]
           if (!meta) continue
           
-          // When a poster in column c is hovered, STOP that column completely (target = 0)
-          const isColHovered = (wallHoveredRef.current && hoveredColRef.current === c) || (activeIdRef.current !== null && hoveredColRef.current === c)
-          const target = isColHovered ? 0 : baseVelocities[c]
+          // When a poster in column c is hovered, STOP that column IMMEDIATELY AND COMPLETELY (0 movement)
+          const isColHovered = hoveredColRef.current === c || (activeIdRef.current !== null && hoveredColRef.current === c)
+          
+          if (isColHovered) {
+            velocitiesRef.current[c] = 0
+            continue // Freeze column immediately without creeping
+          }
 
-          const ease = 1 - Math.exp(-dt / (target === 0 ? 0.08 : 0.24))
+          const target = baseVelocities[c]
+          const ease = 1 - Math.exp(-dt / 0.2)
           velocitiesRef.current[c] += (target - velocitiesRef.current[c]) * ease
           let next = (offsetsRef.current[c] ?? 0) + velocitiesRef.current[c] * dt
           next = ((next % meta.copyHeight) + meta.copyHeight) % meta.copyHeight
