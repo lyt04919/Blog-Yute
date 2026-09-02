@@ -1,7 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { BentoGrid, BentoCard } from '@/components/ui/bento-grid'
+import { AnimatedList } from '@/components/ui/animated-list'
+import { AnimatedBeam } from '@/components/ui/animated-beam'
+import { Marquee } from '@/components/ui/marquee'
 import { 
 	FileCode2, 
 	Bell, 
@@ -13,10 +16,55 @@ import {
 	Clock,
 	Code2,
 	GitBranch,
-	Music,
-	Cpu
+	Cpu,
+	Sparkles,
+	Layers,
+	FileText,
+	Terminal
 } from 'lucide-react'
-import { motion } from 'motion/react'
+
+const files = [
+	{ name: 'agent.core.ts', ext: '.ts', icon: FileCode2, color: 'text-blue-500', size: '2.4 KB' },
+	{ name: 'architecture.config', ext: '.config', icon: Code2, color: 'text-purple-500', size: '1.8 KB' },
+	{ name: 'schema.prisma', ext: '.prisma', icon: Cpu, color: 'text-emerald-500', size: '3.1 KB' },
+	{ name: 'tailwind.config.ts', ext: '.ts', icon: Layers, color: 'text-cyan-500', size: '4.2 KB' },
+	{ name: 'route.edge.ts', ext: '.ts', icon: Zap, color: 'text-amber-500', size: '1.2 KB' },
+]
+
+const notifications = [
+	{
+		id: 1,
+		title: 'Production Deployed',
+		time: '2m ago',
+		description: 'All static assets synced to global edge CDN',
+		icon: CheckCircle2,
+		color: 'text-emerald-500 bg-emerald-500/10',
+	},
+	{
+		id: 2,
+		title: 'Edge Latency: 12ms',
+		time: '5m ago',
+		description: 'Cloudflare cached with 100% performance score',
+		icon: Zap,
+		color: 'text-blue-500 bg-blue-500/10',
+	},
+	{
+		id: 3,
+		title: 'Nomad Base Station',
+		time: 'LIVE',
+		description: 'Hangzhou · GMT+8 Active Digital Nomad',
+		icon: MapPin,
+		color: 'text-rose-500 bg-rose-500/10',
+	},
+	{
+		id: 4,
+		title: 'GitHub Commit Pushed',
+		time: 'Just now',
+		description: 'main branch updated with zero downtime',
+		icon: GitBranch,
+		color: 'text-purple-500 bg-purple-500/10',
+	},
+]
 
 export function GeekIdentityBento({ className }: { className?: string }) {
 	const [timeString, setTimeString] = useState<string>('')
@@ -24,6 +72,15 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 	const [currentMonth, setCurrentMonth] = useState<string>('September')
 	const [currentYear, setCurrentYear] = useState<number>(2026)
 	const [mounted, setMounted] = useState<boolean>(false)
+
+	// Animated Beam Refs
+	const containerRef = useRef<HTMLDivElement>(null)
+	const div1Ref = useRef<HTMLDivElement>(null)
+	const div2Ref = useRef<HTMLDivElement>(null)
+	const div3Ref = useRef<HTMLDivElement>(null)
+	const div4Ref = useRef<HTMLDivElement>(null)
+	const div5Ref = useRef<HTMLDivElement>(null)
+	const div6Ref = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
 		setMounted(true)
@@ -49,7 +106,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 	return (
 		<div className={className}>
 			<BentoGrid className="grid-cols-1 md:grid-cols-3 auto-rows-[22rem]">
-				{/* ════════════════ 1. File Stack (Col 1, Row 1 - like "Save your files") ════════════════ */}
+				{/* ════════════════ 1. Save your files (Live Marquee) ════════════════ */}
 				<BentoCard
 					name="Save your architecture"
 					description="模块化、高可维护的 TypeScript 与 Next.js 边缘架构设计。"
@@ -58,57 +115,35 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					cta="查看仓库源码"
 					className="col-span-1"
 					background={
-						<div className="absolute top-4 inset-x-4 flex items-center justify-center gap-2.5 overflow-hidden select-none pointer-events-none">
-							{/* File Card 1 */}
-							<div className="w-28 h-32 rounded-xl bg-zinc-50 dark:bg-zinc-800/90 border border-zinc-200/90 dark:border-zinc-700/80 p-3 shadow-md flex flex-col justify-between transform -rotate-3 transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-105">
-								<div className="flex items-center justify-between text-zinc-400">
-									<FileCode2 className="size-4 text-blue-500" />
-									<span className="text-[9px] font-mono font-bold">.ts</span>
-								</div>
-								<div className="space-y-1">
-									<div className="h-1.5 w-16 bg-zinc-300 dark:bg-zinc-600 rounded-full" />
-									<div className="h-1.5 w-10 bg-zinc-200 dark:bg-zinc-700 rounded-full" />
-								</div>
-								<span className="text-[9.5px] font-mono font-bold text-zinc-600 dark:text-zinc-300 truncate">
-									agent.core.ts
-								</span>
-							</div>
-
-							{/* File Card 2 (Center highlight) */}
-							<div className="w-32 h-36 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 p-3 shadow-xl flex flex-col justify-between z-10 transition-transform duration-300 group-hover:scale-105 group-hover:-translate-y-1">
-								<div className="flex items-center justify-between">
-									<Code2 className="size-4 text-purple-500" />
-									<span className="text-[9px] font-mono font-bold text-purple-500">PROD</span>
-								</div>
-								<div className="space-y-1.5">
-									<div className="h-2 w-20 bg-purple-500/20 rounded-full" />
-									<div className="h-1.5 w-14 bg-zinc-200 dark:bg-zinc-700 rounded-full" />
-									<div className="h-1.5 w-18 bg-zinc-200 dark:bg-zinc-700 rounded-full" />
-								</div>
-								<span className="text-[10px] font-mono font-extrabold text-zinc-800 dark:text-zinc-100 truncate">
-									architecture.config
-								</span>
-							</div>
-
-							{/* File Card 3 */}
-							<div className="w-28 h-32 rounded-xl bg-zinc-50 dark:bg-zinc-800/90 border border-zinc-200/90 dark:border-zinc-700/80 p-3 shadow-md flex flex-col justify-between transform rotate-3 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-105">
-								<div className="flex items-center justify-between text-zinc-400">
-									<Cpu className="size-4 text-emerald-500" />
-									<span className="text-[9px] font-mono font-bold">.env</span>
-								</div>
-								<div className="space-y-1">
-									<div className="h-1.5 w-14 bg-zinc-300 dark:bg-zinc-600 rounded-full" />
-									<div className="h-1.5 w-8 bg-zinc-200 dark:bg-zinc-700 rounded-full" />
-								</div>
-								<span className="text-[9.5px] font-mono font-bold text-zinc-600 dark:text-zinc-300 truncate">
-									edge.worker.js
-								</span>
-							</div>
+						<div className="size-full flex items-center justify-center overflow-hidden [mask-image:linear-gradient(to_right,transparent,white_20%,white_80%,transparent)]">
+							<Marquee pauseOnHover duration="18s" className="py-2">
+								{files.map((file, idx) => {
+									const IconComp = file.icon
+									return (
+										<div
+											key={idx}
+											className="w-28 h-32 rounded-xl bg-zinc-50 dark:bg-zinc-800/90 border border-zinc-200/90 dark:border-zinc-700/80 p-3 shadow-md flex flex-col justify-between shrink-0 select-none transition-all duration-300 hover:scale-105 hover:shadow-lg"
+										>
+											<div className="flex items-center justify-between">
+												<IconComp className={`size-4 ${file.color}`} />
+												<span className="text-[9px] font-mono font-bold text-zinc-400">{file.ext}</span>
+											</div>
+											<div className="space-y-1">
+												<div className="h-1.5 w-14 bg-zinc-300 dark:bg-zinc-600 rounded-full" />
+												<div className="h-1.5 w-8 bg-zinc-200 dark:bg-zinc-700 rounded-full" />
+											</div>
+											<span className="text-[9.5px] font-mono font-bold text-zinc-700 dark:text-zinc-200 truncate">
+												{file.name}
+											</span>
+										</div>
+									)
+								})}
+							</Marquee>
 						</div>
 					}
 				/>
 
-				{/* ════════════════ 2. Notifications (Col 2-3, Row 1 - like "Notifications") ════════════════ */}
+				{/* ════════════════ 2. Notifications (Live AnimatedList) ════════════════ */}
 				<BentoCard
 					name="Real-time Pulse & Notifications"
 					description="全自动边缘构建、毫秒级响应分发与全天候在线的数字游民基站。"
@@ -117,53 +152,34 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					cta="查看系统运行日志"
 					className="col-span-1 md:col-span-2"
 					background={
-						<div className="absolute top-3 inset-x-6 flex flex-col gap-2.5 overflow-hidden select-none pointer-events-none">
-							{/* Notification Item 1 */}
-							<div className="flex items-center gap-3 p-2.5 px-3.5 rounded-xl bg-white/90 dark:bg-zinc-800/90 border border-zinc-200/80 dark:border-zinc-700/80 shadow-sm transition-all duration-300 group-hover:translate-x-1">
-								<div className="size-7 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-									<CheckCircle2 className="size-4" />
-								</div>
-								<div className="flex flex-col flex-1 min-w-0">
-									<div className="flex items-center justify-between">
-										<span className="text-xs font-bold text-zinc-800 dark:text-zinc-100 truncate">Production Deployed</span>
-										<span className="text-[10px] text-zinc-400 font-mono">2m ago</span>
-									</div>
-									<span className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">All static assets synced to global edge</span>
-								</div>
-							</div>
-
-							{/* Notification Item 2 */}
-							<div className="flex items-center gap-3 p-2.5 px-3.5 rounded-xl bg-white/90 dark:bg-zinc-800/90 border border-zinc-200/80 dark:border-zinc-700/80 shadow-sm transition-all duration-300 group-hover:translate-x-1 delay-75">
-								<div className="size-7 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-									<Zap className="size-4" />
-								</div>
-								<div className="flex flex-col flex-1 min-w-0">
-									<div className="flex items-center justify-between">
-										<span className="text-xs font-bold text-zinc-800 dark:text-zinc-100 truncate">Edge Latency: 12ms</span>
-										<span className="text-[10px] text-zinc-400 font-mono">5m ago</span>
-									</div>
-									<span className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">Cloudflare CDN cached with 100% score</span>
-								</div>
-							</div>
-
-							{/* Notification Item 3 */}
-							<div className="flex items-center gap-3 p-2.5 px-3.5 rounded-xl bg-white/90 dark:bg-zinc-800/90 border border-zinc-200/80 dark:border-zinc-700/80 shadow-sm transition-all duration-300 group-hover:translate-x-1 delay-150">
-								<div className="size-7 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
-									<MapPin className="size-4" />
-								</div>
-								<div className="flex flex-col flex-1 min-w-0">
-									<div className="flex items-center justify-between">
-										<span className="text-xs font-bold text-zinc-800 dark:text-zinc-100 truncate">Nomad Base Station</span>
-										<span className="text-[10px] text-zinc-400 font-mono">LIVE</span>
-									</div>
-									<span className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">Hangzhou · GMT+8 Active Nomad</span>
-								</div>
-							</div>
+						<div className="size-full flex flex-col justify-start px-6 pt-3 overflow-hidden select-none">
+							<AnimatedList delay={2000}>
+								{notifications.map((item) => {
+									const IconComp = item.icon
+									return (
+										<div
+											key={item.id}
+											className="flex items-center gap-3 p-2.5 px-4 rounded-xl bg-white/95 dark:bg-zinc-800/95 border border-zinc-200/90 dark:border-zinc-700/90 shadow-sm"
+										>
+											<div className={`size-7 rounded-lg flex items-center justify-center shrink-0 ${item.color}`}>
+												<IconComp className="size-4" />
+											</div>
+											<div className="flex flex-col flex-1 min-w-0">
+												<div className="flex items-center justify-between">
+													<span className="text-xs font-bold text-zinc-800 dark:text-zinc-100 truncate">{item.title}</span>
+													<span className="text-[10px] text-zinc-400 font-mono">{item.time}</span>
+												</div>
+												<span className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">{item.description}</span>
+											</div>
+										</div>
+									)
+								})}
+							</AnimatedList>
 						</div>
 					}
 				/>
 
-				{/* ════════════════ 3. Integrations (Col 1-2, Row 2 - like "Integrations") ════════════════ */}
+				{/* ════════════════ 3. Integrations (Live AnimatedBeam) ════════════════ */}
 				<BentoCard
 					name="Integrations & Stack"
 					description="深度整合 Next.js 16、TypeScript、React 19、Tailwind CSS、GitHub 与现代 AI 工具链。"
@@ -172,53 +188,108 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					cta="探索完整生态集成"
 					className="col-span-1 md:col-span-2"
 					background={
-						<div className="absolute inset-0 flex items-center justify-center select-none pointer-events-none">
-							<svg className="w-full h-full max-w-[360px] max-h-[140px]" viewBox="0 0 360 140" fill="none">
-								{/* Curved Connector Lines */}
-								<path d="M 60 70 C 120 70, 120 30, 180 30" stroke="currentColor" strokeWidth="1.5" className="text-zinc-300 dark:text-zinc-700 stroke-dasharray-[4_4] animate-pulse" />
-								<path d="M 60 70 C 120 70, 120 70, 180 70" stroke="currentColor" strokeWidth="1.5" className="text-zinc-300 dark:text-zinc-700" />
-								<path d="M 60 70 C 120 70, 120 110, 180 110" stroke="currentColor" strokeWidth="1.5" className="text-zinc-300 dark:text-zinc-700 stroke-dasharray-[4_4]" />
-								
-								<path d="M 180 30 C 240 30, 240 25, 300 25" stroke="currentColor" strokeWidth="1.5" className="text-zinc-300 dark:text-zinc-700" />
-								<path d="M 180 70 C 240 70, 240 60, 300 55" stroke="currentColor" strokeWidth="1.5" className="text-zinc-300 dark:text-zinc-700 stroke-dasharray-[4_4]" />
-								<path d="M 180 70 C 240 70, 240 85, 300 85" stroke="currentColor" strokeWidth="1.5" className="text-zinc-300 dark:text-zinc-700" />
-								<path d="M 180 110 C 240 110, 240 115, 300 115" stroke="currentColor" strokeWidth="1.5" className="text-zinc-300 dark:text-zinc-700 stroke-dasharray-[4_4]" />
+						<div
+							ref={containerRef}
+							className="relative size-full flex items-center justify-between px-10 overflow-hidden select-none"
+						>
+							{/* Left Node: YOU */}
+							<div
+								ref={div1Ref}
+								className="size-11 rounded-2xl bg-white dark:bg-zinc-800 border-2 border-zinc-200 dark:border-zinc-700 shadow-lg flex items-center justify-center text-xs font-bold font-mono text-zinc-800 dark:text-zinc-100 z-10"
+							>
+								YOU
+							</div>
 
-								{/* Left Origin Node */}
-								<g transform="translate(40, 50)">
-									<rect width="40" height="40" rx="12" className="fill-white dark:fill-zinc-800 stroke-zinc-200 dark:stroke-zinc-700" strokeWidth="1.5" />
-									<text x="20" y="25" textAnchor="middle" className="fill-zinc-800 dark:fill-zinc-100 font-bold text-xs font-mono">YOU</text>
-								</g>
+							{/* Center Hub Node */}
+							<div
+								ref={div2Ref}
+								className="size-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white shadow-xl flex items-center justify-center text-xs font-extrabold font-mono z-10"
+							>
+								HUB
+							</div>
 
-								{/* Center Core Node */}
-								<g transform="translate(160, 50)">
-									<rect width="40" height="40" rx="12" className="fill-purple-600 text-white shadow-lg" />
-									<text x="20" y="25" textAnchor="middle" fill="white" className="font-extrabold text-xs font-mono">HUB</text>
-								</g>
+							{/* Right Stack Column Nodes */}
+							<div className="flex flex-col gap-2 z-10">
+								<div
+									ref={div3Ref}
+									className="size-8 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md flex items-center justify-center text-[10px] font-bold text-blue-500 font-mono"
+								>
+									React
+								</div>
+								<div
+									ref={div4Ref}
+									className="size-8 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md flex items-center justify-center text-[10px] font-bold text-zinc-800 dark:text-zinc-100 font-mono"
+								>
+									Next
+								</div>
+								<div
+									ref={div5Ref}
+									className="size-8 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md flex items-center justify-center text-[10px] font-bold text-blue-600 font-mono"
+								>
+									TS
+								</div>
+								<div
+									ref={div6Ref}
+									className="size-8 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md flex items-center justify-center text-[10px] font-bold text-emerald-500 font-mono"
+								>
+									Git
+								</div>
+							</div>
 
-								{/* Right Stack Nodes */}
-								<g transform="translate(285, 8)">
-									<rect width="34" height="34" rx="10" className="fill-white dark:fill-zinc-800 stroke-zinc-200 dark:stroke-zinc-700" strokeWidth="1.5" />
-									<text x="17" y="21" textAnchor="middle" className="fill-blue-500 font-bold text-[10px] font-mono">React</text>
-								</g>
-								<g transform="translate(285, 42)">
-									<rect width="34" height="34" rx="10" className="fill-white dark:fill-zinc-800 stroke-zinc-200 dark:stroke-zinc-700" strokeWidth="1.5" />
-									<text x="17" y="21" textAnchor="middle" className="fill-zinc-800 dark:fill-zinc-100 font-bold text-[10px] font-mono">Next</text>
-								</g>
-								<g transform="translate(285, 72)">
-									<rect width="34" height="34" rx="10" className="fill-white dark:fill-zinc-800 stroke-zinc-200 dark:stroke-zinc-700" strokeWidth="1.5" />
-									<text x="17" y="21" textAnchor="middle" className="fill-blue-600 font-bold text-[10px] font-mono">TS</text>
-								</g>
-								<g transform="translate(285, 102)">
-									<rect width="34" height="34" rx="10" className="fill-white dark:fill-zinc-800 stroke-zinc-200 dark:stroke-zinc-700" strokeWidth="1.5" />
-									<text x="17" y="21" textAnchor="middle" className="fill-emerald-500 font-bold text-[10px] font-mono">Git</text>
-								</g>
-							</svg>
+							{/* Animated Beams connecting nodes */}
+							<AnimatedBeam
+								containerRef={containerRef}
+								fromRef={div1Ref}
+								toRef={div2Ref}
+								duration={2.5}
+								gradientStartColor="#3b82f6"
+								gradientStopColor="#8b5cf6"
+							/>
+							<AnimatedBeam
+								containerRef={containerRef}
+								fromRef={div2Ref}
+								toRef={div3Ref}
+								duration={3}
+								delay={0.2}
+								curvature={-25}
+								gradientStartColor="#8b5cf6"
+								gradientStopColor="#3b82f6"
+							/>
+							<AnimatedBeam
+								containerRef={containerRef}
+								fromRef={div2Ref}
+								toRef={div4Ref}
+								duration={3}
+								delay={0.4}
+								curvature={-8}
+								gradientStartColor="#8b5cf6"
+								gradientStopColor="#06b6d4"
+							/>
+							<AnimatedBeam
+								containerRef={containerRef}
+								fromRef={div2Ref}
+								toRef={div5Ref}
+								duration={3}
+								delay={0.6}
+								curvature={8}
+								gradientStartColor="#8b5cf6"
+								gradientStopColor="#3b82f6"
+							/>
+							<AnimatedBeam
+								containerRef={containerRef}
+								fromRef={div2Ref}
+								toRef={div6Ref}
+								duration={3}
+								delay={0.8}
+								curvature={25}
+								gradientStartColor="#8b5cf6"
+								gradientStopColor="#10b981"
+							/>
 						</div>
 					}
 				/>
 
-				{/* ════════════════ 4. Calendar & Time (Col 3, Row 2 - like "Calendar") ════════════════ */}
+				{/* ════════════════ 4. Calendar & Time (Interactive Calendar) ════════════════ */}
 				<BentoCard
 					name="Calendar & Nomad Clock"
 					description="全球时区与数字日程基站，保持高能心流专注。"
@@ -227,12 +298,11 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					cta="查看时区基站"
 					className="col-span-1"
 					background={
-						<div className="absolute top-3 inset-x-6 flex flex-col items-center justify-center select-none pointer-events-none">
-							{/* Mini Apple Calendar Widget */}
+						<div className="size-full flex flex-col items-center justify-center pt-2 select-none">
 							<div className="w-full max-w-[200px] rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 p-3 shadow-md">
 								<div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-700/80 pb-2 mb-2">
 									<span className="text-xs font-bold text-rose-500 font-mono">{currentMonth} {currentYear}</span>
-									<span className="text-[10px] font-mono font-bold text-zinc-400">{timeString || '00:00'}</span>
+									<span className="text-[10px] font-mono font-bold text-zinc-400">{timeString || '00:00:00'}</span>
 								</div>
 								<div className="grid grid-cols-7 gap-1 text-center text-[10px] font-mono text-zinc-400 mb-1">
 									<span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
@@ -241,7 +311,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 									<span className="opacity-30">30</span>
 									<span className="opacity-30">31</span>
 									<span className="font-semibold">1</span>
-									<span className="size-5 mx-auto rounded-full bg-rose-500 text-white font-bold flex items-center justify-center shadow-xs">
+									<span className="size-5 mx-auto rounded-full bg-rose-500 text-white font-bold flex items-center justify-center shadow-xs animate-pulse">
 										{mounted ? currentDay : 2}
 									</span>
 									<span className="font-semibold">3</span>
