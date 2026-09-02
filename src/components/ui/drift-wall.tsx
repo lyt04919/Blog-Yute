@@ -107,7 +107,7 @@ export default function DriftWall({
     return () => mq.removeEventListener('change', onChange)
   }, [])
 
-  // IntersectionObserver to pause RAF when off-screen
+  // IntersectionObserver to freeze RAF when off-screen
   useEffect(() => {
     if (!containerRef.current) return
     const io = new IntersectionObserver(([entry]) => {
@@ -122,7 +122,7 @@ export default function DriftWall({
   }, [])
 
   const columnItems = useMemo(() => {
-    const validItems = items.length > 0 ? items : DEFAULT_ITEMS
+    const validItems = items && items.length > 0 ? items : DEFAULT_ITEMS
     const cols: DriftWallItem[][] = Array.from({ length: columns }, () => [])
     validItems.forEach((item, i) => cols[i % columns].push(item))
     return cols.map(col => (col.length ? col : validItems.slice(0, 1)))
@@ -130,9 +130,10 @@ export default function DriftWall({
 
   const columnMeta = useMemo(() => {
     const unit = tileHeight + gap
+    const safeH = Math.max(360, containerHeight || 360)
     return columnItems.map(col => {
       const copyHeight = Math.max(unit, col.length * unit)
-      const copies = Math.max(2, Math.ceil((containerHeight * 2.2) / copyHeight) + 1)
+      const copies = Math.max(2, Math.ceil((safeH * 2.2) / copyHeight) + 1)
       return { copyHeight, copies }
     })
   }, [columnItems, tileHeight, gap, containerHeight])
@@ -141,7 +142,7 @@ export default function DriftWall({
     if (!containerRef.current) return
     const ro = new ResizeObserver(([entry]) => {
       if (entry.contentRect.height > 0) {
-        setContainerHeight(entry.contentRect.height)
+        setContainerHeight(Math.max(360, entry.contentRect.height))
       }
     })
     ro.observe(containerRef.current)
@@ -165,9 +166,11 @@ export default function DriftWall({
     (px: number, py: number) => {
       const plane = planeRef.current
       if (!plane) return
+      const safePx = Number.isFinite(px) ? px : 0
+      const safePy = Number.isFinite(py) ? py : 0
       plane.style.transform =
         `translate(-50%, -50%) scale(1.3) ` +
-        `rotateX(${tilt + py}deg) rotateY(${turn + px}deg) rotateZ(${roll}deg) ` +
+        `rotateX(${tilt + safePy}deg) rotateY(${turn + safePx}deg) rotateZ(${roll}deg) ` +
         `translateZ(${-depth}px)`
     },
     [tilt, turn, roll, depth]
@@ -178,20 +181,47 @@ export default function DriftWall({
     applyPlaneTransform(0, 0)
   }, [applyPlaneTransform])
 
+  // Tab switching / visibilitychange listener: Pause when tab is backgrounded & resume cleanly
   useEffect(() => {
-    lastTsRef.current = null
-    applyPlaneTransform(0, 0)
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        if (rafRef.current) {
+          cancelAnimationFrame(rafRef.current)
+          rafRef.current = null
+        }
+        lastTsRef.current = null
+      } else {
+        lastTsRef.current = null
+        pointerDampedRef.current = { x: 0, y: 0 }
+        applyPlaneTransform(0, 0)
+        // Ensure offsets are valid
+        for (let c = 0; c < offsetsRef.current.length; c++) {
+          if (!Number.isFinite(offsetsRef.current[c])) offsetsRef.current[c] = 0
+          if (!Number.isFinite(velocitiesRef.current[c])) velocitiesRef.current[c] = 0
+        }
+        if (!rafRef.current) {
+          rafRef.current = requestAnimationFrame(animate)
+        }
+      }
+    }
 
     const animate = (ts: number) => {
-      if (lastTsRef.current === null) lastTsRef.current = ts
-      const dt = Math.min(0.05, Math.max(0, ts - lastTsRef.current) / 1000)
+      if (lastTsRef.current === null || !Number.isFinite(lastTsRef.current)) {
+        lastTsRef.current = ts
+      }
+      const rawDt = (ts - lastTsRef.current) / 1000
+      const dt = Number.isFinite(rawDt) && rawDt > 0 ? Math.min(0.05, rawDt) : 0.016
       lastTsRef.current = ts
 
-      if (isVisibleRef.current) {
+      if (isVisibleRef.current && !document.hidden) {
         const maxTilt = parallax * 8
-        const targetX = pointerRef.current.x * maxTilt
-        const targetY = -pointerRef.current.y * maxTilt
+        const targetX = (Number.isFinite(pointerRef.current.x) ? pointerRef.current.x : 0) * maxTilt
+        const targetY = -(Number.isFinite(pointerRef.current.y) ? pointerRef.current.y : 0) * maxTilt
         const damp = 1 - Math.exp(-dt / 0.16)
+
+        if (!Number.isFinite(pointerDampedRef.current.x)) pointerDampedRef.current.x = 0
+        if (!Number.isFinite(pointerDampedRef.current.y)) pointerDampedRef.current.y = 0
+
         pointerDampedRef.current.x += (targetX - pointerDampedRef.current.x) * damp
         pointerDampedRef.current.y += (targetY - pointerDampedRef.current.y) * damp
         applyPlaneTransform(pointerDampedRef.current.x, pointerDampedRef.current.y)
@@ -199,7 +229,7 @@ export default function DriftWall({
         if (!reduced) {
           for (let c = 0; c < trackRefs.current.length; c++) {
             const meta = columnMeta[c]
-            if (!meta) continue
+            if (!meta || !meta.copyHeight) continue
             
             // When hovered, the column is 100% frozen in place
             if (hoveredColRef.current === c) {
@@ -207,10 +237,14 @@ export default function DriftWall({
               continue
             }
 
-            const target = baseVelocities[c]
+            const target = baseVelocities[c] || 0
             const ease = 1 - Math.exp(-dt / 0.2)
+            
+            if (!Number.isFinite(velocitiesRef.current[c])) velocitiesRef.current[c] = 0
+            if (!Number.isFinite(offsetsRef.current[c])) offsetsRef.current[c] = 0
+
             velocitiesRef.current[c] += (target - velocitiesRef.current[c]) * ease
-            let next = (offsetsRef.current[c] ?? 0) + velocitiesRef.current[c] * dt
+            let next = offsetsRef.current[c] + velocitiesRef.current[c] * dt
             next = ((next % meta.copyHeight) + meta.copyHeight) % meta.copyHeight
             offsetsRef.current[c] = next
 
@@ -223,8 +257,11 @@ export default function DriftWall({
       rafRef.current = requestAnimationFrame(animate)
     }
 
+    document.addEventListener('visibilitychange', handleVisibilityChange)
     rafRef.current = requestAnimationFrame(animate)
+
     return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
       if (rafRef.current) cancelAnimationFrame(rafRef.current)
       rafRef.current = null
       lastTsRef.current = null
@@ -234,7 +271,7 @@ export default function DriftWall({
   const handlePointerMove = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
       const rect = containerRef.current?.getBoundingClientRect()
-      if (!rect) return
+      if (!rect || rect.width === 0 || rect.height === 0) return
       if (parallax > 0 && !reduced) {
         pointerRef.current = {
           x: (e.clientX - rect.left) / rect.width - 0.5,
@@ -290,7 +327,11 @@ export default function DriftWall({
             referrerPolicy="no-referrer"
             loading="lazy" 
             decoding="async" 
-            draggable={false} 
+            draggable={false}
+            onError={(e) => {
+              // Fade out broken images gracefully without breaking layout
+              e.currentTarget.style.opacity = '0.2'
+            }}
           />
           <span className="drift-wall__overlay" aria-hidden="true" />
         </span>
