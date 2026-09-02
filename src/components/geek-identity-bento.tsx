@@ -54,7 +54,7 @@ const topUserMovies: MovieItem[] = (moviesData as any[])
 		stars: m.stars || m.doubanRating || 9.0
 	}))
 
-// 4 distinct columns (4 items each) for smooth looping
+// 4 distinct columns (4 items each) for vertical marquee
 const movieCol1 = topUserMovies.slice(0, 4)
 const movieCol2 = topUserMovies.slice(4, 8)
 const movieCol3 = topUserMovies.slice(8, 12)
@@ -131,7 +131,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					}
 				/>
 
-				{/* ════════════════ 2. 电影胶片流 · 3D 用户真实海报墙 (User's Real Movies with Image Proxy) ════════════════ */}
+				{/* ════════════════ 2. 电影胶片流 · 3D 用户真实海报墙 (Live Vertical Marquee) ════════════════ */}
 				<BentoCard
 					name="银幕光影流"
 					description="3D 悬浮流动海报流，沉浸式记录银幕震撼与光影回响。"
@@ -143,14 +143,14 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 						<div className="absolute inset-x-0 top-0 h-[215px] [mask-image:linear-gradient(to_bottom,#000_50%,transparent_100%)] overflow-hidden flex items-center justify-center pointer-events-none">
 							<div 
 								style={{
-									transform: 'perspective(1000px) rotateX(14deg) rotateY(-10deg) rotateZ(1deg) scale(1.05)',
+									transform: 'perspective(1000px) rotateX(15deg) rotateY(-12deg) rotateZ(1deg) scale(1.05)',
 									transformStyle: 'preserve-3d',
 								}}
-								className="flex gap-2.5 px-2 py-1"
+								className="flex gap-2.5 px-2 justify-center items-center h-[260px]"
 							>
 								{/* Column 1 (Flowing Up) */}
-								<div className="flex flex-col gap-2.5 animate-marquee-vertical [animation-duration:22s]">
-									{[...movieCol1, ...movieCol1].map((m, idx) => (
+								<Marquee vertical duration="16s" className="p-0 [gap:10px] h-full overflow-visible">
+									{movieCol1.map((m, idx) => (
 										<div
 											key={idx}
 											className="relative w-20 h-30 sm:w-24 sm:h-36 rounded-xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-white/10 shrink-0 bg-zinc-900"
@@ -164,11 +164,11 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 											/>
 										</div>
 									))}
-								</div>
+								</Marquee>
 
 								{/* Column 2 (Flowing Down) */}
-								<div className="flex flex-col gap-2.5 animate-marquee-vertical [animation-duration:26s] [animation-direction:reverse]">
-									{[...movieCol2, ...movieCol2].map((m, idx) => (
+								<Marquee vertical reverse duration="20s" className="p-0 [gap:10px] h-full overflow-visible">
+									{movieCol2.map((m, idx) => (
 										<div
 											key={idx}
 											className="relative w-20 h-30 sm:w-24 sm:h-36 rounded-xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-white/10 shrink-0 bg-zinc-900"
@@ -182,11 +182,11 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 											/>
 										</div>
 									))}
-								</div>
+								</Marquee>
 
 								{/* Column 3 (Flowing Up) */}
-								<div className="flex flex-col gap-2.5 animate-marquee-vertical [animation-duration:24s]">
-									{[...movieCol3, ...movieCol3].map((m, idx) => (
+								<Marquee vertical duration="18s" className="p-0 [gap:10px] h-full overflow-visible">
+									{movieCol3.map((m, idx) => (
 										<div
 											key={idx}
 											className="relative w-20 h-30 sm:w-24 sm:h-36 rounded-xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-white/10 shrink-0 bg-zinc-900"
@@ -200,11 +200,11 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 											/>
 										</div>
 									))}
-								</div>
+								</Marquee>
 
 								{/* Column 4 (Flowing Down) */}
-								<div className="flex flex-col gap-2.5 animate-marquee-vertical [animation-duration:28s] [animation-direction:reverse]">
-									{[...movieCol4, ...movieCol4].map((m, idx) => (
+								<Marquee vertical reverse duration="22s" className="p-0 [gap:10px] h-full overflow-visible">
+									{movieCol4.map((m, idx) => (
 										<div
 											key={idx}
 											className="relative w-20 h-30 sm:w-24 sm:h-36 rounded-xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-white/10 shrink-0 bg-zinc-900"
@@ -218,7 +218,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 											/>
 										</div>
 									))}
-								</div>
+								</Marquee>
 							</div>
 						</div>
 					}
