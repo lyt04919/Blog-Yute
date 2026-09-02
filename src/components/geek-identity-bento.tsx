@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { BentoGrid, BentoCard } from '@/components/ui/bento-grid'
 import { AnimatedBeam } from '@/components/ui/animated-beam'
 import { Marquee } from '@/components/ui/marquee'
+import { getPosterUrl } from '@/app/favorite/components/movie-card'
 import { 
 	BookOpen, 
 	Film, 
@@ -42,14 +43,14 @@ const realBooks: BookItem[] = (booksData as any[])
 		stars: b.stars || 5
 	}))
 
-// Curated top movies from user's movies.json sorted by rating
+// Curated top movies with proper image proxy routing
 const topUserMovies: MovieItem[] = (moviesData as any[])
 	.filter((m) => Boolean(m.poster) && m.isShow !== false)
 	.sort((a, b) => (b.stars || b.doubanRating || 0) - (a.stars || a.doubanRating || 0))
 	.slice(0, 16)
 	.map((m) => ({
 		name: m.name,
-		poster: m.poster,
+		poster: getPosterUrl(m.poster),
 		stars: m.stars || m.doubanRating || 9.0
 	}))
 
@@ -130,7 +131,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					}
 				/>
 
-				{/* ════════════════ 2. 电影胶片流 · 3D 用户真实海报墙 (User's Real Movies from movies.json) ════════════════ */}
+				{/* ════════════════ 2. 电影胶片流 · 3D 用户真实海报墙 (User's Real Movies with Image Proxy) ════════════════ */}
 				<BentoCard
 					name="银幕光影流"
 					description="3D 悬浮流动海报流，沉浸式记录银幕震撼与光影回响。"
