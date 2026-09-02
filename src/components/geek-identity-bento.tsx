@@ -1,20 +1,21 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { BentoGrid, BentoCard } from '@/components/ui/bento-grid'
 import { Marquee } from '@/components/ui/marquee'
 import DriftWall, { type DriftWallItem } from '@/components/ui/drift-wall'
+import { InfiniteSpiral } from '@/components/ui/infinite-spiral'
 import { getPosterUrl } from '@/app/favorite/components/movie-card'
 import { 
 	BookOpen, 
 	Film, 
-	CalendarDays,
-	Feather
+	Feather,
+	Sparkles
 } from 'lucide-react'
 
 // Import user's authentic data
 import moviesData from '@/data/movies.json'
 import booksData from '@/data/books.json'
+import shareData from '@/app/favorite/share/list.json'
 
 interface BookItem {
 	name: string
@@ -42,20 +43,19 @@ const movieDriftItems: DriftWallItem[] = (moviesData as any[])
 		href: '/favorite'
 	}))
 
+// Curated web & tools items for 3D InfiniteSpiral helix
+const webToolsSpiralItems = (shareData as any[])
+	.filter((s) => Boolean(s.logo) && s.isShow !== false)
+	.map((s, idx) => ({
+		id: `tool-${idx}`,
+		src: s.logo,
+		alt: s.name,
+		label: s.name,
+		href: s.url,
+		target: '_blank'
+	}))
+
 export function GeekIdentityBento({ className }: { className?: string }) {
-	const [currentDay, setCurrentDay] = useState<number>(1)
-	const [currentMonth, setCurrentMonth] = useState<string>('September')
-	const [currentYear, setCurrentYear] = useState<number>(2026)
-	const [mounted, setMounted] = useState<boolean>(false)
-
-	useEffect(() => {
-		setMounted(true)
-		const now = new Date()
-		setCurrentDay(now.getDate())
-		setCurrentMonth(now.toLocaleDateString('en-US', { month: 'long' }))
-		setCurrentYear(now.getFullYear())
-	}, [])
-
 	return (
 		<div className={className}>
 			<BentoGrid className="grid-cols-1 md:grid-cols-3 gap-4">
@@ -284,43 +284,33 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					}
 				/>
 
-				{/* ════════════════ 4. 时光轨迹日历 (Live Calendar) ════════════════ */}
+				{/* ════════════════ 4. 🌀 灵感工具箱 · React Bits 3D InfiniteSpiral ════════════════ */}
 				<BentoCard
-					name="时光轨迹"
-					description="按时间维度回溯精神体验与阅读脉络。"
-					Icon={CalendarDays}
-					href="/favorite"
-					cta="时光归档"
+					name="灵感工具箱"
+					description="精选 25+ 款高生产力前端库、设计工具与效率神器。"
+					Icon={Sparkles}
+					href="/favorite/share"
+					cta="探索精选工具"
 					className="col-span-1 md:col-span-1"
 					background={
-						<div className="absolute inset-x-0 top-0 h-[210px] [mask-image:linear-gradient(to_bottom,#000_65%,transparent_100%)] flex items-start justify-center pt-3 overflow-hidden">
-							<div className="w-full max-w-[210px] rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 p-3 shadow-md">
-								<div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-700/80 pb-2 mb-2">
-									<span className="text-xs font-bold text-zinc-700 dark:text-zinc-200 font-mono">{currentMonth} {currentYear}</span>
-									<span className="text-[10px] font-mono font-bold text-zinc-400">FAVORITES</span>
-								</div>
-								<div className="grid grid-cols-7 gap-1 text-center text-[10px] font-mono text-zinc-400 mb-1">
-									<span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
-								</div>
-								<div className="grid grid-cols-7 gap-1 text-center text-[10px] font-mono text-zinc-600 dark:text-zinc-300">
-									<span className="opacity-30">30</span>
-									<span className="opacity-30">31</span>
-									<span className="font-semibold">1</span>
-									<span className="size-5 mx-auto rounded-full bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-bold flex items-center justify-center shadow-xs">
-										{mounted ? currentDay : 2}
-									</span>
-									<span className="font-semibold">3</span>
-									<span className="font-semibold text-rose-500 font-bold">4</span>
-									<span className="font-semibold">5</span>
-									<span className="font-semibold text-blue-500 font-bold">6</span>
-									<span className="font-semibold text-zinc-500 font-bold">7</span>
-									<span className="font-semibold">8</span>
-									<span className="font-semibold text-emerald-500 font-bold">9</span>
-									<span className="font-semibold text-super-emerald-500 font-bold">10</span>
-									<span className="font-semibold">11</span>
-									<span className="font-semibold text-info-blue font-bold">12</span>
-								</div>
-							</div>
+						<div className="absolute inset-x-0 top-0 h-[225px] [mask-image:linear-gradient(to_bottom,transparent_0%,#000_12%,#000_82%,transparent_100%)] flex items-center justify-center overflow-hidden">
+							<InfiniteSpiral
+								items={webToolsSpiralItems}
+								animationMode="auto"
+								speed={0.42}
+								radius={76}
+								cardWidth={52}
+								cardHeight={52}
+								verticalSpacing={44}
+								perspective={850}
+								cardRadius={12}
+								centerScale={1.15}
+								edgeFade={0.25}
+								edgeBlur={3}
+								cardsPerTurn={6}
+								pauseOnHover={true}
+								imageFit="contain"
+							/>
 						</div>
 					}
 				/>
