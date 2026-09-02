@@ -10,7 +10,7 @@ import {
 	Film, 
 	CalendarDays,
 	MapPin,
-	ArrowRight
+	Feather
 } from 'lucide-react'
 
 // Import user's authentic data
@@ -135,125 +135,109 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					}
 				/>
 
-				{/* ════════════════ 3. 📸 私享随笔 · 拍立得记忆流 (1:1 还原设计图全尺寸布局) ════════════════ */}
+				{/* ════════════════ 3. 📸 私享随笔 · 拍立得记忆流 (保留标准 BentoCard 底部信息栏) ════════════════ */}
 				<BentoCard
-					darkTheme={true}
-					className="col-span-1 md:col-span-2 bg-[#0c0c11] dark:bg-[#0c0c11] border-zinc-800/90 text-white shadow-2xl overflow-hidden"
-				>
-					<div 
-						style={{ minHeight: '360px' }}
-						className="relative w-full h-full flex flex-col md:flex-row items-center justify-between p-6 sm:p-8 gap-6 overflow-hidden"
-					>
-						{/* 背景极微环境光点缀 */}
-						<div className="absolute -top-16 -left-16 w-56 h-56 bg-amber-500/10 rounded-full filter blur-3xl pointer-events-none" />
-						<div className="absolute -bottom-16 -right-16 w-56 h-56 bg-blue-500/10 rounded-full filter blur-3xl pointer-events-none" />
-
-						{/* 📸 左侧区域：大尺寸错落拍立得相纸（严格像素约束防撑爆） */}
-						<div 
-							style={{ width: '220px', minWidth: '220px', height: '260px' }}
-							className="relative shrink-0 flex items-center justify-center select-none"
-						>
-							{/* 底层拍立得：新西兰 Tekapo 湖畔 */}
+					name="私享随笔"
+					description="记录日常思绪、旅途快照与那些触动心弦的生活切片。"
+					Icon={Feather}
+					href="/vault/diary"
+					cta="翻阅生活日记"
+					className="col-span-1 md:col-span-2"
+					background={
+						<div className="absolute inset-x-0 top-0 h-[225px] [mask-image:linear-gradient(to_bottom,#000_82%,transparent_100%)] flex items-center justify-between px-6 sm:px-8 overflow-hidden select-none">
+							{/* 📸 左侧区域：大尺寸错落拍立得相纸（行内硬尺寸防越界） */}
 							<div 
-								style={{
-									width: '160px',
-									height: '210px',
-									transform: 'rotate(8deg) translate(14px, -10px)',
-									transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)'
-								}}
-								className="absolute bg-[#FAF9F6] p-2.5 rounded-sm shadow-xl border border-black/15 pointer-events-none group-hover:!rotate-[13deg] group-hover:!translate-x-6 group-hover:!-translate-y-4 group-hover:shadow-2xl flex flex-col"
+								style={{ width: '185px', minWidth: '185px', height: '195px' }}
+								className="relative shrink-0 flex items-center justify-center"
 							>
+								{/* 底层拍立得：新西兰 Tekapo 湖畔 */}
 								<div 
-									style={{ width: '140px', height: '140px' }}
-									className="rounded-2xs overflow-hidden bg-zinc-200 shrink-0"
+									style={{
+										width: '128px',
+										height: '164px',
+										transform: 'rotate(7deg) translate(12px, -6px)',
+										transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)'
+									}}
+									className="absolute bg-[#FAF9F6] p-2 rounded-sm shadow-md border border-black/15 pointer-events-none group-hover:!rotate-[12deg] group-hover:!translate-x-5 group-hover:!-translate-y-2 group-hover:shadow-xl flex flex-col"
 								>
-									<img
-										src="/images/uploads/0c004c6f642839f2.jpeg"
-										alt="Tekapo Lake"
-										style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-										loading="lazy"
-									/>
+									<div 
+										style={{ width: '112px', height: '112px' }}
+										className="rounded-2xs overflow-hidden bg-zinc-200 shrink-0"
+									>
+										<img
+											src="/images/uploads/0c004c6f642839f2.jpeg"
+											alt="Tekapo Lake"
+											style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+											loading="lazy"
+										/>
+									</div>
+									<div className="flex-1 flex items-center justify-center">
+										<p className="text-[8px] font-mono font-bold text-zinc-700 tracking-tight truncate">
+											Tekapo Lake (2024.06)
+										</p>
+									</div>
 								</div>
-								<div className="flex-1 flex items-center justify-center">
-									<p className="text-[9px] font-mono font-bold text-zinc-700 tracking-tight truncate">
-										Tekapo Lake (2024.06)
-									</p>
-								</div>
-							</div>
 
-							{/* 表层拍立得：海边黄昏抓拍 */}
-							<div 
-								style={{
-									width: '170px',
-									height: '220px',
-									transform: 'rotate(-4deg) translate(-10px, 10px)',
-									transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)'
-								}}
-								className="relative bg-[#FAF9F6] p-2.5 rounded-sm shadow-2xl border border-black/15 pointer-events-none z-10 group-hover:!rotate-0 group-hover:!scale-105 group-hover:!-translate-y-2 group-hover:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] flex flex-col"
-							>
+								{/* 表层拍立得：海边黄昏抓拍 */}
 								<div 
-									style={{ width: '150px', height: '150px' }}
-									className="rounded-2xs overflow-hidden bg-zinc-200 shrink-0"
+									style={{
+										width: '138px',
+										height: '174px',
+										transform: 'rotate(-4deg) translate(-8px, 6px)',
+										transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)'
+									}}
+									className="relative bg-[#FAF9F6] p-2 rounded-sm shadow-xl border border-black/15 pointer-events-none z-10 group-hover:!rotate-0 group-hover:!scale-104 group-hover:!-translate-y-1.5 group-hover:shadow-2xl flex flex-col"
 								>
-									<img
-										src={featuredDiary?.image || '/images/uploads/7ef4d45667098fa8.jpeg'}
-										alt="Sunset Beach"
-										style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-										loading="lazy"
-									/>
-								</div>
-								<div className="flex-1 flex items-center justify-center">
-									<p className="text-[9px] font-serif font-bold text-zinc-800 tracking-tight truncate">
-										Sunset Beach (2024.06)
-									</p>
+									<div 
+										style={{ width: '122px', height: '122px' }}
+										className="rounded-2xs overflow-hidden bg-zinc-200 shrink-0"
+									>
+										<img
+											src={featuredDiary?.image || '/images/uploads/7ef4d45667098fa8.jpeg'}
+											alt="Sunset Beach"
+											style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+											loading="lazy"
+										/>
+									</div>
+									<div className="flex-1 flex items-center justify-center">
+										<p className="text-[8px] font-serif font-bold text-zinc-800 tracking-tight truncate">
+											Sunset Beach (2024.06)
+										</p>
+									</div>
 								</div>
 							</div>
-						</div>
 
-						{/* 📝 右侧区域：沉浸式随笔手账（时间胶囊 + 大标题 + 动人文字 + 地点与 CTA） */}
-						<div className="flex-1 min-w-0 h-full flex flex-col justify-between z-10 py-1">
-							{/* 顶部：日期胶囊与心境胶囊 */}
-							<div className="flex flex-wrap items-center gap-2 mb-3">
-								<span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-white/10 text-white border border-white/15 backdrop-blur-md shadow-xs">
-									2024.06.16
-								</span>
-								<span className="px-3 py-1 rounded-full text-xs font-mono font-semibold bg-blue-500/20 text-blue-300 border border-blue-400/30 backdrop-blur-md flex items-center gap-1.5 shadow-xs">
-									<span>☀️ Sunny</span>
-									<span className="opacity-40">·</span>
-									<span>Calm</span>
-								</span>
-							</div>
+							{/* 📝 右侧区域：沉浸式随笔摘录（自适应深浅主题颜色） */}
+							<div className="flex-1 min-w-0 pl-4 sm:pl-6 flex flex-col justify-center gap-1.5 z-10">
+								{/* 顶部标签：日期胶囊 + 心境胶囊 + 地点徽章 */}
+								<div className="flex flex-wrap items-center gap-1.5">
+									<span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-mono font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shadow-2xs">
+										2024.06.16
+									</span>
+									<span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-mono font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 border border-zinc-200/80 dark:border-zinc-700/80 flex items-center gap-1 shadow-2xs">
+										<span>☀️ 晴朗</span>
+										<span className="opacity-30">·</span>
+										<span>平静</span>
+									</span>
+									<span className="hidden sm:inline-flex px-2 py-0.5 rounded-full text-[9.5px] font-mono text-zinc-500 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-700/60 items-center gap-1">
+										<MapPin className="w-2.5 h-2.5 text-rose-500" />
+										<span>秦皇岛 · 海边</span>
+									</span>
+								</div>
 
-							{/* 中部：优雅大标题与思绪段落 */}
-							<div className="flex-1 flex flex-col justify-center my-2">
-								<h3 className="text-xl sm:text-2xl font-serif font-bold text-white tracking-tight leading-snug mb-2 drop-shadow-xs">
+								{/* 标题 */}
+								<h4 className="text-sm sm:text-base font-serif font-bold text-zinc-900 dark:text-white tracking-tight leading-snug drop-shadow-2xs">
 									一个人去看海 · 黄昏随想
-								</h3>
-								<p className="text-xs sm:text-[13.5px] font-sans leading-relaxed text-zinc-300/90 line-clamp-3 sm:line-clamp-4 pr-2">
-									“两年前的今天，第一次一个人去看海。虽然海风很凉，但听着浪花拍打礁石的声音，内心竟然出奇地平静。拍了好多照片，最喜欢这张黄昏时的抓拍。人生其实就像大海一样，有时波澜壮阔，有时又归于宁静。希望自己永远能保持这份面对世界的好奇心。🌊🌅”
+								</h4>
+
+								{/* 思绪正文 */}
+								<p className="text-xs sm:text-[13px] font-sans leading-relaxed text-zinc-700 dark:text-zinc-300 line-clamp-2 sm:line-clamp-3 italic opacity-95">
+									“两年前的今天，第一次一个人去看海。虽然海风很凉，但听着浪花拍打礁石的声音，内心竟然出奇地平静。人生其实就像大海一样，有时波澜壮阔，有时又归于宁静。希望自己永远能保持这份好奇心。🌊🌅”
 								</p>
 							</div>
-
-							{/* 底部：地点坐标与直达 CTA 按键 */}
-							<div className="flex items-center justify-between pt-3 border-t border-white/10 mt-2">
-								<div className="flex items-center gap-2 text-xs font-mono text-zinc-400">
-									<div className="size-6 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
-										<MapPin className="w-3.5 h-3.5 text-blue-400" />
-									</div>
-									<span className="font-semibold text-zinc-300">秦皇岛 · 海边</span>
-								</div>
-
-								<a
-									href="/vault/diary"
-									className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all shadow-md hover:shadow-blue-500/30 hover:scale-102 active:scale-98"
-								>
-									<span>翻阅生活日记</span>
-									<ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-								</a>
-							</div>
 						</div>
-					</div>
-				</BentoCard>
+					}
+				/>
 
 				{/* ════════════════ 4. 时光轨迹日历 (Live Calendar) ════════════════ */}
 				<BentoCard
