@@ -12,64 +12,51 @@ import {
 	Star
 } from 'lucide-react'
 
-// Curated items from Favorites data for Marquee
-const featuredFavorites = [
-	{ 
-		name: '小王子', 
-		sub: '安东尼·圣-埃克苏佩里', 
-		tag: '文学', 
-		cover: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=300&q=80',
-	},
-	{ 
-		name: '光辉岁月', 
-		sub: 'Beyond', 
-		tag: '黑胶', 
-		cover: 'https://images.unsplash.com/photo-1539185441755-769473a23570?w=300&q=80',
-	},
-	{ 
-		name: '星际穿越', 
-		sub: '克里斯托弗·诺兰', 
-		tag: '电影', 
-		cover: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=300&q=80',
-	},
-	{ 
-		name: '掌控习惯', 
-		sub: '詹姆斯·克莱尔', 
-		tag: '成长', 
-		cover: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=300&q=80',
-	},
-	{ 
-		name: '艾尔登法环', 
-		sub: 'FromSoftware', 
-		tag: '游戏', 
-		cover: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=300&q=80',
-	},
-]
+// Import user's authentic data
+import moviesData from '@/data/movies.json'
+import booksData from '@/data/books.json'
 
-// Curated vertical movie posters (2:3 aspect ratio)
-const movieCol1 = [
-	{ title: '星际穿越', image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&q=80' },
-	{ title: '银翼杀手 2049', image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&q=80' },
-	{ title: '盗梦空间', image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400&q=80' },
-]
+interface MovieItem {
+	name: string
+	poster: string
+	stars?: number | string
+}
 
-const movieCol2 = [
-	{ title: '奥本海默', image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=400&q=80' },
-	{ title: '爱乐之城', image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400&q=80' },
-	{ title: '楚门的世界', image: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=400&q=80' },
-]
+interface BookItem {
+	name: string
+	author?: string
+	cover: string
+	tag?: string
+	stars?: number
+}
 
-const movieCol3 = [
-	{ title: '黑客帝国', image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&q=80' },
-	{ title: '千与千寻', image: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=400&q=80' },
-	{ title: '泰坦尼克号', image: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400&q=80' },
-]
+// Extract real books
+const realBooks: BookItem[] = (booksData as any[])
+	.filter((b) => Boolean(b.cover))
+	.slice(0, 10)
+	.map((b) => ({
+		name: b.name.replace(/\s*\(.*?\)/g, ''), // clean name
+		author: b.author || '',
+		cover: b.cover,
+		tag: b.tags?.[0] || '精选',
+		stars: b.stars || 5
+	}))
 
-const movieCol4 = [
-	{ title: '沙丘 II', image: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=400&q=80' },
-	{ title: '海上钢琴师', image: 'https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=400&q=80' },
-	{ title: '辛德勒名单', image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400&q=80' },
-]
+// Extract real movies from user's movies.json
+const realMovies: MovieItem[] = (moviesData as any[])
+	.filter((m) => Boolean(m.poster) && m.isShow !== false)
+	.map((m) => ({
+		name: m.name,
+		poster: m.poster,
+		stars: m.stars || m.doubanRating || 9.0
+	}))
+
+// Distribute user's movie posters into 4 columns
+const colSize = Math.max(1, Math.ceil(realMovies.length / 4))
+const movieCol1 = realMovies.slice(0, colSize)
+const movieCol2 = realMovies.slice(colSize, colSize * 2)
+const movieCol3 = realMovies.slice(colSize * 2, colSize * 3)
+const movieCol4 = realMovies.slice(colSize * 3, colSize * 4)
 
 export function GeekIdentityBento({ className }: { className?: string }) {
 	const [currentDay, setCurrentDay] = useState<number>(1)
@@ -97,7 +84,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 	return (
 		<div className={className}>
 			<BentoGrid className="grid-cols-1 md:grid-cols-3 gap-4">
-				{/* ════════════════ 1. 灵感书影音 (Live Marquee) ════════════════ */}
+				{/* ════════════════ 1. 灵感书影音 (User's Real Books from books.json) ════════════════ */}
 				<BentoCard
 					name="灵感书影音"
 					description="精选人文经典、高保真黑胶与硬核科幻。"
@@ -108,26 +95,30 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					background={
 						<div className="absolute inset-x-0 top-0 h-[210px] [mask-image:linear-gradient(to_bottom,#000_50%,transparent_100%)] overflow-hidden">
 							<Marquee pauseOnHover duration="20s" className="py-2.5">
-								{featuredFavorites.map((item, idx) => (
+								{realBooks.map((item, idx) => (
 									<div
 										key={idx}
-										className="w-28 h-32 rounded-xl bg-zinc-50 dark:bg-zinc-800/90 border border-zinc-200/90 dark:border-zinc-700/80 p-2.5 shadow-md flex flex-col justify-between shrink-0 select-none transition-all duration-300 hover:scale-105 hover:shadow-lg"
+										className="w-28 h-34 rounded-xl bg-zinc-50 dark:bg-zinc-800/90 border border-zinc-200/90 dark:border-zinc-700/80 p-2 shadow-md flex flex-col justify-between shrink-0 select-none transition-all duration-300 hover:scale-105 hover:shadow-lg overflow-hidden"
 									>
-										<div className="flex items-center justify-between">
-											<span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-zinc-200/70 dark:bg-zinc-700/80 text-zinc-700 dark:text-zinc-200 font-mono">
-												{item.tag}
-											</span>
-											<div className="flex items-center text-amber-500">
-												<Star className="size-2.5 fill-current" />
-												<span className="text-[8.5px] font-bold ml-0.5 font-mono">5.0</span>
-											</div>
+										<div className="w-full h-20 rounded-lg overflow-hidden bg-zinc-200 dark:bg-zinc-700 relative">
+											<img 
+												src={item.cover} 
+												alt={item.name} 
+												className="w-full h-full object-cover" 
+											/>
 										</div>
-										<div className="space-y-0.5">
-											<p className="text-[10px] font-bold text-zinc-800 dark:text-zinc-100 truncate">
+										<div className="space-y-0.5 mt-1">
+											<div className="flex items-center justify-between">
+												<span className="text-[8.5px] font-bold px-1 py-0.2 rounded bg-zinc-200/70 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 font-mono">
+													{item.tag}
+												</span>
+												<div className="flex items-center text-amber-500">
+													<Star className="size-2 fill-current" />
+													<span className="text-[8.5px] font-bold ml-0.5 font-mono">5.0</span>
+												</div>
+											</div>
+											<p className="text-[9.5px] font-bold text-zinc-800 dark:text-zinc-100 truncate">
 												{item.name}
-											</p>
-											<p className="text-[8.5px] text-zinc-400 dark:text-zinc-400 truncate">
-												{item.sub}
 											</p>
 										</div>
 									</div>
@@ -137,7 +128,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					}
 				/>
 
-				{/* ════════════════ 2. 电影胶片流 · 3D 原始比例海报墙 (Pure 2:3 Posters) ════════════════ */}
+				{/* ════════════════ 2. 电影胶片流 · 3D 用户真实海报墙 (User's Real Movies from movies.json) ════════════════ */}
 				<BentoCard
 					name="银幕光影流"
 					description="3D 悬浮流动海报流，沉浸式记录银幕震撼与光影回响。"
@@ -162,8 +153,8 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 											className="relative w-22 h-33 sm:w-24 sm:h-36 rounded-xl overflow-hidden shadow-lg border border-black/10 dark:border-white/10 shrink-0 bg-zinc-900"
 										>
 											<img 
-												src={m.image} 
-												alt={m.title} 
+												src={m.poster} 
+												alt={m.name} 
 												loading="eager" 
 												className="w-full h-full object-cover" 
 											/>
@@ -179,8 +170,8 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 											className="relative w-22 h-33 sm:w-24 sm:h-36 rounded-xl overflow-hidden shadow-lg border border-black/10 dark:border-white/10 shrink-0 bg-zinc-900"
 										>
 											<img 
-												src={m.image} 
-												alt={m.title} 
+												src={m.poster} 
+												alt={m.name} 
 												loading="eager" 
 												className="w-full h-full object-cover" 
 											/>
@@ -196,8 +187,8 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 											className="relative w-22 h-33 sm:w-24 sm:h-36 rounded-xl overflow-hidden shadow-lg border border-black/10 dark:border-white/10 shrink-0 bg-zinc-900"
 										>
 											<img 
-												src={m.image} 
-												alt={m.title} 
+												src={m.poster} 
+												alt={m.name} 
 												loading="eager" 
 												className="w-full h-full object-cover" 
 											/>
@@ -213,8 +204,8 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 											className="relative w-22 h-33 sm:w-24 sm:h-36 rounded-xl overflow-hidden shadow-lg border border-black/10 dark:border-white/10 shrink-0 bg-zinc-900"
 										>
 											<img 
-												src={m.image} 
-												alt={m.title} 
+												src={m.poster} 
+												alt={m.name} 
 												loading="eager" 
 												className="w-full h-full object-cover" 
 											/>
