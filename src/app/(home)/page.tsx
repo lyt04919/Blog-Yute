@@ -63,8 +63,8 @@ export default function Home() {
 				<HeroSection />
 
 				{/* 2. 极客全景看板：Magic UI Bento Grid (Engineering, Nomad Time, Vinyl, GitHub, Setup) */}
-				<LazySection minHeight="960px">
-					<section className="w-full max-w-5xl mx-auto px-4 sm:px-6 mt-16 sm:mt-20 pt-6">
+				<LazySection minHeight="720px">
+					<section className="w-full max-w-4xl mx-auto px-4 sm:px-6 mt-16 sm:mt-20 pt-6">
 						<div className="flex flex-col items-center text-center mb-8 sm:mb-12">
 							<div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold font-mono uppercase bg-[var(--color-brand)]/10 text-[var(--color-brand)] border border-[var(--color-brand)]/20 mb-3 shadow-xs">
 								<span>✦ Digital Identity</span>
