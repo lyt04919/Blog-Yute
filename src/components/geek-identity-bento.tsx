@@ -1,21 +1,22 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { BentoGrid, BentoCard } from '@/components/ui/bento-grid'
-import { AnimatedBeam } from '@/components/ui/animated-beam'
 import { Marquee } from '@/components/ui/marquee'
 import DriftWall, { type DriftWallItem } from '@/components/ui/drift-wall'
 import { getPosterUrl } from '@/app/favorite/components/movie-card'
 import { 
 	BookOpen, 
 	Film, 
-	Compass, 
-	CalendarDays
+	CalendarDays,
+	Feather,
+	MapPin
 } from 'lucide-react'
 
 // Import user's authentic data
 import moviesData from '@/data/movies.json'
 import booksData from '@/data/books.json'
+import diaryData from '@/data/private/diary.json'
 
 interface BookItem {
 	name: string
@@ -43,20 +44,14 @@ const movieDriftItems: DriftWallItem[] = (moviesData as any[])
 		href: '/favorite'
 	}))
 
+// Featured authentic diary slice (Sea reflection with polaroid memories)
+const featuredDiary = (diaryData as any[]).find((d) => d.id === 'mock_historical_2024') || (diaryData as any[])[0]
+
 export function GeekIdentityBento({ className }: { className?: string }) {
 	const [currentDay, setCurrentDay] = useState<number>(1)
 	const [currentMonth, setCurrentMonth] = useState<string>('September')
 	const [currentYear, setCurrentYear] = useState<number>(2026)
 	const [mounted, setMounted] = useState<boolean>(false)
-
-	// Animated Beam Refs
-	const containerRef = useRef<HTMLDivElement>(null)
-	const div1Ref = useRef<HTMLDivElement>(null)
-	const div2Ref = useRef<HTMLDivElement>(null)
-	const div3Ref = useRef<HTMLDivElement>(null)
-	const div4Ref = useRef<HTMLDivElement>(null)
-	const div5Ref = useRef<HTMLDivElement>(null)
-	const div6Ref = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
 		setMounted(true)
@@ -140,112 +135,83 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					}
 				/>
 
-				{/* ════════════════ 3. 全景灵感矩阵 (Live AnimatedBeam) ════════════════ */}
+				{/* ════════════════ 3. 📸 私享随笔 · 拍立得记忆流 (Polaroid Memories Journal) ════════════════ */}
 				<BentoCard
-					name="灵感矩阵"
-					description="连接书影音游多维世界，构建完整的数字精神领域。"
-					Icon={Compass}
-					href="/favorite"
-					cta="探索灵感矩阵"
+					name="私享随笔"
+					description="记录日常思绪、旅途快照与那些触动心弦的生活切片。"
+					Icon={Feather}
+					href="/vault/diary"
+					cta="翻阅随想日记"
 					className="col-span-1 md:col-span-2"
 					background={
-						<div
-							ref={containerRef}
-							className="absolute inset-x-0 top-0 h-[210px] [mask-image:linear-gradient(to_bottom,#000_65%,transparent_100%)] flex items-center justify-between px-10 overflow-hidden"
-						>
-							{/* Left Node: Explorer */}
-							<div
-								ref={div1Ref}
-								className="size-11 rounded-2xl bg-white dark:bg-zinc-800 border-2 border-zinc-200 dark:border-zinc-700 shadow-lg flex items-center justify-center text-xs font-bold font-mono text-zinc-800 dark:text-zinc-100 z-10"
-							>
-								ME
-							</div>
+						<div className="absolute inset-x-0 top-0 h-[215px] [mask-image:linear-gradient(to_bottom,#000_75%,transparent_100%)] flex items-center justify-between px-5 sm:px-7 overflow-hidden">
+							{/* 📸 左侧：错落拍立得相纸（悬停时展开微浮升） */}
+							<div className="relative shrink-0 w-32 sm:w-44 h-44 flex items-center justify-center">
+								{/* 底层拍立得：新西兰 Tekapo 湖畔 */}
+								<div className="absolute w-24 sm:w-30 bg-white dark:bg-zinc-100 p-2 pb-5 rounded-md shadow-md border border-black/10 transform rotate-6 translate-x-3 translate-y-1 transition-all duration-300 ease-out group-hover:rotate-12 group-hover:translate-x-6 group-hover:-translate-y-2 group-hover:shadow-xl select-none pointer-events-none">
+									<div className="w-full aspect-[4/3] rounded-xs overflow-hidden bg-zinc-200">
+										<img
+											src="/images/uploads/0c004c6f642839f2.jpeg"
+											alt="Tekapo Lake"
+											className="w-full h-full object-cover"
+											loading="lazy"
+										/>
+									</div>
+									<p className="mt-1.5 text-[8.5px] font-mono font-medium text-zinc-600 text-center tracking-tight truncate">
+										Tekapo · 2024.06
+									</p>
+								</div>
 
-							{/* Center Hub Node */}
-							<div
-								ref={div2Ref}
-								className="size-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white shadow-xl flex items-center justify-center text-xs font-extrabold font-mono z-10"
-							>
-								HUB
-							</div>
-
-							{/* Right Category Nodes */}
-							<div className="flex flex-col gap-2 z-10">
-								<div
-									ref={div3Ref}
-									className="size-8 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md flex items-center justify-center text-[10px] font-bold text-amber-500 font-mono"
-								>
-									Books
-								</div>
-								<div
-									ref={div4Ref}
-									className="size-8 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md flex items-center justify-center text-[10px] font-bold text-blue-500 font-mono"
-								>
-									Films
-								</div>
-								<div
-									ref={div5Ref}
-									className="size-8 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md flex items-center justify-center text-[10px] font-bold text-rose-500 font-mono"
-								>
-									Music
-								</div>
-								<div
-									ref={div6Ref}
-									className="size-8 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md flex items-center justify-center text-[10px] font-bold text-emerald-500 font-mono"
-								>
-									Games
+								{/* 表层拍立得：海边黄昏 */}
+								<div className="relative w-24 sm:w-30 bg-white dark:bg-zinc-100 p-2 pb-5 rounded-md shadow-lg border border-black/10 transform -rotate-4 -translate-x-2 transition-all duration-300 ease-out group-hover:rotate-0 group-hover:scale-105 group-hover:-translate-y-2.5 group-hover:shadow-2xl select-none pointer-events-none z-10">
+									<div className="w-full aspect-[4/3] rounded-xs overflow-hidden bg-zinc-200">
+										<img
+											src={featuredDiary?.image || '/images/uploads/7ef4d45667098fa8.jpeg'}
+											alt="海边黄昏"
+											className="w-full h-full object-cover"
+											loading="lazy"
+										/>
+									</div>
+									<p className="mt-1.5 text-[8.5px] font-serif font-bold text-zinc-800 text-center tracking-tight truncate">
+										海边黄昏 · 2024.06
+									</p>
 								</div>
 							</div>
 
-							{/* Animated Beams */}
-							<AnimatedBeam
-								containerRef={containerRef}
-								fromRef={div1Ref}
-								toRef={div2Ref}
-								duration={2.5}
-								gradientStartColor="#f59e0b"
-								gradientStopColor="#8b5cf6"
-							/>
-							<AnimatedBeam
-								containerRef={containerRef}
-								fromRef={div2Ref}
-								toRef={div3Ref}
-								duration={3}
-								delay={0.2}
-								curvature={-25}
-								gradientStartColor="#8b5cf6"
-								gradientStopColor="#f59e0b"
-							/>
-							<AnimatedBeam
-								containerRef={containerRef}
-								fromRef={div2Ref}
-								toRef={div4Ref}
-								duration={3}
-								delay={0.4}
-								curvature={-8}
-								gradientStartColor="#8b5cf6"
-								gradientStopColor="#3b82f6"
-							/>
-							<AnimatedBeam
-								containerRef={containerRef}
-								fromRef={div2Ref}
-								toRef={div5Ref}
-								duration={3}
-								delay={0.6}
-								curvature={8}
-								gradientStartColor="#8b5cf6"
-								gradientStopColor="#f43f5e"
-							/>
-							<AnimatedBeam
-								containerRef={containerRef}
-								fromRef={div2Ref}
-								toRef={div6Ref}
-								duration={3}
-								delay={0.8}
-								curvature={25}
-								gradientStartColor="#8b5cf6"
-								gradientStopColor="#10b981"
-							/>
+							{/* 📝 右侧：真实心境、时间与随笔摘录 */}
+							<div className="flex-1 min-w-0 pl-3 sm:pl-5 flex flex-col justify-center gap-1.5">
+								{/* 标签栏：时间胶囊 + 天气心境 + 地点徽章 */}
+								<div className="flex flex-wrap items-center gap-1.5">
+									<span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shadow-2xs">
+										2024.06.16
+									</span>
+									<span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-700/80 flex items-center gap-1 shadow-2xs">
+										<span>☀️ 晴朗</span>
+										<span className="opacity-30">·</span>
+										<span>平静</span>
+									</span>
+									<span className="hidden sm:inline-flex px-1.5 py-0.5 rounded-full text-[9px] font-mono text-zinc-500 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-700/60 items-center gap-0.5">
+										<MapPin className="w-2.5 h-2.5 text-rose-500" />
+										<span>海边</span>
+									</span>
+								</div>
+
+								{/* 随想文字摘抄 */}
+								<div className="relative pr-1">
+									<p className="text-xs sm:text-[13px] font-serif leading-relaxed text-zinc-700 dark:text-zinc-300 line-clamp-3 italic opacity-95">
+										“两年前的今天，第一次一个人去看海。虽然海风很凉，但听着浪花拍打礁石的声音，内心竟然出奇地平静... 人生其实就像大海一样，有时波澜壮阔，有时又归于宁静。希望自己永远能保持这份面对世界的好奇心。🌊🌅”
+									</p>
+								</div>
+
+								{/* 标签与馆藏切片统计 */}
+								<div className="flex items-center gap-2 text-[10px] font-mono text-zinc-400 dark:text-zinc-500 pt-0.5">
+									<span>#看海</span>
+									<span>#旅行</span>
+									<span>#摄影</span>
+									<span className="hidden sm:inline text-zinc-300 dark:text-zinc-700">|</span>
+									<span className="hidden sm:inline text-zinc-500 dark:text-zinc-400">已收录 {(diaryData as any[]).length} 篇时光切片</span>
+								</div>
+							</div>
 						</div>
 					}
 				/>
