@@ -91,14 +91,11 @@ export default function DriftWall({
   const offsetsRef = useRef<number[]>([])
   const velocitiesRef = useRef<number[]>([])
   const hoveredColRef = useRef<number>(-1)
-  const wallHoveredRef = useRef<boolean>(false)
   const pointerRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
   const pointerDampedRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
   const lastTsRef = useRef<number | null>(null)
 
   const [containerHeight, setContainerHeight] = useState<number>(360)
-  const [activeId, setActiveId] = useState<string | null>(null)
-  const activeIdRef = useRef<string | null>(null)
   const [reduced, setReduced] = useState<boolean>(false)
 
   useEffect(() => {
@@ -182,12 +179,12 @@ export default function DriftWall({
           const meta = columnMeta[c]
           if (!meta) continue
           
-          // When a poster in column c is hovered, STOP that column IMMEDIATELY AND COMPLETELY (0 movement)
-          const isColHovered = hoveredColRef.current === c || (activeIdRef.current !== null && hoveredColRef.current === c)
+          // Completely freeze column when hovered without any jitter
+          const isColHovered = hoveredColRef.current === c
           
           if (isColHovered) {
             velocitiesRef.current[c] = 0
-            continue // Freeze column immediately without creeping
+            continue
           }
 
           const target = baseVelocities[c]
@@ -211,19 +208,7 @@ export default function DriftWall({
       rafRef.current = null
       lastTsRef.current = null
     }
-  }, [baseVelocities, columnMeta, pauseOnHover, parallax, reduced, applyPlaneTransform])
-
-  const activate = useCallback((id: string, index: number) => {
-    activeIdRef.current = id
-    hoveredColRef.current = index
-    setActiveId(id)
-  }, [])
-
-  const release = useCallback(() => {
-    activeIdRef.current = null
-    hoveredColRef.current = -1
-    setActiveId(null)
-  }, [])
+  }, [baseVelocities, columnMeta, parallax, reduced, applyPlaneTransform])
 
   const handlePointerMove = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
@@ -235,23 +220,14 @@ export default function DriftWall({
           y: (e.clientY - rect.top) / rect.height - 0.5
         }
       }
-      const hit = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null
-      const tile = hit && hit.closest ? hit.closest('[data-tile-id]') as HTMLElement | null : null
-      if (!tile) return
-      const id = tile.dataset.tileId
-      if (!id || id === activeIdRef.current) return
-      activeIdRef.current = id
-      hoveredColRef.current = Number(tile.dataset.col)
-      setActiveId(id)
     },
     [parallax, reduced]
   )
 
   const handlePointerLeaveWall = useCallback(() => {
-    wallHoveredRef.current = false
     pointerRef.current = { x: 0, y: 0 }
-    release()
-  }, [release])
+    hoveredColRef.current = -1
+  }, [])
 
   const cssVars = useMemo(
     () => ({
@@ -270,31 +246,33 @@ export default function DriftWall({
   )
 
   const renderTile = (item: DriftWallItem, id: string, colIndex: number) => {
-    const inner = (
-      <span className="drift-wall__inner">
-        <img 
-          src={item.image} 
-          alt={item.title ?? ''} 
-          referrerPolicy="no-referrer"
-          loading="eager" 
-          decoding="async" 
-          draggable={false} 
-        />
-        <span className="drift-wall__overlay" aria-hidden="true" />
-      </span>
-    )
-    const commonProps = {
-      className: `drift-wall__tile${activeId === id ? ' is-active' : ''}`,
-      'data-tile-id': id,
-      'data-col': colIndex,
-      onMouseEnter: () => activate(id, colIndex),
-      onMouseLeave: release,
-      onFocus: () => activate(id, colIndex),
-      onBlur: release
-    }
     return (
-      <div key={id} tabIndex={0} role="button" aria-label={item.title ?? 'tile'} {...commonProps}>
-        {inner}
+      <div 
+        key={id} 
+        tabIndex={0} 
+        role="button" 
+        aria-label={item.title ?? 'tile'} 
+        className="drift-wall__tile"
+        onMouseEnter={() => {
+          hoveredColRef.current = colIndex
+        }}
+        onMouseLeave={() => {
+          if (hoveredColRef.current === colIndex) {
+            hoveredColRef.current = -1
+          }
+        }}
+      >
+        <span className="drift-wall__inner">
+          <img 
+            src={item.image} 
+            alt={item.title ?? ''} 
+            referrerPolicy="no-referrer"
+            loading="eager" 
+            decoding="async" 
+            draggable={false} 
+          />
+          <span className="drift-wall__overlay" aria-hidden="true" />
+        </span>
       </div>
     )
   }
@@ -307,9 +285,6 @@ export default function DriftWall({
       className={rootClass}
       style={cssVars}
       onPointerMove={handlePointerMove}
-      onPointerEnter={() => {
-        wallHoveredRef.current = true
-      }}
       onPointerLeave={handlePointerLeaveWall}
       role="group"
       aria-label="Drifting wall of tiles"
@@ -326,7 +301,7 @@ export default function DriftWall({
                 hoveredColRef.current = c
               }}
               onMouseLeave={() => {
-                if (hoveredColRef.current === c && !activeIdRef.current) {
+                if (hoveredColRef.current === c) {
                   hoveredColRef.current = -1
                 }
               }}

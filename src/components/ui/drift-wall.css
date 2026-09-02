@@ -13,8 +13,17 @@
   --dw-dim: 0.45;
   --dw-gray: 0;
   --dw-overlay: #060010;
-  --dw-edge: 40%;
   background: #08080f;
+}
+
+.drift-wall__plane,
+.drift-wall__col,
+.drift-wall__track,
+.drift-wall__tile,
+.drift-wall__inner {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .drift-wall__plane {
@@ -23,7 +32,6 @@
   left: 50%;
   display: flex;
   flex-direction: row;
-  transform-style: preserve-3d;
   cursor: pointer;
   transform-origin: 50% 50%;
   will-change: transform;
@@ -32,12 +40,10 @@
 .drift-wall__col {
   position: relative;
   width: calc(var(--dw-tile-w) + var(--dw-gap));
-  transform-style: preserve-3d;
   transition: z-index 0.2s;
 }
 
-.drift-wall__col:hover,
-.drift-wall__col:has(.is-active) {
+.drift-wall__col:hover {
   z-index: 50;
 }
 
@@ -45,7 +51,6 @@
   display: flex;
   flex-direction: column;
   will-change: transform;
-  transform-style: preserve-3d;
 }
 
 .drift-wall__tile {
@@ -55,7 +60,6 @@
   height: calc(var(--dw-tile-h) + var(--dw-gap));
   flex: 0 0 auto;
   outline: none;
-  transform-style: preserve-3d;
   cursor: pointer;
 }
 
@@ -71,11 +75,12 @@
   pointer-events: none;
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  will-change: transform, opacity, box-shadow;
   transition:
-    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    transform 0.28s cubic-bezier(0.2, 0.9, 0.3, 1),
+    opacity 0.28s cubic-bezier(0.2, 0.9, 0.3, 1),
+    box-shadow 0.28s cubic-bezier(0.2, 0.9, 0.3, 1),
+    border-color 0.28s cubic-bezier(0.2, 0.9, 0.3, 1);
 }
 
 .drift-wall__tile img {
@@ -84,7 +89,7 @@
   object-fit: cover;
   display: block;
   filter: grayscale(var(--dw-gray)) saturate(0.85);
-  transition: filter 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: filter 0.28s cubic-bezier(0.2, 0.9, 0.3, 1);
   user-select: none;
   -webkit-user-drag: none;
 }
@@ -95,34 +100,26 @@
   background: var(--dw-overlay);
   opacity: 0.45;
   pointer-events: none;
-  transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.28s cubic-bezier(0.2, 0.9, 0.3, 1);
 }
 
-/* Hover Lift Physics */
-.drift-wall__tile:hover,
-.drift-wall__tile.is-active,
-.drift-wall__tile:focus-visible {
+/* Rock-Solid Pure CSS Hover (Zero Jitter, Zero React State Thrashing) */
+.drift-wall__tile:hover {
   z-index: 60;
 }
 
-.drift-wall__tile:hover .drift-wall__inner,
-.drift-wall__tile.is-active .drift-wall__inner,
-.drift-wall__tile:focus-visible .drift-wall__inner {
+.drift-wall__tile:hover .drift-wall__inner {
   opacity: 1 !important;
   transform: translateZ(var(--dw-lift)) scale(1.08) !important;
   box-shadow: 0 24px 60px -15px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.4) !important;
   border-color: rgba(255, 255, 255, 0.5) !important;
 }
 
-.drift-wall__tile:hover img,
-.drift-wall__tile.is-active img,
-.drift-wall__tile:focus-visible img {
+.drift-wall__tile:hover img {
   filter: grayscale(0) saturate(1.15) !important;
 }
 
-.drift-wall__tile:hover .drift-wall__overlay,
-.drift-wall__tile.is-active .drift-wall__overlay,
-.drift-wall__tile:focus-visible .drift-wall__overlay {
+.drift-wall__tile:hover .drift-wall__overlay {
   opacity: 0 !important;
 }
 
