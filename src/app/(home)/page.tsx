@@ -62,18 +62,18 @@ export default function Home() {
 				{/* 1. 原版第一个页面：3D 卡片与双层 Orbit 卫星环绕系统 */}
 				<HeroSection />
 
-				{/* 2. 极客全景看板：Magic UI Bento Grid (Engineering, Nomad Time, Vinyl, GitHub, Setup) */}
+				{/* 2. 灵感与收藏全景看板：Magic UI Bento Grid (Favorites: Books, Movies, Music, Games) */}
 				<LazySection minHeight="760px">
 					<section className="w-full max-w-4xl mx-auto px-4 sm:px-6 mt-16 sm:mt-20 pt-6">
 						<div className="flex flex-col items-center text-center mb-8 sm:mb-12">
 							<div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold font-mono uppercase bg-[var(--color-brand)]/10 text-[var(--color-brand)] border border-[var(--color-brand)]/20 mb-3 shadow-xs">
-								<span>✦ Digital Identity</span>
+								<span>✦ Digital Favorites</span>
 							</div>
 							<h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-[var(--color-primary)]">
-								极客全景看板
+								精选与灵感全景
 							</h2>
 							<p className="text-xs sm:text-sm text-[var(--color-secondary)] max-w-md mt-2 leading-relaxed opacity-90 font-medium">
-								工程哲学 · 数字游民 · 黑胶声浪 · 开源脉冲 · 桌面生产力
+								书影音游 · 精神漫游 · 灵感矩阵 · 时光打卡
 							</p>
 						</div>
 						<GeekIdentityBento />
