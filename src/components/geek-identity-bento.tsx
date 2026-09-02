@@ -132,7 +132,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					}
 				/>
 
-				{/* ════════════════ 2. 电影胶片流 · 全景 3D 悬浮海报墙 (Full-Bleed 3D DriftWall) ════════════════ */}
+				{/* ════════════════ 2. 电影胶片流 · 全景 3D 悬浮海报墙 (Full-Bleed 3D DriftWall with Hover Lift) ════════════════ */}
 				<BentoCard
 					name="银幕光影流"
 					description="3D 悬浮流动海报流，沉浸式记录银幕震撼与光影回响。"
@@ -141,101 +141,106 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					cta="探索电影全库"
 					className="col-span-1 md:col-span-2 text-white"
 					background={
-						<div className="absolute inset-0 w-full h-full overflow-hidden bg-zinc-950 flex items-center justify-center pointer-events-none">
+						<div className="absolute inset-0 w-full h-full overflow-hidden bg-zinc-950 flex items-center justify-center">
 							{/* 3D Tilted Perspective Canvas */}
 							<div 
 								style={{
 									transform: 'perspective(1200px) rotateX(16deg) rotateY(-14deg) rotateZ(2deg) scale(1.35)',
 									transformStyle: 'preserve-3d',
 								}}
-								className="flex gap-3 justify-center items-center h-[520px] w-[140%] shrink-0 select-none pointer-events-none"
+								className="flex gap-3.5 justify-center items-center h-[520px] w-[140%] shrink-0 select-none"
 							>
 								{/* Column 1 (Flowing Up) */}
-								<Marquee vertical duration="18s" className="p-0 [gap:12px] h-full overflow-visible">
+								<Marquee vertical duration="18s" className="p-0 [gap:14px] h-full overflow-visible">
 									{movieCol1.map((m, idx) => (
 										<div
 											key={idx}
-											className="relative w-24 h-36 sm:w-28 sm:h-42 rounded-xl overflow-hidden shadow-2xl border border-white/15 shrink-0 bg-zinc-900"
+											className="group/tile relative w-36 h-24 sm:w-44 sm:h-28 rounded-2xl overflow-hidden shrink-0 cursor-pointer border border-white/10 bg-zinc-900 shadow-lg transition-all duration-300 ease-out hover:z-30 hover:scale-105 hover:shadow-[0_24px_60px_-18px_rgba(0,0,0,0.95)] hover:border-white/40"
 										>
 											<img 
 												src={m.poster} 
 												alt={m.name} 
 												referrerPolicy="no-referrer"
 												loading="eager" 
-												className="w-full h-full object-cover" 
+												className="w-full h-full object-cover transition-all duration-300 opacity-55 group-hover/tile:opacity-100 group-hover/tile:saturate-110" 
 											/>
+											<div className="absolute inset-0 bg-[#060010] opacity-40 group-hover/tile:opacity-0 transition-opacity duration-300 pointer-events-none" />
 										</div>
 									))}
 								</Marquee>
 
 								{/* Column 2 (Flowing Down) */}
-								<Marquee vertical reverse duration="24s" className="p-0 [gap:12px] h-full overflow-visible">
+								<Marquee vertical reverse duration="24s" className="p-0 [gap:14px] h-full overflow-visible">
 									{movieCol2.map((m, idx) => (
 										<div
 											key={idx}
-											className="relative w-24 h-36 sm:w-28 sm:h-42 rounded-xl overflow-hidden shadow-2xl border border-white/15 shrink-0 bg-zinc-900"
+											className="group/tile relative w-36 h-24 sm:w-44 sm:h-28 rounded-2xl overflow-hidden shrink-0 cursor-pointer border border-white/10 bg-zinc-900 shadow-lg transition-all duration-300 ease-out hover:z-30 hover:scale-105 hover:shadow-[0_24px_60px_-18px_rgba(0,0,0,0.95)] hover:border-white/40"
 										>
 											<img 
 												src={m.poster} 
 												alt={m.name} 
 												referrerPolicy="no-referrer"
 												loading="eager" 
-												className="w-full h-full object-cover" 
+												className="w-full h-full object-cover transition-all duration-300 opacity-55 group-hover/tile:opacity-100 group-hover/tile:saturate-110" 
 											/>
+											<div className="absolute inset-0 bg-[#060010] opacity-40 group-hover/tile:opacity-0 transition-opacity duration-300 pointer-events-none" />
 										</div>
 									))}
 								</Marquee>
 
 								{/* Column 3 (Flowing Up) */}
-								<Marquee vertical duration="20s" className="p-0 [gap:12px] h-full overflow-visible">
+								<Marquee vertical duration="20s" className="p-0 [gap:14px] h-full overflow-visible">
 									{movieCol3.map((m, idx) => (
 										<div
 											key={idx}
-											className="relative w-24 h-36 sm:w-28 sm:h-42 rounded-xl overflow-hidden shadow-2xl border border-white/15 shrink-0 bg-zinc-900"
+											className="group/tile relative w-36 h-24 sm:w-44 sm:h-28 rounded-2xl overflow-hidden shrink-0 cursor-pointer border border-white/10 bg-zinc-900 shadow-lg transition-all duration-300 ease-out hover:z-30 hover:scale-105 hover:shadow-[0_24px_60px_-18px_rgba(0,0,0,0.95)] hover:border-white/40"
 										>
 											<img 
 												src={m.poster} 
 												alt={m.name} 
 												referrerPolicy="no-referrer"
 												loading="eager" 
-												className="w-full h-full object-cover" 
+												className="w-full h-full object-cover transition-all duration-300 opacity-55 group-hover/tile:opacity-100 group-hover/tile:saturate-110" 
 											/>
+											<div className="absolute inset-0 bg-[#060010] opacity-40 group-hover/tile:opacity-0 transition-opacity duration-300 pointer-events-none" />
 										</div>
 									))}
 								</Marquee>
 
 								{/* Column 4 (Flowing Down) */}
-								<Marquee vertical reverse duration="26s" className="p-0 [gap:12px] h-full overflow-visible">
+								<Marquee vertical reverse duration="26s" className="p-0 [gap:14px] h-full overflow-visible">
 									{movieCol4.map((m, idx) => (
 										<div
 											key={idx}
-											className="relative w-24 h-36 sm:w-28 sm:h-42 rounded-xl overflow-hidden shadow-2xl border border-white/15 shrink-0 bg-zinc-900"
+											className="group/tile relative w-36 h-24 sm:w-44 sm:h-28 rounded-2xl overflow-hidden shrink-0 cursor-pointer border border-white/10 bg-zinc-900 shadow-lg transition-all duration-300 ease-out hover:z-30 hover:scale-105 hover:shadow-[0_24px_60px_-18px_rgba(0,0,0,0.95)] hover:border-white/40"
 										>
 											<img 
 												src={m.poster} 
 												alt={m.name} 
 												referrerPolicy="no-referrer"
 												loading="eager" 
-												className="w-full h-full object-cover" 
+												className="w-full h-full object-cover transition-all duration-300 opacity-55 group-hover/tile:opacity-100 group-hover/tile:saturate-110" 
 											/>
+											<div className="absolute inset-0 bg-[#060010] opacity-40 group-hover/tile:opacity-0 transition-opacity duration-300 pointer-events-none" />
 										</div>
 									))}
 								</Marquee>
 
 								{/* Column 5 (Flowing Up) */}
-								<Marquee vertical duration="22s" className="p-0 [gap:12px] h-full overflow-visible">
+								<Marquee vertical duration="22s" className="p-0 [gap:14px] h-full overflow-visible">
 									{movieCol5.map((m, idx) => (
 										<div
 											key={idx}
-											className="relative w-24 h-36 sm:w-28 sm:h-42 rounded-xl overflow-hidden shadow-2xl border border-white/15 shrink-0 bg-zinc-900"
+											className="group/tile relative w-36 h-24 sm:w-44 sm:h-28 rounded-2xl overflow-hidden shrink-0 cursor-pointer border border-white/10 bg-zinc-900 shadow-lg transition-all duration-300 ease-out hover:z-30 hover:scale-105 hover:shadow-[0_24px_60px_-18px_rgba(0,0,0,0.95)] hover:border-white/40"
 										>
 											<img 
 												src={m.poster} 
 												alt={m.name} 
 												referrerPolicy="no-referrer"
 												loading="eager" 
-												className="w-full h-full object-cover" 
+												className="w-full h-full object-cover transition-all duration-300 opacity-55 group-hover/tile:opacity-100 group-hover/tile:saturate-110" 
 											/>
+											<div className="absolute inset-0 bg-[#060010] opacity-40 group-hover/tile:opacity-0 transition-opacity duration-300 pointer-events-none" />
 										</div>
 									))}
 								</Marquee>
@@ -390,7 +395,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 									<span className="font-semibold">7</span>
 									<span className="font-semibold">8</span>
 									<span className="font-semibold text-emerald-500 font-bold">9</span>
-									<span className="font-semibold">10</span>
+									<span className="font-semibold text-super-emerald-500 font-bold">10</span>
 									<span className="font-semibold">11</span>
 									<span className="font-semibold">12</span>
 								</div>

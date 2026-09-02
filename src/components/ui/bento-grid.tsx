@@ -68,7 +68,7 @@ export function BentoCard({
           transform: isHovered ? 'scale(1.04)' : 'scale(1)',
           transition: 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
-        className="absolute inset-0 z-0 overflow-hidden pointer-events-none"
+        className="absolute inset-0 z-0 overflow-hidden"
       >
         {background}
       </div>
