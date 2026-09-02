@@ -60,7 +60,7 @@ export const InfiniteSpiral: React.FC<InfiniteSpiralProps> = ({
 	edgeFade = 0.3,
 	edgeBlur = 6,
 	pauseOnHover = true,
-	imageFit = 'cover',
+	imageFit = 'contain',
 	grayscale = 0,
 	className = ''
 }) => {
@@ -97,8 +97,12 @@ export const InfiniteSpiral: React.FC<InfiniteSpiralProps> = ({
 		const scrollSpeedMultiplier = Math.max(speed, 0) / 0.55
 		let lastScrollY = window.scrollY
 
-		const resizeObserver = new ResizeObserver(() => {
+		const updateBounds = () => {
 			if (root) bounds = root.getBoundingClientRect()
+		}
+
+		const resizeObserver = new ResizeObserver(() => {
+			updateBounds()
 		})
 		resizeObserver.observe(root)
 
@@ -143,10 +147,10 @@ export const InfiniteSpiral: React.FC<InfiniteSpiralProps> = ({
 
 			const count = normalizedItems.length
 			const half = count / 2
-			const width = Math.max(bounds.width, 1)
-			const height = Math.max(bounds.height, 1)
+			const width = Math.max(bounds.width || root.clientWidth || 260, 1)
+			const height = Math.max(bounds.height || root.clientHeight || 220, 1)
 			const fit = Math.min(1, width / (cardWidth * 2.8), height / (cardHeight * 2.35))
-			const responsiveRadius = Math.min(radius, Math.max(72, width * 0.36)) * fit
+			const responsiveRadius = Math.min(radius, Math.max(72, width * 0.36)) * Math.max(fit, 0.7)
 			const fadeStart = clamp(1 - edgeFade, 0, 0.98)
 			const turnSize = Math.max(cardsPerTurn, 1)
 
@@ -158,7 +162,7 @@ export const InfiniteSpiral: React.FC<InfiniteSpiralProps> = ({
 				const edge = Math.min(Math.abs(offset) / Math.max(half, 1), 1)
 				const opacity = 1 - smoothstep(fadeStart, 1, edge)
 				const focus = 1 - Math.min(Math.abs(offset) / Math.max(turnSize * 0.65, 1), 1)
-				const scale = (1 + (centerScale - 1) * focus) * fit
+				const scale = (1 + (centerScale - 1) * focus) * Math.max(fit, 0.7)
 				const angle = offset * (360 / turnSize) + rotation
 				const angleRadians = (angle * Math.PI) / 180
 				const x = Math.sin(angleRadians) * responsiveRadius
@@ -167,7 +171,7 @@ export const InfiniteSpiral: React.FC<InfiniteSpiralProps> = ({
 				const visualScale = scale * depthScale
 				const depth = (z / Math.max(responsiveRadius, 1) + 1) / 2
 				const blur = edgeBlur * smoothstep(0.35, 1, edge)
-				card.style.transform = `translate(-50%, -50%) translate3d(${x}px, ${offset * verticalSpacing * fit}px, 0) rotateZ(${cardTilt}deg) scale(${visualScale})`
+				card.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(2)}px, ${(offset * verticalSpacing * fit).toFixed(2)}px, 0) rotateZ(${cardTilt}deg) scale(${visualScale.toFixed(3)})`
 				card.style.opacity = opacity.toFixed(3)
 				card.style.filter = blur > 0.01 ? `blur(${blur.toFixed(2)}px)` : 'none'
 				card.style.zIndex = String(Math.round(depth * 100000) + index)
@@ -204,15 +208,12 @@ export const InfiniteSpiral: React.FC<InfiniteSpiralProps> = ({
 		pauseOnHover
 	])
 
-	const rootStyle = {
+	const rootStyle: React.CSSProperties = {
 		perspective: `${perspective}px`,
-		'--infinite-spiral-card-width': `${cardWidth}px`,
-		'--infinite-spiral-card-height': `${cardHeight}px`,
-		'--infinite-spiral-card-radius': `${cardRadius}px`,
 		cursor: animationMode === 'drag' || animationMode === 'all' ? 'grab' : 'default',
 		touchAction: animationMode === 'drag' || animationMode === 'all' ? 'pan-x' : 'auto',
 		userSelect: animationMode === 'drag' || animationMode === 'all' ? 'none' : 'auto'
-	} as React.CSSProperties
+	}
 
 	const dragEnabled = animationMode === 'drag' || animationMode === 'all'
 
@@ -228,7 +229,7 @@ export const InfiniteSpiral: React.FC<InfiniteSpiralProps> = ({
 	return (
 		<div
 			ref={rootRef}
-			className={`infinite-spiral ${className}`.trim()}
+			className={`infinite-spiral relative w-full h-full min-h-[200px] overflow-hidden select-none ${className}`.trim()}
 			style={rootStyle}
 			onMouseEnter={() => {
 				hoveredRef.current = true
@@ -261,7 +262,11 @@ export const InfiniteSpiral: React.FC<InfiniteSpiralProps> = ({
 				dragMovedRef.current = false
 			}}
 		>
-			<div className="infinite-spiral__stage" role="list" aria-label="Infinite spiral gallery">
+			<div 
+				className="infinite-spiral__stage absolute inset-0 transform-gpu [transform-style:preserve-3d]" 
+				role="list" 
+				aria-label="Infinite spiral gallery"
+			>
 				{normalizedItems.map((item, index) => {
 					const Card = item.href ? 'a' : 'div'
 					return (
@@ -270,8 +275,20 @@ export const InfiniteSpiral: React.FC<InfiniteSpiralProps> = ({
 							ref={(node: HTMLElement | null) => {
 								cardRefs.current[index] = node
 							}}
-							className="infinite-spiral__item"
-							style={{ width: cardWidth, height: cardHeight, borderRadius: cardRadius }}
+							className="infinite-spiral__item absolute top-1/2 left-1/2 flex items-center justify-center overflow-hidden rounded-xl bg-white dark:bg-zinc-900 border border-black/10 dark:border-white/15 shadow-md hover:shadow-xl p-2.5 [transform-style:preserve-3d] [backface-visibility:hidden] will-change-transform"
+							style={{ 
+								position: 'absolute',
+								top: '50%',
+								left: '50%',
+								width: `${cardWidth}px`, 
+								height: `${cardHeight}px`, 
+								borderRadius: `${cardRadius}px`,
+								display: 'flex',
+								alignItems: 'center',
+								justifyContent: 'center',
+								boxSizing: 'border-box',
+								overflow: 'hidden'
+							}}
 							href={item.href}
 							target={item.target}
 							rel={item.target === '_blank' ? 'noreferrer' : undefined}
@@ -279,7 +296,7 @@ export const InfiniteSpiral: React.FC<InfiniteSpiralProps> = ({
 							aria-label={item.label ?? item.alt}
 						>
 							<img
-								className="infinite-spiral__image"
+								className="infinite-spiral__image block object-contain pointer-events-none select-none"
 								src={item.src}
 								alt={item.alt}
 								referrerPolicy="no-referrer"
@@ -288,8 +305,8 @@ export const InfiniteSpiral: React.FC<InfiniteSpiralProps> = ({
 								style={{
 									width: '100%',
 									height: '100%',
-									maxWidth: 'none',
-									maxHeight: 'none',
+									maxWidth: '100%',
+									maxHeight: '100%',
 									objectFit: imageFit,
 									filter: `grayscale(${Math.min(1, Math.max(0, grayscale))})`
 								}}

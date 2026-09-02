@@ -18,6 +18,7 @@
 @import 'katex/dist/katex.min.css';
 @import './theme.css';
 @import './article.css';
+@import '../components/ui/infinite-spiral.css';
 
 @plugin 'tailwindcss-animate';
 
