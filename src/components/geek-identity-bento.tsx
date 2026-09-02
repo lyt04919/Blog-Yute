@@ -9,9 +9,7 @@ import {
 	Film, 
 	Compass, 
 	CalendarDays, 
-	Star,
-	Sparkles,
-	Clapperboard
+	Star
 } from 'lucide-react'
 
 // Curated items from Favorites data for Marquee
@@ -21,55 +19,53 @@ const featuredFavorites = [
 		sub: '安东尼·圣-埃克苏佩里', 
 		tag: '文学', 
 		cover: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=300&q=80',
-		color: 'from-amber-500/20 to-orange-500/10'
 	},
 	{ 
 		name: '光辉岁月', 
 		sub: 'Beyond', 
 		tag: '黑胶', 
 		cover: 'https://images.unsplash.com/photo-1539185441755-769473a23570?w=300&q=80',
-		color: 'from-rose-500/20 to-pink-500/10'
 	},
 	{ 
 		name: '星际穿越', 
 		sub: '克里斯托弗·诺兰', 
 		tag: '电影', 
 		cover: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=300&q=80',
-		color: 'from-blue-500/20 to-cyan-500/10'
 	},
 	{ 
 		name: '掌控习惯', 
 		sub: '詹姆斯·克莱尔', 
 		tag: '成长', 
 		cover: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=300&q=80',
-		color: 'from-emerald-500/20 to-teal-500/10'
 	},
 	{ 
 		name: '艾尔登法环', 
 		sub: 'FromSoftware', 
 		tag: '游戏', 
 		cover: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=300&q=80',
-		color: 'from-purple-500/20 to-indigo-500/10'
 	},
 ]
 
-// Curated movie columns for 3D Movie Wall
+// Curated movie stills & posters for 3D Movie DriftWall
 const movieCol1 = [
-	{ title: '星际穿越', en: 'Interstellar', rating: '9.4', tag: '科幻', bg: 'from-blue-600/30 to-indigo-950/80', border: 'border-blue-500/30' },
-	{ title: '银翼杀手 2049', en: 'Blade Runner', rating: '8.8', tag: '赛博', bg: 'from-amber-600/30 to-purple-950/80', border: 'border-amber-500/30' },
-	{ title: '盗梦空间', en: 'Inception', rating: '9.3', tag: '悬疑', bg: 'from-cyan-600/30 to-slate-950/80', border: 'border-cyan-500/30' },
+	{ title: '星际穿越', rating: '9.4', image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&q=80' },
+	{ title: '银翼杀手 2049', rating: '8.8', image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&q=80' },
+	{ title: '盗梦空间', rating: '9.3', image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400&q=80' },
+	{ title: '沙丘 II', rating: '8.9', image: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=400&q=80' },
 ]
 
 const movieCol2 = [
-	{ title: '奥本海默', en: 'Oppenheimer', rating: '8.8', tag: '传记', bg: 'from-orange-600/30 to-stone-950/80', border: 'border-orange-500/30' },
-	{ title: '爱乐之城', en: 'La La Land', rating: '8.7', tag: '歌舞', bg: 'from-purple-600/30 to-rose-950/80', border: 'border-purple-500/30' },
-	{ title: '楚门的世界', en: 'The Truman Show', rating: '9.3', tag: '经典', bg: 'from-sky-600/30 to-blue-950/80', border: 'border-sky-500/30' },
+	{ title: '奥本海默', rating: '8.8', image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=400&q=80' },
+	{ title: '爱乐之城', rating: '8.7', image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400&q=80' },
+	{ title: '楚门的世界', rating: '9.3', image: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=400&q=80' },
+	{ title: '海上钢琴师', rating: '9.3', image: 'https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=400&q=80' },
 ]
 
 const movieCol3 = [
-	{ title: '黑客帝国', en: 'The Matrix', rating: '9.1', tag: '动作', bg: 'from-emerald-600/30 to-zinc-950/80', border: 'border-emerald-500/30' },
-	{ title: '千与千寻', en: 'Spirited Away', rating: '9.4', tag: '动画', bg: 'from-rose-600/30 to-red-950/80', border: 'border-rose-500/30' },
-	{ title: '海上钢琴师', en: '1900', rating: '9.3', tag: '音乐', bg: 'from-yellow-600/30 to-amber-950/80', border: 'border-yellow-500/30' },
+	{ title: '黑客帝国', rating: '9.1', image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&q=80' },
+	{ title: '千与千寻', rating: '9.4', image: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=400&q=80' },
+	{ title: '泰坦尼克号', rating: '9.4', image: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400&q=80' },
+	{ title: '辛德勒名单', rating: '9.5', image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400&q=80' },
 ]
 
 export function GeekIdentityBento({ className }: { className?: string }) {
@@ -138,7 +134,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					}
 				/>
 
-				{/* ════════════════ 2. 电影胶片流 · 3D 光影展廊 (Lightweight 3D Movie Wall) ════════════════ */}
+				{/* ════════════════ 2. 电影胶片流 · 3D 光影展廊 (3D DriftWall) ════════════════ */}
 				<BentoCard
 					name="银幕光影流"
 					description="3D 悬浮流动胶片流，沉浸式记录银幕震撼与光影回响。"
@@ -147,81 +143,87 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					cta="探索电影全库"
 					className="col-span-1 md:col-span-2"
 					background={
-						<div className="absolute inset-x-0 top-0 h-[215px] [mask-image:linear-gradient(to_bottom,#000_65%,transparent_100%)] overflow-hidden flex items-center justify-center pointer-events-none">
+						<div className="absolute inset-x-0 top-0 h-[210px] [mask-image:linear-gradient(to_bottom,#000_50%,transparent_100%)] overflow-hidden flex items-center justify-center pointer-events-none">
 							<div 
 								style={{
-									transform: 'perspective(1000px) rotateX(16deg) rotateY(-14deg) rotateZ(2deg) scale(1.08)',
+									transform: 'perspective(1000px) rotateX(15deg) rotateY(-12deg) rotateZ(1deg) scale(1.05)',
 									transformStyle: 'preserve-3d',
 								}}
-								className="flex gap-3 px-4 py-2"
+								className="flex gap-2.5 px-2 py-1"
 							>
 								{/* Column 1 (Flowing Up) */}
-								<div className="flex flex-col gap-2.5 animate-marquee-vertical [animation-duration:14s]">
+								<div className="flex flex-col gap-2.5 animate-marquee-vertical [animation-duration:15s]">
 									{[...movieCol1, ...movieCol1].map((m, idx) => (
 										<div
 											key={idx}
-											className={`w-32 h-16 rounded-xl bg-gradient-to-br ${m.bg} ${m.border} border p-2 shadow-md flex flex-col justify-between shrink-0 select-none backdrop-blur-sm`}
+											className="relative w-28 h-20 sm:w-32 sm:h-22 rounded-xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-white/15 shrink-0 bg-zinc-900"
 										>
-											<div className="flex items-center justify-between">
-												<span className="text-[8.5px] font-bold px-1 py-0.2 rounded bg-black/40 text-zinc-200 font-mono">
-													{m.tag}
-												</span>
-												<div className="flex items-center text-amber-400">
-													<Star className="size-2.5 fill-current" />
-													<span className="text-[8.5px] font-bold ml-0.5 font-mono">{m.rating}</span>
+											<img 
+												src={m.image} 
+												alt={m.title} 
+												loading="eager" 
+												className="w-full h-full object-cover" 
+											/>
+											<div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent p-2 flex flex-col justify-end">
+												<div className="flex items-center justify-between">
+													<span className="text-[10px] font-bold text-white truncate drop-shadow-xs">{m.title}</span>
+													<span className="text-[8.5px] font-bold text-amber-400 font-mono flex items-center shrink-0">
+														<Star className="size-2 fill-current mr-0.5" />
+														{m.rating}
+													</span>
 												</div>
-											</div>
-											<div className="truncate">
-												<div className="text-[10px] font-bold text-white truncate drop-shadow-xs">{m.title}</div>
-												<div className="text-[8px] text-zinc-300 font-mono truncate opacity-80">{m.en}</div>
 											</div>
 										</div>
 									))}
 								</div>
 
 								{/* Column 2 (Flowing Down) */}
-								<div className="flex flex-col gap-2.5 animate-marquee-vertical [animation-duration:18s] [animation-direction:reverse]">
+								<div className="flex flex-col gap-2.5 animate-marquee-vertical [animation-duration:19s] [animation-direction:reverse]">
 									{[...movieCol2, ...movieCol2].map((m, idx) => (
 										<div
 											key={idx}
-											className={`w-32 h-16 rounded-xl bg-gradient-to-br ${m.bg} ${m.border} border p-2 shadow-md flex flex-col justify-between shrink-0 select-none backdrop-blur-sm`}
+											className="relative w-28 h-20 sm:w-32 sm:h-22 rounded-xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-white/15 shrink-0 bg-zinc-900"
 										>
-											<div className="flex items-center justify-between">
-												<span className="text-[8.5px] font-bold px-1 py-0.2 rounded bg-black/40 text-zinc-200 font-mono">
-													{m.tag}
-												</span>
-												<div className="flex items-center text-amber-400">
-													<Star className="size-2.5 fill-current" />
-													<span className="text-[8.5px] font-bold ml-0.5 font-mono">{m.rating}</span>
+											<img 
+												src={m.image} 
+												alt={m.title} 
+												loading="eager" 
+												className="w-full h-full object-cover" 
+											/>
+											<div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent p-2 flex flex-col justify-end">
+												<div className="flex items-center justify-between">
+													<span className="text-[10px] font-bold text-white truncate drop-shadow-xs">{m.title}</span>
+													<span className="text-[8.5px] font-bold text-amber-400 font-mono flex items-center shrink-0">
+														<Star className="size-2 fill-current mr-0.5" />
+														{m.rating}
+													</span>
 												</div>
-											</div>
-											<div className="truncate">
-												<div className="text-[10px] font-bold text-white truncate drop-shadow-xs">{m.title}</div>
-												<div className="text-[8px] text-zinc-300 font-mono truncate opacity-80">{m.en}</div>
 											</div>
 										</div>
 									))}
 								</div>
 
 								{/* Column 3 (Flowing Up) */}
-								<div className="flex flex-col gap-2.5 animate-marquee-vertical [animation-duration:16s]">
+								<div className="flex flex-col gap-2.5 animate-marquee-vertical [animation-duration:17s]">
 									{[...movieCol3, ...movieCol3].map((m, idx) => (
 										<div
 											key={idx}
-											className={`w-32 h-16 rounded-xl bg-gradient-to-br ${m.bg} ${m.border} border p-2 shadow-md flex flex-col justify-between shrink-0 select-none backdrop-blur-sm`}
+											className="relative w-28 h-20 sm:w-32 sm:h-22 rounded-xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-white/15 shrink-0 bg-zinc-900"
 										>
-											<div className="flex items-center justify-between">
-												<span className="text-[8.5px] font-bold px-1 py-0.2 rounded bg-black/40 text-zinc-200 font-mono">
-													{m.tag}
-												</span>
-												<div className="flex items-center text-amber-400">
-													<Star className="size-2.5 fill-current" />
-													<span className="text-[8.5px] font-bold ml-0.5 font-mono">{m.rating}</span>
+											<img 
+												src={m.image} 
+												alt={m.title} 
+												loading="eager" 
+												className="w-full h-full object-cover" 
+											/>
+											<div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent p-2 flex flex-col justify-end">
+												<div className="flex items-center justify-between">
+													<span className="text-[10px] font-bold text-white truncate drop-shadow-xs">{m.title}</span>
+													<span className="text-[8.5px] font-bold text-amber-400 font-mono flex items-center shrink-0">
+														<Star className="size-2 fill-current mr-0.5" />
+														{m.rating}
+													</span>
 												</div>
-											</div>
-											<div className="truncate">
-												<div className="text-[10px] font-bold text-white truncate drop-shadow-xs">{m.title}</div>
-												<div className="text-[8px] text-zinc-300 font-mono truncate opacity-80">{m.en}</div>
 											</div>
 										</div>
 									))}
