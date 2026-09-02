@@ -9,14 +9,12 @@ import {
 	BookOpen, 
 	Film, 
 	CalendarDays,
-	MapPin,
 	Feather
 } from 'lucide-react'
 
 // Import user's authentic data
 import moviesData from '@/data/movies.json'
 import booksData from '@/data/books.json'
-import diaryData from '@/data/private/diary.json'
 
 interface BookItem {
 	name: string
@@ -43,9 +41,6 @@ const movieDriftItems: DriftWallItem[] = (moviesData as any[])
 		image: getPosterUrl(m.poster),
 		href: '/favorite'
 	}))
-
-// Featured authentic diary slice (Sea reflection with polaroid memories)
-const featuredDiary = (diaryData as any[]).find((d) => d.id === 'mock_historical_2024') || (diaryData as any[])[0]
 
 export function GeekIdentityBento({ className }: { className?: string }) {
 	const [currentDay, setCurrentDay] = useState<number>(1)
@@ -135,7 +130,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					}
 				/>
 
-				{/* ════════════════ 3. 📸 私享随笔 · 拍立得记忆流 (保留标准 BentoCard 底部信息栏) ════════════════ */}
+				{/* ════════════════ 3. 📸 私享随笔 · 纯粹三联拍立得画廊 (Triple Polaroid Gallery) ════════════════ */}
 				<BentoCard
 					name="私享随笔"
 					description="记录日常思绪、旅途快照与那些触动心弦的生活切片。"
@@ -144,96 +139,83 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					cta="翻阅生活日记"
 					className="col-span-1 md:col-span-2"
 					background={
-						<div className="absolute inset-x-0 top-0 h-[225px] [mask-image:linear-gradient(to_bottom,#000_82%,transparent_100%)] flex items-center justify-between px-6 sm:px-8 overflow-hidden select-none">
-							{/* 📸 左侧区域：大尺寸错落拍立得相纸（行内硬尺寸防越界） */}
-							<div 
-								style={{ width: '185px', minWidth: '185px', height: '195px' }}
-								className="relative shrink-0 flex items-center justify-center"
-							>
-								{/* 底层拍立得：新西兰 Tekapo 湖畔 */}
-								<div 
+						<div className="absolute inset-x-0 top-0 h-[225px] [mask-image:linear-gradient(to_bottom,#000_82%,transparent_100%)] flex items-center justify-center px-4 sm:px-6 overflow-hidden select-none">
+							<div className="flex items-center justify-center gap-3 sm:gap-6">
+								{/* 1. 左侧拍立得：夕阳海滩 (-8°) */}
+								<div
 									style={{
-										width: '128px',
-										height: '164px',
-										transform: 'rotate(7deg) translate(12px, -6px)',
+										width: '126px',
+										height: '166px',
+										transform: 'rotate(-8deg) translateY(4px)',
 										transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)'
 									}}
-									className="absolute bg-[#FAF9F6] p-2 rounded-sm shadow-md border border-black/15 pointer-events-none group-hover:!rotate-[12deg] group-hover:!translate-x-5 group-hover:!-translate-y-2 group-hover:shadow-xl flex flex-col"
+									className="relative bg-[#FAF9F6] p-2 rounded-sm shadow-md border border-black/10 pointer-events-none group-hover:!-rotate-12 group-hover:!-translate-x-3 group-hover:shadow-xl flex flex-col shrink-0"
 								>
-									<div 
-										style={{ width: '112px', height: '112px' }}
-										className="rounded-2xs overflow-hidden bg-zinc-200 shrink-0"
-									>
+									<div style={{ width: '110px', height: '110px' }} className="rounded-2xs overflow-hidden bg-zinc-200 shrink-0">
+										<img
+											src="/images/uploads/7ef4d45667098fa8.jpeg"
+											alt="夕阳海滩"
+											style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+											loading="lazy"
+										/>
+									</div>
+									<div className="flex-1 flex items-center justify-center">
+										<p className="text-[8.5px] font-serif font-bold text-zinc-800 tracking-tight truncate">
+											夕阳海滩 · 06.16
+										</p>
+									</div>
+								</div>
+
+								{/* 2. 中间拍立得：雪山湖泊 (0°) */}
+								<div
+									style={{
+										width: '134px',
+										height: '174px',
+										transform: 'rotate(0deg) translateY(-6px)',
+										transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+										zIndex: 10
+									}}
+									className="relative bg-[#FAF9F6] p-2 rounded-sm shadow-xl border border-black/10 pointer-events-none group-hover:!-translate-y-3 group-hover:!scale-104 group-hover:shadow-2xl flex flex-col shrink-0"
+								>
+									<div style={{ width: '118px', height: '118px' }} className="rounded-2xs overflow-hidden bg-zinc-200 shrink-0">
 										<img
 											src="/images/uploads/0c004c6f642839f2.jpeg"
-											alt="Tekapo Lake"
+											alt="雪山湖泊"
 											style={{ width: '100%', height: '100%', objectFit: 'cover' }}
 											loading="lazy"
 										/>
 									</div>
 									<div className="flex-1 flex items-center justify-center">
-										<p className="text-[8px] font-mono font-bold text-zinc-700 tracking-tight truncate">
-											Tekapo Lake (2024.06)
+										<p className="text-[8.5px] font-mono font-bold text-zinc-700 tracking-tight truncate">
+											雪山湖泊 · 06.16
 										</p>
 									</div>
 								</div>
 
-								{/* 表层拍立得：海边黄昏抓拍 */}
-								<div 
+								{/* 3. 右侧拍立得：惬意日常 (+8°) */}
+								<div
 									style={{
-										width: '138px',
-										height: '174px',
-										transform: 'rotate(-4deg) translate(-8px, 6px)',
+										width: '126px',
+										height: '166px',
+										transform: 'rotate(8deg) translateY(4px)',
 										transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)'
 									}}
-									className="relative bg-[#FAF9F6] p-2 rounded-sm shadow-xl border border-black/15 pointer-events-none z-10 group-hover:!rotate-0 group-hover:!scale-104 group-hover:!-translate-y-1.5 group-hover:shadow-2xl flex flex-col"
+									className="relative bg-[#FAF9F6] p-2 rounded-sm shadow-md border border-black/10 pointer-events-none group-hover:!rotate-12 group-hover:!translate-x-3 group-hover:shadow-xl flex flex-col shrink-0"
 								>
-									<div 
-										style={{ width: '122px', height: '122px' }}
-										className="rounded-2xs overflow-hidden bg-zinc-200 shrink-0"
-									>
+									<div style={{ width: '110px', height: '110px' }} className="rounded-2xs overflow-hidden bg-zinc-200 shrink-0">
 										<img
-											src={featuredDiary?.image || '/images/uploads/7ef4d45667098fa8.jpeg'}
-											alt="Sunset Beach"
+											src="/images/uploads/844b159ea02995f4.jpeg"
+											alt="惬意日常"
 											style={{ width: '100%', height: '100%', objectFit: 'cover' }}
 											loading="lazy"
 										/>
 									</div>
 									<div className="flex-1 flex items-center justify-center">
-										<p className="text-[8px] font-serif font-bold text-zinc-800 tracking-tight truncate">
-											Sunset Beach (2024.06)
+										<p className="text-[8.5px] font-serif font-bold text-zinc-800 tracking-tight truncate">
+											惬意日常 · 06.16
 										</p>
 									</div>
 								</div>
-							</div>
-
-							{/* 📝 右侧区域：沉浸式随笔摘录（自适应深浅主题颜色） */}
-							<div className="flex-1 min-w-0 pl-4 sm:pl-6 flex flex-col justify-center gap-1.5 z-10">
-								{/* 顶部标签：日期胶囊 + 心境胶囊 + 地点徽章 */}
-								<div className="flex flex-wrap items-center gap-1.5">
-									<span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-mono font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shadow-2xs">
-										2024.06.16
-									</span>
-									<span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-mono font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 border border-zinc-200/80 dark:border-zinc-700/80 flex items-center gap-1 shadow-2xs">
-										<span>☀️ 晴朗</span>
-										<span className="opacity-30">·</span>
-										<span>平静</span>
-									</span>
-									<span className="hidden sm:inline-flex px-2 py-0.5 rounded-full text-[9.5px] font-mono text-zinc-500 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-700/60 items-center gap-1">
-										<MapPin className="w-2.5 h-2.5 text-rose-500" />
-										<span>秦皇岛 · 海边</span>
-									</span>
-								</div>
-
-								{/* 标题 */}
-								<h4 className="text-sm sm:text-base font-serif font-bold text-zinc-900 dark:text-white tracking-tight leading-snug drop-shadow-2xs">
-									一个人去看海 · 黄昏随想
-								</h4>
-
-								{/* 思绪正文 */}
-								<p className="text-xs sm:text-[13px] font-sans leading-relaxed text-zinc-700 dark:text-zinc-300 line-clamp-2 sm:line-clamp-3 italic opacity-95">
-									“两年前的今天，第一次一个人去看海。虽然海风很凉，但听着浪花拍打礁石的声音，内心竟然出奇地平静。人生其实就像大海一样，有时波澜壮阔，有时又归于宁静。希望自己永远能保持这份好奇心。🌊🌅”
-								</p>
 							</div>
 						</div>
 					}
