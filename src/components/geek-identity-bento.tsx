@@ -108,11 +108,11 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 			<BentoGrid className="grid-cols-1 md:grid-cols-3 auto-rows-[22rem]">
 				{/* ════════════════ 1. Save your files (Live Marquee) ════════════════ */}
 				<BentoCard
-					name="Save your architecture"
-					description="模块化、高可维护的 TypeScript 与 Next.js 边缘架构设计。"
+					name="Save your files"
+					description="We automatically save your files as you type."
 					Icon={FileCode2}
 					href="https://github.com/lyt04919"
-					cta="查看仓库源码"
+					cta="Learn more"
 					className="col-span-1"
 					background={
 						<div className="size-full flex items-center justify-center overflow-hidden [mask-image:linear-gradient(to_right,transparent,white_20%,white_80%,transparent)]">
@@ -145,11 +145,11 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 
 				{/* ════════════════ 2. Notifications (Live AnimatedList) ════════════════ */}
 				<BentoCard
-					name="Real-time Pulse & Notifications"
-					description="全自动边缘构建、毫秒级响应分发与全天候在线的数字游民基站。"
+					name="Notifications"
+					description="Get notified when something happens."
 					Icon={Bell}
 					href="https://github.com/lyt04919"
-					cta="查看系统运行日志"
+					cta="Learn more"
 					className="col-span-1 md:col-span-2"
 					background={
 						<div className="size-full flex flex-col justify-start px-6 pt-3 overflow-hidden select-none">
@@ -181,11 +181,11 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 
 				{/* ════════════════ 3. Integrations (Live AnimatedBeam) ════════════════ */}
 				<BentoCard
-					name="Integrations & Stack"
-					description="深度整合 Next.js 16、TypeScript、React 19、Tailwind CSS、GitHub 与现代 AI 工具链。"
+					name="Integrations"
+					description="Supports 100+ integrations and counting."
 					Icon={Share2}
 					href="https://github.com/lyt04919"
-					cta="探索完整生态集成"
+					cta="Learn more"
 					className="col-span-1 md:col-span-2"
 					background={
 						<div
@@ -291,11 +291,11 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 
 				{/* ════════════════ 4. Calendar & Time (Interactive Calendar) ════════════════ */}
 				<BentoCard
-					name="Calendar & Nomad Clock"
-					description="全球时区与数字日程基站，保持高能心流专注。"
+					name="Calendar"
+					description="Use the calendar to filter your files by date."
 					Icon={CalendarDays}
 					href="/about"
-					cta="查看时区基站"
+					cta="Learn more"
 					className="col-span-1"
 					background={
 						<div className="size-full flex flex-col items-center justify-center pt-2 select-none">
