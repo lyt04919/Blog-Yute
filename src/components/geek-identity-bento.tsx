@@ -130,7 +130,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					}
 				/>
 
-				{/* ════════════════ 3. 📸 私享随笔 · 富士拍立得三联画廊 (Fujifilm Instax Mini Gallery) ════════════════ */}
+				{/* ════════════════ 3. 📸 私享随笔 · 富士拍立得三联画廊 (纯净版：保留比例工艺，无水印) ════════════════ */}
 				<BentoCard
 					name="私享随笔"
 					description="记录日常思绪、旅途快照与那些触动心弦的生活切片。"
@@ -145,12 +145,12 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								<div
 									style={{
 										width: '134px',
-										height: '198px',
+										height: '196px',
 										transform: 'rotate(-7deg) translateY(4px)',
 										transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
 										boxShadow: '0 4px 6px -1px rgba(0,0,0,0.06), 0 14px 28px -4px rgba(0,0,0,0.13), 0 0 0 1px rgba(0,0,0,0.07)'
 									}}
-									className="relative bg-gradient-to-b from-[#FFFFFF] via-[#FDFDFD] to-[#F8F8F8] p-2 pb-8 rounded-[9px] pointer-events-none group-hover:!-rotate-[11deg] group-hover:!-translate-x-3 group-hover:shadow-2xl flex flex-col shrink-0"
+									className="relative bg-gradient-to-b from-[#FFFFFF] via-[#FDFDFD] to-[#F8F8F8] p-2 pb-6 rounded-[9px] pointer-events-none group-hover:!-rotate-[11deg] group-hover:!-translate-x-3 group-hover:shadow-2xl flex flex-col shrink-0"
 								>
 									{/* 富士特有内嵌倒角压痕相框 */}
 									<div 
@@ -171,12 +171,12 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 										<div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/20 pointer-events-none" />
 									</div>
 
-									{/* 富士相纸底部手写留白与微水印 */}
-									<div className="flex-1 flex flex-col justify-between pt-1.5 px-0.5 overflow-visible">
+									{/* 富士相纸底部纯净手写留白（无水印与LOGO） */}
+									<div className="flex-1 flex items-center justify-center pt-1 px-0.5 overflow-visible">
 										<p 
 											style={{ 
 												fontFamily: 'var(--font-cursive), "Caveat", "Bradley Hand", cursive',
-												fontSize: '14px',
+												fontSize: '15px',
 												color: '#262626',
 												transform: 'rotate(-0.8deg)'
 											}}
@@ -184,10 +184,6 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 										>
 											Sunset Beach &apos;24
 										</p>
-										<div className="flex items-center justify-between px-1 -mb-1 opacity-40">
-											<span className="text-[6.5px] font-mono tracking-widest uppercase text-zinc-500 font-semibold">FUJIFILM</span>
-											<span className="text-[6px] font-sans tracking-tight text-zinc-500 italic">instax</span>
-										</div>
 									</div>
 								</div>
 
@@ -195,13 +191,13 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								<div
 									style={{
 										width: '140px',
-										height: '206px',
+										height: '204px',
 										transform: 'rotate(0deg) translateY(-5px)',
 										transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
 										zIndex: 10,
 										boxShadow: '0 8px 12px -2px rgba(0,0,0,0.08), 0 20px 38px -6px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.07)'
 									}}
-									className="relative bg-gradient-to-b from-[#FFFFFF] via-[#FDFDFD] to-[#F8F8F8] p-2 pb-8 rounded-[9px] pointer-events-none group-hover:!-translate-y-3 group-hover:!scale-104 group-hover:shadow-2xl flex flex-col shrink-0"
+									className="relative bg-gradient-to-b from-[#FFFFFF] via-[#FDFDFD] to-[#F8F8F8] p-2 pb-6 rounded-[9px] pointer-events-none group-hover:!-translate-y-3 group-hover:!scale-104 group-hover:shadow-2xl flex flex-col shrink-0"
 								>
 									{/* 富士特有内嵌倒角压痕相框 */}
 									<div 
@@ -222,12 +218,12 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 										<div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/20 pointer-events-none" />
 									</div>
 
-									{/* 富士相纸底部手写留白与微水印 */}
-									<div className="flex-1 flex flex-col justify-between pt-1.5 px-0.5 overflow-visible">
+									{/* 富士相纸底部纯净手写留白（无水印与LOGO） */}
+									<div className="flex-1 flex items-center justify-center pt-1 px-0.5 overflow-visible">
 										<p 
 											style={{ 
 												fontFamily: 'var(--font-cursive), "Caveat", "Bradley Hand", cursive',
-												fontSize: '14px',
+												fontSize: '15px',
 												color: '#262626',
 												transform: 'rotate(0.5deg)'
 											}}
@@ -235,10 +231,6 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 										>
 											Lake Tekapo &apos;24
 										</p>
-										<div className="flex items-center justify-between px-1 -mb-1 opacity-40">
-											<span className="text-[6.5px] font-mono tracking-widest uppercase text-zinc-500 font-semibold">FUJIFILM</span>
-											<span className="text-[6px] font-sans tracking-tight text-zinc-500 italic">instax</span>
-										</div>
 									</div>
 								</div>
 
@@ -246,12 +238,12 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								<div
 									style={{
 										width: '134px',
-										height: '198px',
+										height: '196px',
 										transform: 'rotate(7deg) translateY(4px)',
 										transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
 										boxShadow: '0 4px 6px -1px rgba(0,0,0,0.06), 0 14px 28px -4px rgba(0,0,0,0.13), 0 0 0 1px rgba(0,0,0,0.07)'
 									}}
-									className="relative bg-gradient-to-b from-[#FFFFFF] via-[#FDFDFD] to-[#F8F8F8] p-2 pb-8 rounded-[9px] pointer-events-none group-hover:!rotate-[11deg] group-hover:!translate-x-3 group-hover:shadow-2xl flex flex-col shrink-0"
+									className="relative bg-gradient-to-b from-[#FFFFFF] via-[#FDFDFD] to-[#F8F8F8] p-2 pb-6 rounded-[9px] pointer-events-none group-hover:!rotate-[11deg] group-hover:!translate-x-3 group-hover:shadow-2xl flex flex-col shrink-0"
 								>
 									{/* 富士特有内嵌倒角压痕相框 */}
 									<div 
@@ -272,12 +264,12 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 										<div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/20 pointer-events-none" />
 									</div>
 
-									{/* 富士相纸底部手写留白与微水印 */}
-									<div className="flex-1 flex flex-col justify-between pt-1.5 px-0.5 overflow-visible">
+									{/* 富士相纸底部纯净手写留白（无水印与LOGO） */}
+									<div className="flex-1 flex items-center justify-center pt-1 px-0.5 overflow-visible">
 										<p 
 											style={{ 
 												fontFamily: 'var(--font-cursive), "Caveat", "Bradley Hand", cursive',
-												fontSize: '14px',
+												fontSize: '15px',
 												color: '#262626',
 												transform: 'rotate(-0.5deg)'
 											}}
@@ -285,10 +277,6 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 										>
 											Queenstown &apos;24
 										</p>
-										<div className="flex items-center justify-between px-1 -mb-1 opacity-40">
-											<span className="text-[6.5px] font-mono tracking-widest uppercase text-zinc-500 font-semibold">FUJIFILM</span>
-											<span className="text-[6px] font-sans tracking-tight text-zinc-500 italic">instax</span>
-										</div>
 									</div>
 								</div>
 							</div>
