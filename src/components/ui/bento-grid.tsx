@@ -1,4 +1,6 @@
-import { type ComponentPropsWithoutRef, type ReactNode } from "react"
+'use client'
+
+import { useState, type ComponentPropsWithoutRef, type ReactNode } from "react"
 import { ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -41,30 +43,55 @@ export function BentoCard({
   cta = "Learn more",
   ...props
 }: BentoCardProps) {
+  const [isHovered, setIsHovered] = useState(false)
+
   return (
     <div
       key={name}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       className={cn(
-        "bento-card-root group relative col-span-3 flex flex-col justify-between overflow-hidden rounded-2xl",
+        "group relative col-span-3 flex flex-col justify-between overflow-hidden rounded-2xl cursor-pointer select-none",
         // light styles
         "bg-white [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]",
         // dark styles
         "dark:bg-zinc-900/90 transform-gpu dark:[box-shadow:0_-20px_80px_-20px_#ffffff1f_inset] dark:[border:1px_solid_rgba(255,255,255,.1)] border border-zinc-200/80 dark:border-zinc-800",
+        "transition-all duration-300",
         className
       )}
       {...props}
     >
       {/* Background layer spanning upper/full container */}
-      <div className="bento-card-bg-widget absolute inset-0 z-0 overflow-hidden pointer-events-none transition-transform duration-300 ease-out">
+      <div 
+        style={{
+          transform: isHovered ? 'scale(1.04)' : 'scale(1)',
+          transition: 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+        }}
+        className="absolute inset-0 z-0 overflow-hidden pointer-events-none"
+      >
         {background}
       </div>
 
       {/* Info Content Block (slides UP on hover) */}
-      <div className="bento-card-info pointer-events-none z-10 flex transform-gpu flex-col gap-1 p-6 transition-all duration-300 ease-out group-hover:-translate-y-10">
+      <div 
+        style={{
+          transform: isHovered ? 'translateY(-38px)' : 'translateY(0)',
+          transition: 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+        }}
+        className="pointer-events-none z-10 flex transform-gpu flex-col gap-1 p-6"
+      >
         {Icon && (
-          <Icon className="bento-card-icon h-12 w-12 origin-left transform-gpu text-zinc-700 dark:text-zinc-300 transition-all duration-300 ease-in-out group-hover:scale-75" />
+          <div
+            style={{
+              transform: isHovered ? 'scale(0.75)' : 'scale(1)',
+              transformOrigin: 'left center',
+              transition: 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+            }}
+          >
+            <Icon className="h-12 w-12 text-zinc-700 dark:text-zinc-300" />
+          </div>
         )}
-        <h3 className="text-xl font-semibold text-zinc-800 dark:text-zinc-100">
+        <h3 className="text-xl font-semibold text-zinc-800 dark:text-zinc-100 mt-1">
           {name}
         </h3>
         <p className="max-w-lg text-sm text-zinc-500 dark:text-zinc-400">
@@ -74,9 +101,12 @@ export function BentoCard({
 
       {/* Slide-in CTA Button (slides UP from bottom on hover) */}
       <div
-        className={cn(
-          "bento-card-cta pointer-events-none absolute bottom-0 left-0 flex w-full translate-y-10 transform-gpu flex-row items-center p-6 opacity-0 transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100 z-20"
-        )}
+        style={{
+          transform: isHovered ? 'translateY(0)' : 'translateY(36px)',
+          opacity: isHovered ? 1 : 0,
+          transition: 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease',
+        }}
+        className="pointer-events-none absolute bottom-0 left-0 flex w-full flex-row items-center p-6 z-20"
       >
         <a
           href={href || "#"}
@@ -88,7 +118,13 @@ export function BentoCard({
       </div>
 
       {/* Background graying / dimming overlay on hover (Magic UI official effect) */}
-      <div className="bento-card-overlay pointer-events-none absolute inset-0 z-1 transform-gpu transition-all duration-300 group-hover:bg-neutral-900/[0.045] dark:group-hover:bg-white/[0.05]" />
+      <div 
+        style={{
+          opacity: isHovered ? 1 : 0,
+          transition: 'opacity 0.35s ease',
+        }}
+        className="pointer-events-none absolute inset-0 z-1 bg-black/[0.045] dark:bg-white/[0.05]" 
+      />
     </div>
   )
 }
