@@ -103,17 +103,16 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					}
 				/>
 
-				{/* ════════════════ 2. 电影胶片流 · React Bits 3D DriftWall (Pure 2:3 Vertical Posters) ════════════════ */}
+				{/* ════════════════ 2. 电影胶片流 · React Bits 3D DriftWall (Dual Theme: White in Light Mode, Black in Dark Mode) ════════════════ */}
 				<BentoCard
 					name="光影放映厅"
 					description="3D 悬浮流动胶片流，收录 130+ 部影史高分神作与心灵共鸣。"
 					Icon={Film}
 					href="/favorite"
 					cta="进入放映厅"
-					darkTheme={true}
-					className="col-span-1 md:col-span-2 text-white bg-zinc-950 dark:bg-zinc-950 border-zinc-800"
+					className="col-span-1 md:col-span-2"
 					background={
-						<div className="absolute inset-0 w-full h-full overflow-hidden bg-[#08080f]">
+						<div className="absolute inset-0 w-full h-full overflow-hidden bg-slate-50 dark:bg-[#08080f]">
 							<DriftWall
 								items={movieDriftItems}
 								columns={5}
@@ -131,12 +130,9 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								parallax={0.4}
 								pauseOnHover={true}
 								lift={50}
-								fade={0.6}
-								dim={0.45}
-								overlayColor="#060010"
 							/>
-							{/* Ambient Dark Bottom Fade for Crystal Clear Text Contrast */}
-							<div className="absolute inset-x-0 bottom-0 h-52 bg-gradient-to-t from-black/98 via-black/80 to-transparent pointer-events-none" />
+							{/* Ambient Bottom Fade: Clean Pure White in Light Mode, Deep Space Black in Dark Mode */}
+							<div className="absolute inset-x-0 bottom-0 h-52 bg-gradient-to-t from-white/95 via-white/80 to-transparent dark:from-black/98 dark:via-black/80 dark:to-transparent pointer-events-none" />
 						</div>
 					}
 				/>
@@ -280,7 +276,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 									<span className="font-semibold text-rose-500 font-bold">4</span>
 									<span className="font-semibold">5</span>
 									<span className="font-semibold text-blue-500 font-bold">6</span>
-									<span className="font-semibold text-preview-500 font-bold">7</span>
+									<span className="font-semibold text-zinc-500 font-bold">7</span>
 									<span className="font-semibold">8</span>
 									<span className="font-semibold text-emerald-500 font-bold">9</span>
 									<span className="font-semibold text-super-emerald-500 font-bold">10</span>

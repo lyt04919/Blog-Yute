@@ -77,9 +77,9 @@ export default function DriftWall({
   pauseOnHover = true,
   lift = 50,
   fade = 0.6,
-  dim = 0.45,
+  dim,
   grayscale = false,
-  overlayColor = '#060010',
+  overlayColor,
   className = '',
   style
 }: DriftWallProps) {
@@ -194,7 +194,6 @@ export default function DriftWall({
         lastTsRef.current = null
         pointerDampedRef.current = { x: 0, y: 0 }
         applyPlaneTransform(0, 0)
-        // Ensure offsets are valid
         for (let c = 0; c < offsetsRef.current.length; c++) {
           if (!Number.isFinite(offsetsRef.current[c])) offsetsRef.current[c] = 0
           if (!Number.isFinite(velocitiesRef.current[c])) velocitiesRef.current[c] = 0
@@ -287,21 +286,21 @@ export default function DriftWall({
     hoveredColRef.current = -1
   }, [])
 
-  const cssVars = useMemo(
-    () => ({
+  const cssVars = useMemo(() => {
+    const vars: Record<string, any> = {
       '--dw-tile-w': `${tileWidth}px`,
       '--dw-tile-h': `${tileHeight}px`,
       '--dw-gap': `${gap}px`,
       '--dw-radius': `${radius}px`,
       '--dw-perspective': `${perspective}px`,
       '--dw-lift': `${lift}px`,
-      '--dw-dim': dim,
       '--dw-gray': grayscale ? 1 : 0,
-      '--dw-overlay': overlayColor,
       ...style
-    } as CSSProperties),
-    [tileWidth, tileHeight, gap, radius, perspective, lift, dim, grayscale, overlayColor, style]
-  )
+    }
+    if (dim !== undefined) vars['--dw-dim'] = dim
+    if (overlayColor !== undefined) vars['--dw-overlay'] = overlayColor
+    return vars as CSSProperties
+  }, [tileWidth, tileHeight, gap, radius, perspective, lift, dim, grayscale, overlayColor, style])
 
   const renderTile = (item: DriftWallItem, id: string, colIndex: number) => {
     return (
@@ -329,7 +328,6 @@ export default function DriftWall({
             decoding="async" 
             draggable={false}
             onError={(e) => {
-              // Fade out broken images gracefully without breaking layout
               e.currentTarget.style.opacity = '0.2'
             }}
           />
