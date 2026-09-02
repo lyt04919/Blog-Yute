@@ -138,48 +138,80 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 				{/* ════════════════ 3. 📸 私享随笔 · 拍立得记忆流 (1:1 还原设计图全尺寸布局) ════════════════ */}
 				<BentoCard
 					darkTheme={true}
-					className="col-span-1 md:col-span-2 bg-[#0d0d12] dark:bg-[#0d0d12] border-zinc-800/90 text-white shadow-2xl overflow-hidden"
+					className="col-span-1 md:col-span-2 bg-[#0c0c11] dark:bg-[#0c0c11] border-zinc-800/90 text-white shadow-2xl overflow-hidden"
 				>
-					<div className="relative w-full h-full min-h-[360px] flex flex-col md:flex-row items-center justify-between overflow-hidden">
+					<div 
+						style={{ minHeight: '360px' }}
+						className="relative w-full h-full flex flex-col md:flex-row items-center justify-between p-6 sm:p-8 gap-6 overflow-hidden"
+					>
 						{/* 背景极微环境光点缀 */}
 						<div className="absolute -top-16 -left-16 w-56 h-56 bg-amber-500/10 rounded-full filter blur-3xl pointer-events-none" />
 						<div className="absolute -bottom-16 -right-16 w-56 h-56 bg-blue-500/10 rounded-full filter blur-3xl pointer-events-none" />
 
-						{/* 📸 左侧区域：大尺寸错落拍立得相纸（完美契合设计图） */}
-						<div className="relative w-full md:w-[44%] h-[240px] md:h-full flex items-center justify-center p-6 md:p-8 shrink-0 select-none">
+						{/* 📸 左侧区域：大尺寸错落拍立得相纸（严格像素约束防撑爆） */}
+						<div 
+							style={{ width: '220px', minWidth: '220px', height: '260px' }}
+							className="relative shrink-0 flex items-center justify-center select-none"
+						>
 							{/* 底层拍立得：新西兰 Tekapo 湖畔 */}
-							<div className="absolute w-[155px] sm:w-[172px] bg-[#FAF9F6] p-2.5 pb-6 sm:pb-7 rounded-sm shadow-xl border border-black/15 transform rotate-8 translate-x-4 -translate-y-2 transition-all duration-300 ease-out group-hover:rotate-14 group-hover:translate-x-7 group-hover:-translate-y-4 group-hover:shadow-2xl pointer-events-none">
-								<div className="w-full aspect-[4/3] rounded-2xs overflow-hidden bg-zinc-200">
+							<div 
+								style={{
+									width: '160px',
+									height: '210px',
+									transform: 'rotate(8deg) translate(14px, -10px)',
+									transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)'
+								}}
+								className="absolute bg-[#FAF9F6] p-2.5 rounded-sm shadow-xl border border-black/15 pointer-events-none group-hover:!rotate-[13deg] group-hover:!translate-x-6 group-hover:!-translate-y-4 group-hover:shadow-2xl flex flex-col"
+							>
+								<div 
+									style={{ width: '140px', height: '140px' }}
+									className="rounded-2xs overflow-hidden bg-zinc-200 shrink-0"
+								>
 									<img
 										src="/images/uploads/0c004c6f642839f2.jpeg"
 										alt="Tekapo Lake"
-										className="w-full h-full object-cover"
+										style={{ width: '100%', height: '100%', objectFit: 'cover' }}
 										loading="lazy"
 									/>
 								</div>
-								<p className="mt-2 text-[9px] font-mono font-bold text-zinc-700 text-center tracking-tight truncate">
-									Tekapo Lake (2024.06)
-								</p>
+								<div className="flex-1 flex items-center justify-center">
+									<p className="text-[9px] font-mono font-bold text-zinc-700 tracking-tight truncate">
+										Tekapo Lake (2024.06)
+									</p>
+								</div>
 							</div>
 
 							{/* 表层拍立得：海边黄昏抓拍 */}
-							<div className="relative w-[160px] sm:w-[180px] bg-[#FAF9F6] p-2.5 pb-7 sm:pb-8 rounded-sm shadow-2xl border border-black/15 transform -rotate-4 -translate-x-3 translate-y-3 transition-all duration-300 ease-out group-hover:rotate-0 group-hover:scale-104 group-hover:-translate-y-2 group-hover:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] pointer-events-none z-10">
-								<div className="w-full aspect-[4/3] rounded-2xs overflow-hidden bg-zinc-200">
+							<div 
+								style={{
+									width: '170px',
+									height: '220px',
+									transform: 'rotate(-4deg) translate(-10px, 10px)',
+									transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)'
+								}}
+								className="relative bg-[#FAF9F6] p-2.5 rounded-sm shadow-2xl border border-black/15 pointer-events-none z-10 group-hover:!rotate-0 group-hover:!scale-105 group-hover:!-translate-y-2 group-hover:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] flex flex-col"
+							>
+								<div 
+									style={{ width: '150px', height: '150px' }}
+									className="rounded-2xs overflow-hidden bg-zinc-200 shrink-0"
+								>
 									<img
 										src={featuredDiary?.image || '/images/uploads/7ef4d45667098fa8.jpeg'}
 										alt="Sunset Beach"
-										className="w-full h-full object-cover"
+										style={{ width: '100%', height: '100%', objectFit: 'cover' }}
 										loading="lazy"
 									/>
 								</div>
-								<p className="mt-2 text-[9px] font-serif font-bold text-zinc-800 text-center tracking-tight truncate">
-									Sunset Beach (2024.06)
-								</p>
+								<div className="flex-1 flex items-center justify-center">
+									<p className="text-[9px] font-serif font-bold text-zinc-800 tracking-tight truncate">
+										Sunset Beach (2024.06)
+									</p>
+								</div>
 							</div>
 						</div>
 
 						{/* 📝 右侧区域：沉浸式随笔手账（时间胶囊 + 大标题 + 动人文字 + 地点与 CTA） */}
-						<div className="relative w-full md:w-[56%] h-full flex flex-col justify-between p-6 sm:p-8 pl-6 md:pl-2 z-10">
+						<div className="flex-1 min-w-0 h-full flex flex-col justify-between z-10 py-1">
 							{/* 顶部：日期胶囊与心境胶囊 */}
 							<div className="flex flex-wrap items-center gap-2 mb-3">
 								<span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-white/10 text-white border border-white/15 backdrop-blur-md shadow-xs">
@@ -197,7 +229,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								<h3 className="text-xl sm:text-2xl font-serif font-bold text-white tracking-tight leading-snug mb-2 drop-shadow-xs">
 									一个人去看海 · 黄昏随想
 								</h3>
-								<p className="text-xs sm:text-sm font-sans leading-relaxed text-zinc-300/90 line-clamp-3 sm:line-clamp-4 pr-2">
+								<p className="text-xs sm:text-[13.5px] font-sans leading-relaxed text-zinc-300/90 line-clamp-3 sm:line-clamp-4 pr-2">
 									“两年前的今天，第一次一个人去看海。虽然海风很凉，但听着浪花拍打礁石的声音，内心竟然出奇地平静。拍了好多照片，最喜欢这张黄昏时的抓拍。人生其实就像大海一样，有时波澜壮阔，有时又归于宁静。希望自己永远能保持这份面对世界的好奇心。🌊🌅”
 								</p>
 							</div>
