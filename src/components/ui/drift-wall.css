@@ -40,7 +40,7 @@
 .drift-wall__col {
   position: relative;
   width: calc(var(--dw-tile-w) + var(--dw-gap));
-  transition: z-index 0.2s;
+  transition: z-index 0.15s;
 }
 
 .drift-wall__col:hover {
@@ -77,10 +77,10 @@
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
   will-change: transform, opacity, box-shadow;
   transition:
-    transform 0.28s cubic-bezier(0.2, 0.9, 0.3, 1),
-    opacity 0.28s cubic-bezier(0.2, 0.9, 0.3, 1),
-    box-shadow 0.28s cubic-bezier(0.2, 0.9, 0.3, 1),
-    border-color 0.28s cubic-bezier(0.2, 0.9, 0.3, 1);
+    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.2s ease-out,
+    box-shadow 0.2s ease-out,
+    border-color 0.2s ease-out;
 }
 
 .drift-wall__tile img {
@@ -89,7 +89,7 @@
   object-fit: cover;
   display: block;
   filter: grayscale(var(--dw-gray)) saturate(0.85);
-  transition: filter 0.28s cubic-bezier(0.2, 0.9, 0.3, 1);
+  transition: filter 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
   -webkit-user-drag: none;
 }
@@ -100,10 +100,10 @@
   background: var(--dw-overlay);
   opacity: 0.45;
   pointer-events: none;
-  transition: opacity 0.28s cubic-bezier(0.2, 0.9, 0.3, 1);
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Rock-Solid Pure CSS Hover (Zero Jitter, Zero React State Thrashing) */
+/* Instant-Response Snappy CSS Hover Lift */
 .drift-wall__tile:hover {
   z-index: 60;
 }
@@ -111,12 +111,12 @@
 .drift-wall__tile:hover .drift-wall__inner {
   opacity: 1 !important;
   transform: translateZ(var(--dw-lift)) scale(1.08) !important;
-  box-shadow: 0 24px 60px -15px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.4) !important;
-  border-color: rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 24px 60px -15px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.45) !important;
+  border-color: rgba(255, 255, 255, 0.6) !important;
 }
 
 .drift-wall__tile:hover img {
-  filter: grayscale(0) saturate(1.15) !important;
+  filter: grayscale(0) saturate(1.2) !important;
 }
 
 .drift-wall__tile:hover .drift-wall__overlay {

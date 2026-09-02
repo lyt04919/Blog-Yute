@@ -179,7 +179,7 @@ export default function DriftWall({
           const meta = columnMeta[c]
           if (!meta) continue
           
-          // Completely freeze column when hovered without any jitter
+          // Instantly freeze column motion when hovered
           const isColHovered = hoveredColRef.current === c
           
           if (isColHovered) {
@@ -220,6 +220,14 @@ export default function DriftWall({
           y: (e.clientY - rect.top) / rect.height - 0.5
         }
       }
+      // Instant column hit-test on pointer move
+      const hit = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null
+      const colEl = hit && hit.closest ? hit.closest('[data-col]') as HTMLElement | null : null
+      if (colEl && colEl.dataset.col !== undefined) {
+        hoveredColRef.current = Number(colEl.dataset.col)
+      } else {
+        hoveredColRef.current = -1
+      }
     },
     [parallax, reduced]
   )
@@ -253,14 +261,7 @@ export default function DriftWall({
         role="button" 
         aria-label={item.title ?? 'tile'} 
         className="drift-wall__tile"
-        onMouseEnter={() => {
-          hoveredColRef.current = colIndex
-        }}
-        onMouseLeave={() => {
-          if (hoveredColRef.current === colIndex) {
-            hoveredColRef.current = -1
-          }
-        }}
+        data-col={colIndex}
       >
         <span className="drift-wall__inner">
           <img 
@@ -297,14 +298,7 @@ export default function DriftWall({
             <div 
               className="drift-wall__col" 
               key={`col-${c}`}
-              onMouseEnter={() => {
-                hoveredColRef.current = c
-              }}
-              onMouseLeave={() => {
-                if (hoveredColRef.current === c) {
-                  hoveredColRef.current = -1
-                }
-              }}
+              data-col={c}
             >
               <div className="drift-wall__track" ref={el => { trackRefs.current[c] = el }}>
                 {copies.map((_, copyIndex) =>
