@@ -10,8 +10,7 @@ import {
 	BookOpen, 
 	Film, 
 	Compass, 
-	CalendarDays, 
-	Star
+	CalendarDays
 } from 'lucide-react'
 
 // Import user's authentic data
@@ -22,20 +21,15 @@ interface BookItem {
 	name: string
 	author?: string
 	cover: string
-	tag?: string
-	stars?: number
 }
 
-// Extract real books from user's books.json
+// Extract real books with full covers (strictly original vertical book proportions)
 const realBooks: BookItem[] = (booksData as any[])
 	.filter((b) => Boolean(b.cover))
-	.slice(0, 10)
 	.map((b) => ({
 		name: b.name.replace(/\s*\(.*?\)/g, ''), // clean name
 		author: b.author || '',
-		cover: b.cover,
-		tag: b.tags?.[0] || '精选',
-		stars: b.stars || 5
+		cover: getPosterUrl(b.cover)
 	}))
 
 // Curated top 30 movies for full-bleed 5-column 3D DriftWall (strictly 2:3 vertical posters)
@@ -75,7 +69,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 	return (
 		<div className={className}>
 			<BentoGrid className="grid-cols-1 md:grid-cols-3 gap-4">
-				{/* ════════════════ 1. 灵感书影音 (User's Real Books from books.json) ════════════════ */}
+				{/* ════════════════ 1. 灵感书影音 (Pure Uncropped Book Covers) ════════════════ */}
 				<BentoCard
 					name="灵感书影音"
 					description="精选人文经典、高保真黑胶与硬核科幻。"
@@ -84,35 +78,24 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					cta="探索书影音"
 					className="col-span-1 md:col-span-1"
 					background={
-						<div className="absolute inset-x-0 top-0 h-[210px] [mask-image:linear-gradient(to_bottom,#000_50%,transparent_100%)] overflow-hidden">
-							<Marquee pauseOnHover duration="20s" className="py-2.5">
+						<div className="absolute inset-x-0 top-0 h-[220px] [mask-image:linear-gradient(to_bottom,#000_65%,transparent_100%)] overflow-hidden">
+							<Marquee pauseOnHover duration="25s" className="py-3 px-2 [gap:14px]">
 								{realBooks.map((item, idx) => (
 									<div
 										key={idx}
-										className="w-28 h-34 rounded-xl bg-zinc-50 dark:bg-zinc-800/90 border border-zinc-200/90 dark:border-zinc-700/80 p-2 shadow-md flex flex-col justify-between shrink-0 select-none transition-all duration-300 hover:scale-105 hover:shadow-lg overflow-hidden"
+										className="group/book relative w-28 h-40 rounded-xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-zinc-700/80 shrink-0 select-none bg-zinc-100 dark:bg-zinc-800 transition-all duration-300 ease-out hover:scale-105 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
 									>
-										<div className="w-full h-20 rounded-lg overflow-hidden bg-zinc-200 dark:bg-zinc-700 relative">
-											<img 
-												src={item.cover} 
-												alt={item.name} 
-												referrerPolicy="no-referrer"
-												className="w-full h-full object-cover" 
-											/>
-										</div>
-										<div className="space-y-0.5 mt-1">
-											<div className="flex items-center justify-between">
-												<span className="text-[8.5px] font-bold px-1 py-0.2 rounded bg-zinc-200/70 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 font-mono">
-													{item.tag}
-												</span>
-												<div className="flex items-center text-amber-500">
-													<Star className="size-2 fill-current" />
-													<span className="text-[8.5px] font-bold ml-0.5 font-mono">5.0</span>
-												</div>
-											</div>
-											<p className="text-[9.5px] font-bold text-zinc-800 dark:text-zinc-100 truncate">
-												{item.name}
-											</p>
-										</div>
+										<img 
+											src={item.cover} 
+											alt={item.name} 
+											referrerPolicy="no-referrer"
+											loading="lazy"
+											decoding="async"
+											className="w-full h-full object-cover transition-transform duration-300 group-hover/book:scale-105" 
+										/>
+										{/* Realistic book spine lighting fold */}
+										<div className="absolute inset-y-0 left-0 w-2.5 bg-gradient-to-r from-black/25 via-white/10 to-transparent pointer-events-none" />
+										<div className="absolute inset-0 ring-1 ring-inset ring-black/10 dark:ring-white/10 rounded-xl pointer-events-none" />
 									</div>
 								))}
 							</Marquee>
@@ -297,7 +280,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 									<span className="font-semibold text-rose-500 font-bold">4</span>
 									<span className="font-semibold">5</span>
 									<span className="font-semibold text-blue-500 font-bold">6</span>
-									<span className="font-semibold">7</span>
+									<span className="font-semibold text-preview-500 font-bold">7</span>
 									<span className="font-semibold">8</span>
 									<span className="font-semibold text-emerald-500 font-bold">9</span>
 									<span className="font-semibold text-super-emerald-500 font-bold">10</span>
