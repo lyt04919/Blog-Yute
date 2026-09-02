@@ -87,6 +87,13 @@ export default function DriftWall({
   const handlePointerMove = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
       if (parallax <= 0 || !planeRef.current || !containerRef.current) return
+
+      // If the cursor is over any poster tile, lock the 3D plane so it stays 100% still without jitter
+      const target = e.target as HTMLElement
+      if (target?.closest?.('.drift-wall__tile')) {
+        return
+      }
+
       const rect = containerRef.current.getBoundingClientRect()
       if (!rect.width || !rect.height) return
       const px = ((e.clientX - rect.left) / rect.width - 0.5) * parallax * 8

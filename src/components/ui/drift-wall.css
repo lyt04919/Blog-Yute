@@ -62,6 +62,7 @@
   animation-play-state: paused !important;
 }
 
+/* Fixed Hit Box: Does not scale or move to guarantee zero jitter */
 .drift-wall__tile {
   position: relative;
   display: block;
@@ -70,8 +71,12 @@
   flex: 0 0 var(--dw-tile-h);
   outline: none;
   cursor: pointer;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
+/* Visual Container: pointer-events: none prevents mouse leave jitter when scaled */
 .drift-wall__inner {
   position: absolute;
   inset: 0;
@@ -81,16 +86,15 @@
   background: #12121c;
   opacity: var(--dw-dim);
   transform: translateZ(0);
-  transform-style: preserve-3d;
-  pointer-events: auto;
+  pointer-events: none;
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
   will-change: transform, opacity, box-shadow;
   transition:
-    transform 0.24s cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 0.24s ease-out,
-    box-shadow 0.24s ease-out,
-    border-color 0.24s ease-out;
+    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.2s ease-out,
+    box-shadow 0.2s ease-out,
+    border-color 0.2s ease-out;
 }
 
 .drift-wall__tile img {
@@ -99,7 +103,7 @@
   object-fit: cover;
   display: block;
   filter: grayscale(var(--dw-gray)) saturate(0.9);
-  transition: filter 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: filter 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
   -webkit-user-drag: none;
   pointer-events: none;
@@ -111,30 +115,26 @@
   background: var(--dw-overlay);
   opacity: 0.4;
   pointer-events: none;
-  transition: opacity 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Rock-Solid 3D Hover: Elevated and Spotlit */
-.drift-wall__tile:hover,
-.drift-wall__tile:has(.drift-wall__inner:hover) {
-  z-index: 60;
+/* Rock-Solid 3D Hover: Elevated and Spotlit with zero hit-target oscillation */
+.drift-wall__tile:hover {
+  z-index: 70;
 }
 
-.drift-wall__tile:hover .drift-wall__inner,
-.drift-wall__inner:hover {
+.drift-wall__tile:hover .drift-wall__inner {
   opacity: 1 !important;
   transform: translateZ(var(--dw-lift)) scale(1.08) !important;
   box-shadow: 0 24px 60px -15px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.45) !important;
   border-color: rgba(255, 255, 255, 0.6) !important;
 }
 
-.drift-wall__tile:hover img,
-.drift-wall__inner:hover img {
+.drift-wall__tile:hover img {
   filter: grayscale(0) saturate(1.2) !important;
 }
 
-.drift-wall__tile:hover .drift-wall__overlay,
-.drift-wall__inner:hover .drift-wall__overlay {
+.drift-wall__tile:hover .drift-wall__overlay {
   opacity: 0 !important;
 }
 
