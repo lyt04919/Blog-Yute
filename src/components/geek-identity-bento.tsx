@@ -38,7 +38,7 @@ const realBooks: BookItem[] = (booksData as any[])
 		stars: b.stars || 5
 	}))
 
-// Curated top 25 movies for full-bleed 5-column 3D DriftWall (strictly 2:3 vertical posters)
+// Curated top 30 movies for full-bleed 5-column 3D DriftWall (strictly 2:3 vertical posters)
 const movieDriftItems: DriftWallItem[] = (moviesData as any[])
 	.filter((m) => Boolean(m.poster) && m.isShow !== false)
 	.sort((a, b) => (b.stars || b.doubanRating || 0) - (a.stars || a.doubanRating || 0))
@@ -127,26 +127,26 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					Icon={Film}
 					href="/favorite"
 					cta="探索电影全库"
-					className="col-span-1 md:col-span-2 text-white"
+					className="col-span-1 md:col-span-2 text-white bg-zinc-950 dark:bg-zinc-950 border-zinc-800"
 					background={
 						<div className="absolute inset-0 w-full h-full overflow-hidden bg-[#08080f]">
 							<DriftWall
 								items={movieDriftItems}
 								columns={5}
 								tileWidth={105}
-								tileHeight={155}
+								tileHeight={158}
 								gap={14}
 								radius={12}
 								tilt={16}
 								turn={-14}
 								perspective={1200}
 								depth={90}
-								speed={34}
+								speed={32}
 								direction="up"
 								variance={0.35}
 								parallax={0.6}
 								pauseOnHover={true}
-								lift={55}
+								lift={50}
 								fade={0.6}
 								dim={0.45}
 								overlayColor="#060010"
