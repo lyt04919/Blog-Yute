@@ -153,13 +153,15 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								pauseOnHover
 								duration="25s"
 								gap="2.5rem"
-								className="absolute inset-x-0 top-[72px]"
+								style={{ top: '82px' }}
+								className="absolute inset-x-0"
 							>
 								{realBooks.map((item, idx) => (
 									<div
 										key={idx}
 										className="group/book relative w-36 h-[180px] rounded-xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-zinc-700/80 shrink-0 select-none bg-zinc-100 dark:bg-zinc-800 transition-all duration-300 ease-out hover:scale-105 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
 									>
+										{/* 1. Base sharp book cover */}
 										<img 
 											src={item.cover} 
 											alt={item.name} 
@@ -168,9 +170,29 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 											decoding="async"
 											className="w-full h-full object-cover transition-transform duration-300 group-hover/book:scale-105" 
 										/>
+
+										{/* 2. Progressive blur layer (越向下越模糊，精确复刻灵感工具箱景深层次) */}
+										<div 
+											className="absolute inset-0 pointer-events-none overflow-hidden rounded-xl"
+											style={{
+												maskImage: 'linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.45) 55%, black 85%)',
+												WebkitMaskImage: 'linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.45) 55%, black 85%)',
+											}}
+										>
+											<img 
+												src={item.cover} 
+												alt="" 
+												aria-hidden="true"
+												referrerPolicy="no-referrer"
+												loading="lazy"
+												decoding="async"
+												className="w-full h-full object-cover blur-[8px] scale-105 transition-transform duration-300 group-hover/book:scale-110" 
+											/>
+										</div>
+
 										{/* Realistic book spine lighting fold */}
-										<div className="absolute inset-y-0 left-0 w-2.5 bg-gradient-to-r from-black/25 via-white/10 to-transparent pointer-events-none" />
-										<div className="absolute inset-0 ring-1 ring-inset ring-black/10 dark:ring-white/10 rounded-xl pointer-events-none" />
+										<div className="absolute inset-y-0 left-0 w-2.5 bg-gradient-to-r from-black/25 via-white/10 to-transparent pointer-events-none z-10" />
+										<div className="absolute inset-0 ring-1 ring-inset ring-black/10 dark:ring-white/10 rounded-xl pointer-events-none z-10" />
 									</div>
 								))}
 							</Marquee>
