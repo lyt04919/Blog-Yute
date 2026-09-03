@@ -152,14 +152,14 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 							<Marquee
 								pauseOnHover
 								duration="25s"
-								gap="2.5rem"
-								style={{ top: '46px' }}
+								gap="1.25rem"
+								style={{ top: '38px' }}
 								className="absolute inset-x-0 py-0"
 							>
 								{realBooks.map((item, idx) => (
 									<div
 										key={idx}
-										className="group/book relative w-36 h-[180px] rounded-xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-zinc-700/80 shrink-0 select-none bg-zinc-100 dark:bg-zinc-800 transition-all duration-300 ease-out hover:scale-105 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
+										className="group/book relative w-[136px] h-[174px] rounded-2xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-zinc-700/80 shrink-0 select-none bg-zinc-100 dark:bg-zinc-800 transition-all duration-300 ease-out hover:scale-105 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
 									>
 										{/* 1. Base book cover: 100% visible, always renders */}
 										<img 
@@ -171,19 +171,19 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 											className="w-full h-full object-cover transition-transform duration-300 group-hover/book:scale-105" 
 										/>
 
-										{/* 2. Continuous gradient progressive blur on lower half (平滑连续无硬边界/无马赛克条纹) */}
+										{/* 2. Continuous gradient progressive blur on lower half */}
 										<ProgressiveBlur
 											direction="bottom"
-											height="52%"
+											height="50%"
 											blurLevels={[0.5, 1, 2, 4, 8, 14]}
 										/>
 
 										{/* 3. 柔和环境光渐变底色，自然融入卡片 */}
-										<div className="pointer-events-none absolute inset-x-0 bottom-0 h-[52%] bg-gradient-to-t from-white/90 via-white/40 to-transparent dark:from-zinc-900/90 dark:via-zinc-900/40" />
+										<div className="pointer-events-none absolute inset-x-0 bottom-0 h-[50%] bg-gradient-to-t from-white/90 via-white/40 to-transparent dark:from-zinc-900/90 dark:via-zinc-900/40" />
 
 										{/* Realistic book spine lighting fold */}
 										<div className="absolute inset-y-0 left-0 w-2.5 bg-gradient-to-r from-black/25 via-white/10 to-transparent pointer-events-none z-10" />
-										<div className="absolute inset-0 ring-1 ring-inset ring-black/10 dark:ring-white/10 rounded-xl pointer-events-none z-10" />
+										<div className="absolute inset-0 ring-1 ring-inset ring-black/10 dark:ring-white/10 rounded-2xl pointer-events-none z-10" />
 									</div>
 								))}
 							</Marquee>

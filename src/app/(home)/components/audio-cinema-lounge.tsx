@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import Link from 'next/link'
 import { 
@@ -18,11 +18,13 @@ import {
 	Sparkles, 
 	PlayCircle,
 	Copy,
-	Check
+	Check,
+	Loader2
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Marquee } from '@/components/ui/marquee'
 import { HeroVideoModal } from '@/components/ui/hero-video-dialog'
+import { useMusicPlayerStore } from '@/hooks/use-music-player'
 
 // 数据源引入
 import moviesData from '@/data/movies.json'
@@ -33,12 +35,17 @@ import videosData from '@/app/favorite/videos.json'
 import shareData from '@/app/favorite/share/list.json'
 
 export default function AudioCinemaLounge() {
-	// 核心状态：播放中 / 暂停中 (唯一交互为点击拨杆/唱臂切换落针与移开)
-	const [isPlaying, setIsPlaying] = useState<boolean>(true)
+	// 核心状态：播放中 / 暂停中 (默认待机，用户点击拨杆或播放键后真实放音)
+	const [isPlaying, setIsPlaying] = useState<boolean>(false)
 	const [currentMusicIndex, setCurrentMusicIndex] = useState<number>(0)
+	const [isLoadingAudio, setIsLoadingAudio] = useState<boolean>(false)
 	const [isArmHovered, setIsArmHovered] = useState<boolean>(false)
 	const [isCopied, setIsCopied] = useState<boolean>(false)
 	const [activeVideo, setActiveVideo] = useState<{ url: string; title?: string } | null>(null)
+
+	// 真实音频播放核心引用与预加载缓存
+	const audioRef = useRef<HTMLAudioElement | null>(null)
+	const audioUrlCache = useRef<Record<string, string>>({})
 
 	// 选中的详情模态卡片数据
 	const [selectedItem, setSelectedItem] = useState<{
@@ -65,24 +72,110 @@ export default function AudioCinemaLounge() {
 
 	const currentTrack = playlist[currentMusicIndex] || playlist[0]
 
-	// 唯一交互：点击拨杆/唱臂切换播放/暂停
-	const togglePlayState = () => {
-		setIsPlaying((prev) => !prev)
+	// 动态加载并播放对应曲目高保真音频流
+	const playTrackAudio = async (index: number) => {
+		const targetTrack = playlist[index]
+		if (!targetTrack) return
+
+		setIsLoadingAudio(true)
+
+		try {
+			// 1. 检查缓存
+			let src = audioUrlCache.current[targetTrack.name]
+			if (!src) {
+				const query = encodeURIComponent(`${targetTrack.name} ${targetTrack.subtitle || ''}`)
+				const res = await fetch(`/api/music-preview?term=${query}`)
+				if (res.ok) {
+					const data = await res.json()
+					if (data.previewUrl) {
+						src = data.previewUrl
+						audioUrlCache.current[targetTrack.name] = src
+					}
+				}
+			}
+
+			// 2. 兜底本地高保真音频
+			if (!src) {
+				src = '/music/close-to-you.mp3'
+			}
+
+			if (audioRef.current) {
+				if (audioRef.current.src !== src) {
+					audioRef.current.src = src
+					audioRef.current.load()
+				}
+
+				// 如果底栏全局播放器在播放，先暂停它避免双重发声
+				useMusicPlayerStore.getState().setIsPlaying(false)
+
+				await audioRef.current.play()
+				setIsPlaying(true)
+			}
+		} catch (err) {
+			console.warn('Playback request handled:', err)
+			if (audioRef.current) {
+				audioRef.current.src = '/music/close-to-you.mp3'
+				audioRef.current.load()
+				audioRef.current.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false))
+			}
+		} finally {
+			setIsLoadingAudio(false)
+		}
 	}
 
-	// 切换上一首曲目
+	// 核心交互：点击拨杆/唱臂/按键切换播放与暂停真实声音
+	const togglePlayState = () => {
+		if (isPlaying) {
+			if (audioRef.current) {
+				audioRef.current.pause()
+			}
+			setIsPlaying(false)
+		} else {
+			if (audioRef.current && audioRef.current.src && !audioRef.current.src.endsWith('/')) {
+				useMusicPlayerStore.getState().setIsPlaying(false)
+				audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {
+					playTrackAudio(currentMusicIndex)
+				})
+			} else {
+				playTrackAudio(currentMusicIndex)
+			}
+		}
+	}
+
+	// 切换上一首曲目并自动起播
 	const handlePrevTrack = (e?: React.MouseEvent) => {
 		if (e) e.stopPropagation()
-		setCurrentMusicIndex((prev) => (prev - 1 + playlist.length) % playlist.length)
-		if (!isPlaying) setIsPlaying(true)
+		const newIndex = (currentMusicIndex - 1 + playlist.length) % playlist.length
+		setCurrentMusicIndex(newIndex)
+		playTrackAudio(newIndex)
 	}
 
-	// 切换下一首曲目
+	// 切换下一首曲目并自动起播
 	const handleNextTrack = (e?: React.MouseEvent) => {
 		if (e) e.stopPropagation()
-		setCurrentMusicIndex((prev) => (prev + 1) % playlist.length)
-		if (!isPlaying) setIsPlaying(true)
+		const newIndex = (currentMusicIndex + 1) % playlist.length
+		setCurrentMusicIndex(newIndex)
+		playTrackAudio(newIndex)
 	}
+
+	// 监听全局底栏播放器：如果全局播放器启动，唱机自动暂停；卸载时释放音频资源
+	useEffect(() => {
+		const unsub = useMusicPlayerStore.subscribe((state) => {
+			if (state.isPlaying && isPlaying) {
+				if (audioRef.current) {
+					audioRef.current.pause()
+				}
+				setIsPlaying(false)
+			}
+		})
+		return () => {
+			unsub()
+			if (audioRef.current) {
+				audioRef.current.pause()
+				audioRef.current.src = ''
+			}
+		}
+	}, [isPlaying])
 
 	// 复制链接辅助
 	const handleCopyUrl = (url?: string) => {
@@ -365,7 +458,9 @@ export default function AudioCinemaLounge() {
 										className="rounded-full flex items-center justify-center transition-all active:scale-95 cursor-pointer shrink-0 shadow-md border border-amber-300/80 dark:border-amber-500/50"
 										title={isPlaying ? '拨开唱臂暂停' : '落针播放'}
 									>
-										{isPlaying ? (
+										{isLoadingAudio ? (
+											<Loader2 className="w-4 h-4 animate-spin text-white" />
+										) : isPlaying ? (
 											<Pause className="w-4 h-4 fill-white text-white drop-shadow-sm" />
 										) : (
 											<Play className="w-4 h-4 fill-white text-white translate-x-0.5 drop-shadow-sm" />
@@ -436,8 +531,12 @@ export default function AudioCinemaLounge() {
 											key={track.name}
 											type="button"
 											onClick={() => {
-												setCurrentMusicIndex(idx)
-												if (!isPlaying) setIsPlaying(true)
+												if (currentMusicIndex === idx) {
+													togglePlayState()
+												} else {
+													setCurrentMusicIndex(idx)
+													playTrackAudio(idx)
+												}
 											}}
 											className={`p-1.5 rounded-2xl transition-all flex items-center gap-1.5 text-left cursor-pointer border min-w-0 ${
 												currentMusicIndex === idx
@@ -890,6 +989,22 @@ export default function AudioCinemaLounge() {
 				onClose={() => setActiveVideo(null)}
 				videoSrc={activeVideo?.url || ''}
 				animationStyle="from-center"
+			/>
+
+			{/* 实体黑胶唱机专属高保真音频流播放核心 */}
+			<audio
+				ref={audioRef}
+				preload="none"
+				onEnded={() => handleNextTrack()}
+				onError={() => {
+					if (audioRef.current && audioRef.current.src !== '/music/close-to-you.mp3') {
+						audioRef.current.src = '/music/close-to-you.mp3'
+						audioRef.current.load()
+						if (isPlaying) {
+							audioRef.current.play().catch(() => setIsPlaying(false))
+						}
+					}
+				}}
 			/>
 		</section>
 	)
