@@ -23,9 +23,9 @@ interface BookItem {
 	cover: string
 }
 
-// Extract real books with full covers (strictly original vertical book proportions)
+// Extract real books with full covers (strictly active books intended for display)
 const realBooks: BookItem[] = (booksData as any[])
-	.filter((b) => Boolean(b.cover))
+	.filter((b) => Boolean(b.cover) && b.isShow !== false && b.isShowOnHome !== false)
 	.map((b) => ({
 		name: b.name.replace(/\s*\(.*?\)/g, ''), // clean name
 		author: b.author || '',
@@ -159,16 +159,24 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								{realBooks.map((item, idx) => (
 									<div
 										key={idx}
-										className="group/book relative w-[136px] h-[174px] rounded-2xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-zinc-700/80 shrink-0 select-none bg-zinc-100 dark:bg-zinc-800 transition-all duration-300 ease-out hover:scale-105 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
+										style={{
+											width: '136px',
+											height: '174px',
+											minWidth: '136px',
+											maxWidth: '136px',
+											flexShrink: 0,
+										}}
+										className="group/book relative w-36 h-44 rounded-2xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-zinc-700/80 shrink-0 select-none bg-zinc-100 dark:bg-zinc-800 transition-all duration-300 ease-out hover:scale-105 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
 									>
-										{/* 1. Base book cover: 100% visible, always renders */}
+										{/* 1. Base book cover: 100% visible, strictly contained */}
 										<img 
 											src={item.cover} 
 											alt={item.name} 
 											referrerPolicy="no-referrer"
 											loading="lazy"
 											decoding="async"
-											className="w-full h-full object-cover transition-transform duration-300 group-hover/book:scale-105" 
+											style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+											className="w-full h-full object-cover transition-transform duration-300 group-hover/book:scale-105 select-none pointer-events-none" 
 										/>
 
 										{/* 2. Continuous gradient progressive blur on lower half */}
