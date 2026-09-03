@@ -19,6 +19,8 @@ export interface BentoCardProps extends ComponentPropsWithoutRef<"div"> {
   cta?: string
   darkTheme?: boolean
   children?: ReactNode
+  blurLevels?: number[]
+  progressiveBlurHeight?: string
 }
 
 export function BentoGrid({ children, className, ...props }: BentoGridProps) {
@@ -88,6 +90,7 @@ export function BentoCard({
   name,
   className,
   background,
+  Icon,
   description,
   href,
   cta = "Learn more",
