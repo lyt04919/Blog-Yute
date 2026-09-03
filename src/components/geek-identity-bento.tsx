@@ -151,13 +151,13 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 						<Marquee
 							pauseOnHover
 							duration="25s"
-							gap="1rem"
-							className="absolute inset-x-0 top-10 [mask-image:linear-gradient(to_top,transparent_40%,#000_100%)]"
+							gap="1.75rem"
+							className="absolute inset-x-0 top-14 [mask-image:linear-gradient(to_top,transparent_30%,#000_90%)]"
 						>
 							{realBooks.map((item, idx) => (
 								<div
 									key={idx}
-									className="group/book relative w-32 h-40 rounded-xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-zinc-700/80 shrink-0 select-none bg-zinc-100 dark:bg-zinc-800 transition-all duration-300 ease-out hover:scale-105 hover:shadow-xl hover:-translate-y-1 cursor-pointer transform-gpu blur-[0.5px] hover:blur-none"
+									className="group/book relative w-36 h-[180px] rounded-xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-zinc-700/80 shrink-0 select-none bg-zinc-100 dark:bg-zinc-800 transition-all duration-300 ease-out hover:scale-105 hover:shadow-xl hover:-translate-y-1 cursor-pointer transform-gpu blur-[0.5px] hover:blur-none"
 								>
 									<img 
 										src={item.cover} 
