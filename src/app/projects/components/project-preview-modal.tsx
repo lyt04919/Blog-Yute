@@ -54,24 +54,34 @@ export default function ProjectPreviewModal({
 		.replace(/^https?:\/\//, '')
 		.replace(/\/.*$/, '')
 
-	const deviceWidthClasses: Record<DeviceMode, string> = {
-		desktop: isFullscreen ? 'w-[98vw] max-w-[98vw]' : 'w-[95vw] max-w-7xl',
-		tablet: 'w-[768px] max-w-[95vw]',
-		mobile: 'w-[390px] max-w-[95vw]'
+	const modalDimensions: Record<DeviceMode, { width: string; maxWidth: string }> = {
+		desktop: {
+			width: isFullscreen ? '98vw' : '96vw',
+			maxWidth: isFullscreen ? '98vw' : '1720px'
+		},
+		tablet: {
+			width: '1080px',
+			maxWidth: '96vw'
+		},
+		mobile: {
+			width: '430px',
+			maxWidth: '96vw'
+		}
 	}
 
-	const modalHeight = isFullscreen ? '95vh' : '88vh'
+	const modalHeight = isFullscreen ? '95vh' : '90vh'
 
 	return (
 		<DialogModal
 			open={Boolean(project)}
 			onClose={onClose}
-			overlayClassName="p-2 sm:p-4 md:p-6"
-			style={{ height: modalHeight, maxHeight: '96vh' }}
-			className={cn(
-				'rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl overflow-hidden flex flex-col transition-all duration-300',
-				deviceWidthClasses[deviceMode]
-			)}
+			overlayClassName="p-2 sm:p-3 md:p-4"
+			style={{
+				...modalDimensions[deviceMode],
+				height: modalHeight,
+				maxHeight: '96vh'
+			}}
+			className="rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl overflow-hidden flex flex-col transition-all duration-300"
 		>
 			{/* Top Mac Window Control Bar */}
 			<div className="h-12 px-4 bg-zinc-100/90 dark:bg-zinc-950/90 border-b border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between shrink-0 select-none">
