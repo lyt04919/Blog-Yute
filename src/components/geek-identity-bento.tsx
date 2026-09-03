@@ -55,6 +55,36 @@ const webToolsSpiralItems = (shareData as any[])
 		target: '_blank'
 	}))
 
+// Realistic translucent washi tape (和纸美纹胶带)
+function WashiTape({ rotate = 0 }: { rotate?: number }) {
+	return (
+		<div
+			style={{
+				width: '54px',
+				height: '18px',
+				top: '-9px',
+				left: '50%',
+				transform: `translateX(-50%) rotate(${rotate}deg)`,
+				backgroundColor: 'rgba(255, 255, 255, 0.78)',
+				backdropFilter: 'blur(2px)',
+				boxShadow: '0 1px 3px rgba(0,0,0,0.12), inset 0 1px 1px rgba(255,255,255,0.85)',
+				backgroundImage: `
+					repeating-linear-gradient(
+						45deg,
+						rgba(0, 0, 0, 0.02) 0px,
+						rgba(0, 0, 0, 0.02) 2px,
+						transparent 2px,
+						transparent 4px
+					)
+				`,
+				borderLeft: '1.5px dashed rgba(0,0,0,0.16)',
+				borderRight: '1.5px dashed rgba(0,0,0,0.16)',
+			}}
+			className="absolute z-30 pointer-events-none rounded-[1px] select-none"
+		/>
+	)
+}
+
 export function GeekIdentityBento({ className }: { className?: string }) {
 	return (
 		<div className={className}>
@@ -130,7 +160,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					}
 				/>
 
-				{/* ════════════════ 3. 📸 私享随笔 · 富士拍立得三联画廊 (纯净版：自然下移居中排布) ════════════════ */}
+				{/* ════════════════ 3. 📸 私享随笔 · 经典胶带拍立得三联画廊 (参考图一美纹纸胶带与真实质感) ════════════════ */}
 				<BentoCard
 					name="私享随笔"
 					description="记录日常思绪、旅途快照与那些触动心弦的生活切片。"
@@ -139,27 +169,30 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					cta="翻阅生活日记"
 					className="col-span-1 md:col-span-2"
 					background={
-						<div className="absolute inset-x-0 top-0 h-[260px] flex items-center justify-center pt-6 sm:pt-7 px-4 sm:px-6 select-none">
-							<div className="flex items-center justify-center gap-4 sm:gap-7">
-								{/* 1. 左侧富士相纸：奥克兰黄昏 (-7°) */}
+						<div className="absolute inset-x-0 top-0 h-[260px] flex items-center justify-center pt-8 sm:pt-9 px-4 sm:px-6 select-none">
+							<div className="flex items-center justify-center gap-3 sm:gap-5">
+								{/* 1. 左侧拍立得：奥克兰黄昏 (-7°) */}
 								<div
 									style={{
-										width: '134px',
-										height: '196px',
+										width: '146px',
+										height: '182px',
 										transform: 'rotate(-7deg) translateY(12px)',
 										transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
-										boxShadow: '0 4px 6px -1px rgba(0,0,0,0.06), 0 14px 28px -4px rgba(0,0,0,0.13), 0 0 0 1px rgba(0,0,0,0.07)'
+										boxShadow: '0 4px 6px -1px rgba(0,0,0,0.06), 0 14px 28px -4px rgba(0,0,0,0.13), 0 0 0 1px rgba(0,0,0,0.06)'
 									}}
-									className="relative bg-gradient-to-b from-[#FFFFFF] via-[#FDFDFD] to-[#F8F8F8] p-2 pb-6 rounded-[9px] pointer-events-none group-hover:!-rotate-[11deg] group-hover:!-translate-x-3 group-hover:!translate-y-2 group-hover:shadow-2xl flex flex-col shrink-0"
+									className="relative bg-gradient-to-b from-[#FFFFFF] via-[#FDFDFD] to-[#F7F7F7] p-2.5 pb-6 rounded-[8px] pointer-events-none group-hover:!-rotate-[11deg] group-hover:!-translate-x-3 group-hover:!translate-y-2 group-hover:shadow-2xl flex flex-col shrink-0"
 								>
-									{/* 富士特有内嵌倒角压痕相框 */}
+									{/* 和纸美纹胶带 */}
+									<WashiTape rotate={2.5} />
+
+									{/* 经典 1:1 方形照片窗口 */}
 									<div 
 										style={{ 
-											width: '118px', 
-											height: '144px',
+											width: '126px', 
+											height: '126px',
 											boxShadow: 'inset 0 1.5px 3px rgba(0,0,0,0.22), inset 0 0 0 1px rgba(0,0,0,0.08)'
 										}} 
-										className="relative rounded-[5px] overflow-hidden bg-zinc-900 shrink-0"
+										className="relative rounded-[4px] overflow-hidden bg-zinc-900 shrink-0"
 									>
 										<img
 											src="/images/uploads/7ef4d45667098fa8.jpeg"
@@ -167,12 +200,12 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 											style={{ width: '100%', height: '100%', objectFit: 'cover' }}
 											loading="lazy"
 										/>
-										{/* 富士高光胶片反光膜 */}
+										{/* 胶片高光反光膜 */}
 										<div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/20 pointer-events-none" />
 									</div>
 
-									{/* 富士相纸底部纯净手写留白（无水印与LOGO） */}
-									<div className="flex-1 flex items-center justify-center pt-1 px-0.5 overflow-visible">
+									{/* 拍立得宽下巴手写留白 */}
+									<div className="flex-1 flex items-center justify-center pt-1.5 px-0.5 overflow-visible">
 										<p 
 											style={{ 
 												fontFamily: 'var(--font-cursive), "Caveat", "Bradley Hand", cursive',
@@ -187,26 +220,29 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 									</div>
 								</div>
 
-								{/* 2. 中间富士相纸：蒂卡波湖 (0° 视觉主位微浮) */}
+								{/* 2. 中间拍立得：蒂卡波湖 (0° 视觉主位微浮，叠于上方) */}
 								<div
 									style={{
-										width: '140px',
-										height: '204px',
+										width: '150px',
+										height: '186px',
 										transform: 'rotate(0deg) translateY(2px)',
 										transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
 										zIndex: 10,
-										boxShadow: '0 8px 12px -2px rgba(0,0,0,0.08), 0 20px 38px -6px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.07)'
+										boxShadow: '0 8px 14px -2px rgba(0,0,0,0.09), 0 22px 42px -6px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.07)'
 									}}
-									className="relative bg-gradient-to-b from-[#FFFFFF] via-[#FDFDFD] to-[#F8F8F8] p-2 pb-6 rounded-[9px] pointer-events-none group-hover:!-translate-y-2 group-hover:!scale-104 group-hover:shadow-2xl flex flex-col shrink-0"
+									className="relative bg-gradient-to-b from-[#FFFFFF] via-[#FDFDFD] to-[#F7F7F7] p-2.5 pb-6 rounded-[8px] pointer-events-none group-hover:!-translate-y-2 group-hover:!scale-104 group-hover:shadow-2xl flex flex-col shrink-0"
 								>
-									{/* 富士特有内嵌倒角压痕相框 */}
+									{/* 和纸美纹胶带 */}
+									<WashiTape rotate={-1.5} />
+
+									{/* 经典 1:1 方形照片窗口 */}
 									<div 
 										style={{ 
-											width: '124px', 
-											height: '150px',
+											width: '130px', 
+											height: '130px',
 											boxShadow: 'inset 0 1.5px 3px rgba(0,0,0,0.22), inset 0 0 0 1px rgba(0,0,0,0.08)'
 										}} 
-										className="relative rounded-[5px] overflow-hidden bg-zinc-900 shrink-0"
+										className="relative rounded-[4px] overflow-hidden bg-zinc-900 shrink-0"
 									>
 										<img
 											src="/images/uploads/0c004c6f642839f2.jpeg"
@@ -214,12 +250,12 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 											style={{ width: '100%', height: '100%', objectFit: 'cover' }}
 											loading="lazy"
 										/>
-										{/* 富士高光胶片反光膜 */}
+										{/* 胶片高光反光膜 */}
 										<div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/20 pointer-events-none" />
 									</div>
 
-									{/* 富士相纸底部纯净手写留白（无水印与LOGO） */}
-									<div className="flex-1 flex items-center justify-center pt-1 px-0.5 overflow-visible">
+									{/* 拍立得宽下巴手写留白 */}
+									<div className="flex-1 flex items-center justify-center pt-1.5 px-0.5 overflow-visible">
 										<p 
 											style={{ 
 												fontFamily: 'var(--font-cursive), "Caveat", "Bradley Hand", cursive',
@@ -234,25 +270,28 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 									</div>
 								</div>
 
-								{/* 3. 右侧富士相纸：皇后镇日落 (+7°) */}
+								{/* 3. 右侧拍立得：皇后镇日落 (+7°) */}
 								<div
 									style={{
-										width: '134px',
-										height: '196px',
+										width: '146px',
+										height: '182px',
 										transform: 'rotate(7deg) translateY(12px)',
 										transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
-										boxShadow: '0 4px 6px -1px rgba(0,0,0,0.06), 0 14px 28px -4px rgba(0,0,0,0.13), 0 0 0 1px rgba(0,0,0,0.07)'
+										boxShadow: '0 4px 6px -1px rgba(0,0,0,0.06), 0 14px 28px -4px rgba(0,0,0,0.13), 0 0 0 1px rgba(0,0,0,0.06)'
 									}}
-									className="relative bg-gradient-to-b from-[#FFFFFF] via-[#FDFDFD] to-[#F8F8F8] p-2 pb-6 rounded-[9px] pointer-events-none group-hover:!rotate-[11deg] group-hover:!translate-x-3 group-hover:!translate-y-2 group-hover:shadow-2xl flex flex-col shrink-0"
+									className="relative bg-gradient-to-b from-[#FFFFFF] via-[#FDFDFD] to-[#F7F7F7] p-2.5 pb-6 rounded-[8px] pointer-events-none group-hover:!rotate-[11deg] group-hover:!translate-x-3 group-hover:!translate-y-2 group-hover:shadow-2xl flex flex-col shrink-0"
 								>
-									{/* 富士特有内嵌倒角压痕相框 */}
+									{/* 和纸美纹胶带 */}
+									<WashiTape rotate={2} />
+
+									{/* 经典 1:1 方形照片窗口 */}
 									<div 
 										style={{ 
-											width: '118px', 
-											height: '144px',
+											width: '126px', 
+											height: '126px',
 											boxShadow: 'inset 0 1.5px 3px rgba(0,0,0,0.22), inset 0 0 0 1px rgba(0,0,0,0.08)'
 										}} 
-										className="relative rounded-[5px] overflow-hidden bg-zinc-900 shrink-0"
+										className="relative rounded-[4px] overflow-hidden bg-zinc-900 shrink-0"
 									>
 										<img
 											src="/images/uploads/844b159ea02995f4.jpeg"
@@ -260,12 +299,12 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 											style={{ width: '100%', height: '100%', objectFit: 'cover' }}
 											loading="lazy"
 										/>
-										{/* 富士高光胶片反光膜 */}
+										{/* 胶片高光反光膜 */}
 										<div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/20 pointer-events-none" />
 									</div>
 
-									{/* 富士相纸底部纯净手写留白（无水印与LOGO） */}
-									<div className="flex-1 flex items-center justify-center pt-1 px-0.5 overflow-visible">
+									{/* 拍立得宽下巴手写留白 */}
+									<div className="flex-1 flex items-center justify-center pt-1.5 px-0.5 overflow-visible">
 										<p 
 											style={{ 
 												fontFamily: 'var(--font-cursive), "Caveat", "Bradley Hand", cursive',
