@@ -161,7 +161,7 @@ function runTests() {
 		const geekContent = fs.readFileSync(geekBentoPath, 'utf8')
 		assert.ok(geekContent.includes('top-14'), 'GeekIdentityBento book marquee should be positioned at top-14 (shifted downwards)')
 		assert.ok(geekContent.includes('w-36'), 'GeekIdentityBento book covers should be enlarged to w-36')
-		assert.ok(geekContent.includes('gap="1.75rem"'), 'GeekIdentityBento book marquee should use 1.75rem gap (increased separation)')
+		assert.ok(geekContent.includes('gap="2.25rem"'), 'GeekIdentityBento book marquee should use 2.25rem gap (increased separation)')
 		assert.ok(geekContent.includes('[mask-image:linear-gradient'), 'GeekIdentityBento book marquee should have gradient fade mask')
 
 		const marqueePath = path.join(ROOT, 'src/components/ui/marquee.tsx')
@@ -178,7 +178,8 @@ function runTests() {
 	// 9. Verify Projects Page and Data Integrity
 	test('Projects page uses dynamic tag extraction and valid project data assets', () => {
 		const projectsPageContent = fs.readFileSync(path.join(ROOT, 'src/app/projects/page.tsx'), 'utf8')
-		assert.ok(projectsPageContent.includes('toolbarTags'), 'Projects page must compute dynamic toolbarTags')
+		assert.ok(projectsPageContent.includes('categoryTabs'), 'Projects page must compute categoryTabs')
+		assert.ok(projectsPageContent.includes('cascadingToolbarTags'), 'Projects page must compute cascadingToolbarTags')
 		assert.ok(projectsPageContent.includes('extraRightActions={viewModeToggle}'), 'View mode switcher must be integrated in toolbar')
 		assert.ok(projectsPageContent.includes('isFeatured'), 'Projects page must support featured project layout')
 		assert.ok(projectsPageContent.includes('ProjectPreviewModal'), 'Projects page must dynamically import ProjectPreviewModal')
@@ -187,6 +188,7 @@ function runTests() {
 		const projectsCardContent = fs.readFileSync(path.join(ROOT, 'src/app/projects/components/project-card.tsx'), 'utf8')
 		assert.ok(projectsCardContent.includes('isFeatured'), 'ProjectCard must support isFeatured')
 		assert.ok(projectsCardContent.includes('onPreview'), 'ProjectCard must accept onPreview callback')
+		assert.ok(projectsCardContent.includes('copiedNpm'), 'ProjectCard must support NPM command copy')
 
 		const previewModalPath = path.join(ROOT, 'src/app/projects/components/project-preview-modal.tsx')
 		assert.ok(fs.existsSync(previewModalPath), 'ProjectPreviewModal component file must exist')
@@ -198,11 +200,13 @@ function runTests() {
 		assert.ok(fs.existsSync(createDialogPath), 'CreateDialog component file must exist')
 		const dialogContent = fs.readFileSync(createDialogPath, 'utf8')
 		assert.ok(dialogContent.includes('featured:'), 'CreateDialog must support toggling featured status')
+		assert.ok(dialogContent.includes('PROJECT_CATEGORIES'), 'CreateDialog must support project categories')
 
 		const projectsJson = JSON.parse(fs.readFileSync(path.join(ROOT, 'src/data/projects.json'), 'utf8'))
 		for (const p of projectsJson) {
 			assert.ok(!p.image.startsWith('blob:'), `Project ${p.name} image should not be a temporary blob URL`)
 			assert.ok(p.name && p.url && p.description, `Project ${p.name} must have name, url, and description`)
+			assert.ok(p.category, `Project ${p.name} must have category defined`)
 		}
 	})
 

@@ -62,10 +62,11 @@ export function Marquee({
 			style={{
 				['--gap' as any]: gapStr,
 				['--duration' as any]: durationStr,
+				gap: gapStr,
 				...style,
 			}}
 			className={cn(
-				'group flex overflow-hidden p-2 [gap:var(--gap)] select-none',
+				'group flex overflow-hidden p-2 select-none',
 				{
 					'flex-row': !vertical,
 					'flex-col': vertical,
@@ -108,8 +109,9 @@ export function Marquee({
 							animationTimingFunction: 'linear',
 							animationIterationCount: 'infinite',
 							animationDirection: reverse ? 'reverse' : 'normal',
+							gap: gapStr,
 						}}
-						className={cn('marquee-item-track flex shrink-0 justify-around [gap:var(--gap)]', {
+						className={cn('marquee-item-track flex shrink-0', {
 							'flex-row': !vertical,
 							'flex-col': vertical,
 							'pause-on-hover': pauseOnHover,

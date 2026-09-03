@@ -4,7 +4,19 @@ import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { useSize } from '@/hooks/use-size'
 import CreateDialog from './create-dialog'
-import { Globe, Github, Package, BookOpen, ArrowUpRight, Sparkles, Play } from 'lucide-react'
+import { toast } from 'sonner'
+import {
+	Globe,
+	Github,
+	Package,
+	BookOpen,
+	ArrowUpRight,
+	Sparkles,
+	Play,
+	Copy,
+	Check,
+	Terminal
+} from 'lucide-react'
 
 export interface Project {
 	name: string
@@ -12,6 +24,7 @@ export interface Project {
 	description: string
 	image: string
 	url: string
+	category?: 'Web 应用' | '开源工具' | '创意实验' | string
 	tags: string[]
 	github?: string
 	npm?: string
@@ -42,6 +55,7 @@ export function ProjectCard({
 }: ProjectCardProps) {
 	const [isEditing, setIsEditing] = useState(false)
 	const [imageError, setImageError] = useState(false)
+	const [copiedNpm, setCopiedNpm] = useState(false)
 	const { maxSM } = useSize()
 	const [localProject, setLocalProject] = useState(project)
 
@@ -68,6 +82,12 @@ export function ProjectCard({
 			localProject.image.endsWith('.jpeg') ||
 			localProject.image.endsWith('.webp'))
 
+	const npmPackageName = localProject.npm
+		? localProject.npm
+				.replace(/^https?:\/\/(www\.)?npmjs\.com\/package\//, '')
+				.replace(/\/.*$/, '')
+		: null
+
 	const handleTriggerPreview = (e: React.MouseEvent) => {
 		if (isEditMode) {
 			setIsEditing(true)
@@ -77,6 +97,15 @@ export function ProjectCard({
 			e.stopPropagation()
 			onPreview(localProject)
 		}
+	}
+
+	const handleCopyNpm = (e: React.MouseEvent) => {
+		e.stopPropagation()
+		if (!npmPackageName) return
+		navigator.clipboard.writeText(`npm i ${npmPackageName}`)
+		setCopiedNpm(true)
+		toast.success(`已复制安装命令: npm i ${npmPackageName}`)
+		setTimeout(() => setCopiedNpm(false), 2000)
 	}
 
 	return (
@@ -135,6 +164,12 @@ export function ProjectCard({
 							</span>
 
 							<div className="flex items-center gap-1.5">
+								{localProject.category && (
+									<span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-zinc-200/60 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400">
+										{localProject.category === 'Web 应用' ? '🌐 ' : localProject.category === '开源工具' ? '🛠️ ' : '🎨 '}
+										{localProject.category}
+									</span>
+								)}
 								{localProject.status && (
 									<span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
 										<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -205,16 +240,46 @@ export function ProjectCard({
 
 					{/* Card Body */}
 					<div className="p-5 sm:p-6 flex flex-col gap-3">
-						<h3
-							onClick={handleTriggerPreview}
-							className="text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-[var(--color-brand)] transition-colors leading-tight cursor-pointer inline-flex items-center gap-2"
-						>
-							<span>{localProject.name}</span>
-						</h3>
+						<div className="flex items-start justify-between gap-2">
+							<h3
+								onClick={handleTriggerPreview}
+								className="text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-[var(--color-brand)] transition-colors leading-tight cursor-pointer inline-flex items-center gap-2"
+							>
+								<span>{localProject.name}</span>
+							</h3>
+						</div>
 
 						<p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed line-clamp-3">
 							{localProject.description}
 						</p>
+
+						{/* Terminal-styled NPM Quick Install Component (For Open Source Packages) */}
+						{npmPackageName && (
+							<div
+								onClick={handleCopyNpm}
+								className="group/npm flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-zinc-100/90 dark:bg-zinc-800/80 hover:bg-zinc-200/80 dark:hover:bg-zinc-700/80 border border-zinc-200/80 dark:border-zinc-700/80 font-mono text-[11px] text-zinc-700 dark:text-zinc-300 transition-all cursor-pointer shadow-2xs select-none"
+								title="点击复制 NPM 安装命令"
+							>
+								<div className="flex items-center gap-1.5 truncate">
+									<Terminal className="w-3.5 h-3.5 text-zinc-400 select-none shrink-0" />
+									<span className="text-[var(--color-brand)] font-bold select-none">$</span>
+									<span className="truncate">npm i {npmPackageName}</span>
+								</div>
+								<span className="shrink-0 flex items-center gap-1 text-[10px] text-zinc-500 group-hover/npm:text-zinc-900 dark:group-hover/npm:text-white">
+									{copiedNpm ? (
+										<>
+											<Check className="w-3.5 h-3.5 text-emerald-500" />
+											<span className="text-emerald-500 font-semibold">已复制</span>
+										</>
+									) : (
+										<>
+											<Copy className="w-3.5 h-3.5" />
+											<span>复制</span>
+										</>
+									)}
+								</span>
+							</div>
+						)}
 
 						{/* Tags */}
 						<div className="flex flex-wrap gap-1.5 pt-1">
@@ -226,7 +291,7 @@ export function ProjectCard({
 										e.stopPropagation()
 										onTagClick?.(tag)
 									}}
-									className="rounded-lg bg-zinc-100 dark:bg-zinc-800/70 hover:bg-zinc-200 dark:hover:bg-zinc-700/80 px-2.5 py-0.5 text-[11px] font-medium text-zinc-600 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-700/60 transition-colors"
+									className="rounded-lg bg-zinc-100 dark:bg-zinc-800/70 hover:bg-zinc-200 dark:hover:bg-zinc-700/80 px-2.5 py-0.5 text-[11px] font-medium text-zinc-600 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-700/60 transition-colors cursor-pointer"
 								>
 									{tag}
 								</button>
@@ -264,7 +329,7 @@ export function ProjectCard({
 
 					{localProject.npm && (
 						<Link
-							href={localProject.npm}
+							href={localProject.npm.startsWith('http') ? localProject.npm : `https://www.npmjs.com/package/${localProject.npm}`}
 							target="_blank"
 							rel="noopener noreferrer"
 							onClick={(e) => e.stopPropagation()}

@@ -2,40 +2,44 @@
 	{
 		"name": "Pixel Motion",
 		"year": 2025,
+		"category": "Web 应用",
 		"description": "网页端像素绘画工具，支持组件化画布，多画布同时绘画，色彩变量",
 		"image": "https://pixel-motion.yysuni.com/favicon.svg",
 		"url": "https://pixel-motion.yysuni.com/",
 		"tags": [
 			"React",
 			"SVG / 图形",
-			"Web 应用"
+			"Canvas",
+			"像素绘画"
 		],
 		"featured": true
 	},
 	{
 		"name": "Path Motion",
 		"year": 2025,
+		"category": "Web 应用",
 		"description": "在线 svg path 工具，针对 path 绘制、压缩、运动等功能",
 		"image": "https://path-motion.yysuni.com/favicon.svg",
 		"url": "https://path-motion.yysuni.com/canvas",
 		"tags": [
 			"React",
 			"SVG / 图形",
-			"开源工具",
-			"Web 应用"
+			"Canvas",
+			"动画引擎"
 		],
 		"github": "https://github.com/YYsuni/path-motion"
 	},
 	{
 		"name": "箭头生成小工具",
 		"year": 2026,
+		"category": "开源工具",
 		"image": "/images/project/03c08b1832f36f02.png",
 		"url": "https://currve-arrow.yysuni.com/",
 		"description": "实时生成弧线箭头 SVG，可用于图表绘制，也可用于设计取材。没想到这也被周刊看上。",
 		"tags": [
 			"SVG / 图形",
-			"开源工具",
-			"Web 应用"
+			"NPM",
+			"TypeScript"
 		],
 		"github": "https://github.com/YYsuni/curve-arrow",
 		"npm": "https://www.npmjs.com/package/curve-arrow",
@@ -44,14 +48,14 @@
 	{
 		"name": "打破边界：如何优雅地在 Notion 中直接打开 Obsidian 笔记",
 		"year": 2026,
+		"category": "开源工具",
 		"image": "/images/project/obsidian-redirect.svg",
 		"url": "https://github.com/lyt04919/obsidian-redirect",
 		"description": "解决 Notion 无法识别 obsidian:// 协议的痛点，用 100 行以内的纯静态代码实现无缝双向链接，附带一键生成快捷指令方案。",
 		"tags": [
-			"开源工具",
-			"HTML5",
-			"JS",
-			"DevOps",
+			"效率工具",
+			"JavaScript",
+			"自动化脚本",
 			"CSS"
 		],
 		"github": "https://github.com/lyt04919/obsidian-redirect.git",

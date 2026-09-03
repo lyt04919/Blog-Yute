@@ -151,7 +151,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 						<Marquee
 							pauseOnHover
 							duration="25s"
-							gap="1.75rem"
+							gap="2.25rem"
 							className="absolute inset-x-0 top-14 [mask-image:linear-gradient(to_top,transparent_30%,#000_90%)]"
 						>
 							{realBooks.map((item, idx) => (

@@ -16,6 +16,13 @@ import type { ImageItem } from './components/image-upload-dialog'
 import { StandardPageHeader } from '@/components/ui/standard-page-header'
 import { StandardToolbar } from '@/components/ui/standard-toolbar'
 
+function getProjectCategory(p: Project): string {
+	if (p.category) return p.category
+	if (p.tags?.some(t => t.toLowerCase() === 'web 应用' || t.toLowerCase() === 'web app')) return 'Web 应用'
+	if (p.tags?.some(t => t.toLowerCase() === '开源工具' || t.toLowerCase() === 'tool') || p.npm) return '开源工具'
+	return 'Web 应用'
+}
+
 export default function Page() {
 	const [projects, setProjects] = useState<Project[]>(initialList as Project[])
 	const [originalProjects, setOriginalProjects] = useState<Project[]>(initialList as Project[])
@@ -26,8 +33,9 @@ export default function Page() {
 	const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
 	const [imageItems, setImageItems] = useState<Map<string, ImageItem>>(new Map())
 
-	// Search & Tag filter states
+	// Search, Category & Cascading Tag filter states
 	const [searchTerm, setSearchTerm] = useState('')
+	const [selectedCategory, setSelectedCategory] = useState('all')
 	const [selectedTag, setSelectedTag] = useState('all')
 	const [viewMode, setViewMode] = useState<'grid' | 'stack'>('grid')
 
@@ -140,11 +148,40 @@ export default function Page() {
 		}
 	}, [isEditMode, isAuth])
 
-	// Dynamically compute tags from active projects, hiding 0-count categories
-	const toolbarTags = useMemo(() => {
+	// Level 1: Category Tabs (形态大类)
+	const categoryTabs = useMemo(() => {
+		const webCount = projects.filter(p => getProjectCategory(p) === 'Web 应用').length
+		const toolCount = projects.filter(p => getProjectCategory(p) === '开源工具').length
+		const labCount = projects.filter(p => getProjectCategory(p) === '创意实验').length
+
+		const tabs = [
+			{ label: '全部', value: 'all', count: projects.length },
+			{ label: '🌐 Web 应用', value: 'Web 应用', count: webCount },
+			{ label: '🛠️ 开源工具', value: '开源工具', count: toolCount }
+		]
+
+		if (labCount > 0) {
+			tabs.push({ label: '🎨 创意实验', value: '创意实验', count: labCount })
+		}
+
+		return tabs
+	}, [projects])
+
+	const handleSelectCategory = (cat: string) => {
+		setSelectedCategory(cat)
+		setSelectedTag('all')
+	}
+
+	// Level 2: Cascading Dynamic Tags (根据所选大类智能联动的技术标签)
+	const cascadingToolbarTags = useMemo(() => {
+		const categoryProjects = projects.filter(
+			p => selectedCategory === 'all' || getProjectCategory(p) === selectedCategory
+		)
+
 		const counts: Record<string, number> = {}
-		projects.forEach((p) => {
+		categoryProjects.forEach((p) => {
 			p.tags?.forEach((t) => {
+				if (t === 'Web 应用' || t === '开源工具' || t === '创意实验') return
 				counts[t] = (counts[t] || 0) + 1
 			})
 		})
@@ -157,23 +194,29 @@ export default function Page() {
 				count
 			}))
 
-		return [{ label: 'all', value: 'all', count: projects.length }, ...dynamicTags]
-	}, [projects])
+		return [{ label: '全部标签', value: 'all', count: categoryProjects.length }, ...dynamicTags]
+	}, [projects, selectedCategory])
 
+	// Filtered project stream
 	const filteredProjects = useMemo(() => {
 		const query = searchTerm.trim().toLowerCase()
 		return projects.filter(p => {
+			const projectCat = getProjectCategory(p)
+			const matchesCategory =
+				selectedCategory === 'all' || projectCat === selectedCategory
+			const matchesTag =
+				selectedTag === 'all' ||
+				p.tags?.some(t => t.toLowerCase() === selectedTag.toLowerCase())
 			const matchesSearch =
 				!query ||
 				p.name.toLowerCase().includes(query) ||
 				p.description.toLowerCase().includes(query) ||
-				p.tags?.some(t => t.toLowerCase().includes(query))
-			const matchesTag =
-				selectedTag === 'all' ||
-				p.tags?.some(t => t.toLowerCase() === selectedTag.toLowerCase())
-			return matchesSearch && matchesTag
+				p.tags?.some(t => t.toLowerCase().includes(query)) ||
+				projectCat.toLowerCase().includes(query)
+
+			return matchesCategory && matchesTag && matchesSearch
 		})
-	}, [projects, searchTerm, selectedTag])
+	}, [projects, selectedCategory, selectedTag, searchTerm])
 
 	const headerActions = (
 		<div className="flex items-center gap-2">
@@ -262,13 +305,17 @@ export default function Page() {
 					actions={headerActions}
 				/>
 
+				{/* Two-level Toolbar: Status/Category Tabs + Cascading Tech Stack Tags */}
 				<StandardToolbar
-					tags={toolbarTags}
+					statusTabs={categoryTabs}
+					selectedStatus={selectedCategory}
+					onSelectStatus={handleSelectCategory}
+					tags={cascadingToolbarTags}
 					selectedTag={selectedTag}
 					onSelectTag={setSelectedTag}
 					searchValue={searchTerm}
 					onSearchChange={setSearchTerm}
-					searchPlaceholder="搜索项目..."
+					searchPlaceholder="搜索项目名称、技术栈或特性..."
 					extraRightActions={viewModeToggle}
 				/>
 
@@ -276,11 +323,12 @@ export default function Page() {
 					{filteredProjects.length === 0 ? (
 						<div className='flex flex-col items-center justify-center py-20 text-slate-400 gap-3'>
 							<p className='text-base font-medium'>暂无匹配项目</p>
-							{(searchTerm || selectedTag !== 'all') && (
+							{(searchTerm || selectedTag !== 'all' || selectedCategory !== 'all') && (
 								<button
 									type="button"
 									onClick={() => {
 										setSearchTerm('')
+										setSelectedCategory('all')
 										setSelectedTag('all')
 									}}
 									className="px-4 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
@@ -312,6 +360,7 @@ export default function Page() {
 								const isFeatured =
 									Boolean(project.featured) &&
 									selectedTag === 'all' &&
+									selectedCategory === 'all' &&
 									!searchTerm
 								return (
 									<ProjectCard

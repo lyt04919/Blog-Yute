@@ -7,8 +7,15 @@ import { UniversalEditorShell } from '@/components/ui/universal-editor-shell'
 import { TagSelector } from '@/components/ui/tag-selector'
 import { useBlogIndex } from '@/hooks/use-blog-index'
 import { Select } from '@/components/select'
+import { cn } from '@/lib/utils'
 
-const PROJECT_TAG_OPTIONS = ['React', 'Next.js', 'Vue', 'SVG / 图形', '开源工具', 'Web 应用']
+const PROJECT_CATEGORIES = ['Web 应用', '开源工具', '创意实验']
+
+const TAG_PRESETS_BY_CATEGORY: Record<string, string[]> = {
+	'Web 应用': ['React', 'Next.js', 'Vue', 'SVG / 图形', 'Canvas', 'Tailwind CSS', 'TypeScript', 'Web3'],
+	'开源工具': ['TypeScript', 'JavaScript', 'NPM', 'CLI', '自动化脚本', '效率工具', 'DevOps', '浏览器扩展'],
+	'创意实验': ['Three.js', 'WebGL', 'Canvas', 'Shader', '动画引擎', '生成艺术', '音频可视化']
+}
 
 interface CreateDialogProps {
 	project: Project | null
@@ -22,6 +29,7 @@ export default function CreateDialog({ project, onClose, onSave }: CreateDialogP
 		year: new Date().getFullYear(),
 		image: '',
 		url: '',
+		category: 'Web 应用',
 		description: '',
 		tags: [],
 		github: undefined,
@@ -70,7 +78,11 @@ export default function CreateDialog({ project, onClose, onSave }: CreateDialogP
 
 	useEffect(() => {
 		if (project) {
-			setFormData({ ...project, featured: project.featured || false })
+			setFormData({
+				...project,
+				category: project.category || 'Web 应用',
+				featured: project.featured || false
+			})
 			setTagsInput(project.tags.join(', '))
 		} else {
 			setFormData({
@@ -78,6 +90,7 @@ export default function CreateDialog({ project, onClose, onSave }: CreateDialogP
 				year: new Date().getFullYear(),
 				image: '',
 				url: '',
+				category: 'Web 应用',
 				description: '',
 				tags: [],
 				github: undefined,
@@ -119,6 +132,9 @@ export default function CreateDialog({ project, onClose, onSave }: CreateDialogP
 		onClose()
 		toast.success(project ? '更新成功' : '添加成功')
 	}
+
+	const currentCategory = formData.category || 'Web 应用'
+	const currentTagPresets = TAG_PRESETS_BY_CATEGORY[currentCategory] || TAG_PRESETS_BY_CATEGORY['Web 应用']
 
 	return (
 		<>
@@ -203,10 +219,36 @@ export default function CreateDialog({ project, onClose, onSave }: CreateDialogP
 								</label>
 							</div>
 
+							{/* Category Selection */}
 							<div>
-								<span className='text-slate-500 dark:text-slate-400 text-[11px] font-medium block mb-1.5'>项目技术栈标签</span>
+								<span className='text-slate-500 dark:text-slate-400 text-[11px] font-medium block mb-1.5'>项目形态分类</span>
+								<div className="flex items-center gap-2">
+									{PROJECT_CATEGORIES.map(cat => (
+										<button
+											key={cat}
+											type="button"
+											onClick={() => setFormData({ ...formData, category: cat })}
+											className={cn(
+												'px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border',
+												currentCategory === cat
+													? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900 dark:border-white shadow-xs'
+													: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
+											)}
+										>
+											{cat === 'Web 应用' ? '🌐 ' : cat === '开源工具' ? '🛠️ ' : '🎨 '}
+											{cat}
+										</button>
+									))}
+								</div>
+							</div>
+
+							{/* Cascading Tag Presets */}
+							<div>
+								<span className='text-slate-500 dark:text-slate-400 text-[11px] font-medium block mb-1.5'>
+									技术栈标签推荐 ({currentCategory})
+								</span>
 								<TagSelector
-									options={PROJECT_TAG_OPTIONS}
+									options={currentTagPresets}
 									selectedTags={formData.tags}
 									onChange={tags => setFormData({ ...formData, tags })}
 								/>
@@ -235,36 +277,34 @@ export default function CreateDialog({ project, onClose, onSave }: CreateDialogP
 								<div className='relative flex items-center'>
 									<div className='absolute text-slate-400 left-3'><Package className="w-4 h-4"/></div>
 									<input
-										type='url'
+										type='text'
 										value={formData.npm || ''}
 										onChange={e => setFormData({ ...formData, npm: e.target.value || undefined })}
-										placeholder='NPM URL (可选)'
+										placeholder='NPM 包名或 URL (可选，如 curve-arrow)'
 										className='w-full py-2.5 pl-10 pr-4 bg-white dark:bg-slate-950 text-slate-900 dark:text-white text-sm rounded-xl font-medium transition-all border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-slate-400 placeholder:text-slate-400'
 									/>
 								</div>
-								<div className='relative flex items-center z-50'>
-									<div className='absolute text-slate-400 left-3'><BookOpen className="w-4 h-4"/></div>
-									<div className='w-full pl-10'>
-										<Select
-											value={blogSelectValue}
-											onChange={handleBlogSelect}
-											options={blogOptions}
-											className='w-full text-sm'
-										/>
-									</div>
-								</div>
-								{showCustomBlogField && (
+								<div className='space-y-2'>
 									<div className='relative flex items-center'>
-										<div className='absolute text-slate-400 left-3'><BookOpen className="w-4 h-4"/></div>
+										<div className='absolute text-slate-400 left-3 z-10'><BookOpen className="w-4 h-4"/></div>
+										<div className='w-full pl-10'>
+											<Select
+												value={blogSelectValue}
+												onChange={handleBlogSelect}
+												options={blogOptions}
+											/>
+										</div>
+									</div>
+									{showCustomBlogField && (
 										<input
 											type='text'
 											value={formData.blogSlug || ''}
 											onChange={e => setFormData({ ...formData, blogSlug: e.target.value || undefined })}
-											placeholder='自定义关联博客 Slug (如: my-awesome-post)'
-											className='w-full py-2.5 pl-10 pr-4 bg-white dark:bg-slate-950 text-slate-900 dark:text-white text-sm rounded-xl font-medium transition-all border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-slate-400 placeholder:text-slate-400'
+											placeholder='输入自定义博客 Slug (如: my-post-slug)'
+											className='w-full py-2 px-3 text-xs bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-slate-400 font-mono transition-colors placeholder:text-slate-400'
 										/>
-									</div>
-								)}
+									)}
+								</div>
 							</div>
 						</div>
 					</div>
@@ -273,12 +313,8 @@ export default function CreateDialog({ project, onClose, onSave }: CreateDialogP
 
 			{showImageDialog && (
 				<ImageUploadDialog
-					currentImage={formData.image}
 					onClose={() => setShowImageDialog(false)}
-					onSubmit={(image) => {
-						handleImageSubmit(image)
-						setShowImageDialog(false)
-					}}
+					onSubmit={handleImageSubmit}
 				/>
 			)}
 		</>
