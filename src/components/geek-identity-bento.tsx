@@ -171,25 +171,41 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 											className="w-full h-full object-cover transition-transform duration-300 group-hover/book:scale-105" 
 										/>
 
-										{/* 2. Lower-half progressive blur: 从下半截（48%）开始逐渐模糊溶散 */}
+										{/* 2. Lower-half progressive blur: 从下半截（54%）逐级深度模糊溶散 (6px -> 16px -> 28px -> 40px) */}
 										<div 
-											className="absolute inset-x-0 bottom-0 pointer-events-none rounded-b-xl overflow-hidden backdrop-blur-md"
+											className="absolute inset-x-0 bottom-0 pointer-events-none rounded-b-xl"
 											style={{
-												height: '52%',
-												maskImage: 'linear-gradient(to bottom, transparent 0%, black 80%)',
-												WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 80%)',
+												height: '54%',
+												backdropFilter: 'blur(6px)',
+												WebkitBackdropFilter: 'blur(6px)',
 											}}
 										/>
 										<div 
-											className="absolute inset-x-0 bottom-0 pointer-events-none rounded-b-xl overflow-hidden backdrop-blur-xl"
+											className="absolute inset-x-0 bottom-0 pointer-events-none rounded-b-xl"
 											style={{
-												height: '35%',
-												maskImage: 'linear-gradient(to bottom, transparent 0%, black 70%)',
-												WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 70%)',
+												height: '42%',
+												backdropFilter: 'blur(16px)',
+												WebkitBackdropFilter: 'blur(16px)',
 											}}
 										/>
-										{/* 渐进环境底色融合：与 BentoCard 底色自然消融 */}
-										<div className="absolute inset-x-0 bottom-0 h-[52%] pointer-events-none rounded-b-xl bg-gradient-to-t from-white/90 via-white/40 via-50% to-transparent dark:from-zinc-900/90 dark:via-zinc-900/40" />
+										<div 
+											className="absolute inset-x-0 bottom-0 pointer-events-none rounded-b-xl"
+											style={{
+												height: '30%',
+												backdropFilter: 'blur(28px)',
+												WebkitBackdropFilter: 'blur(28px)',
+											}}
+										/>
+										<div 
+											className="absolute inset-x-0 bottom-0 pointer-events-none rounded-b-xl"
+											style={{
+												height: '18%',
+												backdropFilter: 'blur(40px)',
+												WebkitBackdropFilter: 'blur(40px)',
+											}}
+										/>
+										{/* 渐进环境底色融合：下半截深度消融到卡片底色中 */}
+										<div className="absolute inset-x-0 bottom-0 h-[54%] pointer-events-none rounded-b-xl bg-gradient-to-t from-white/95 from-15% via-white/55 via-45% to-transparent dark:from-zinc-900/95 dark:from-15% dark:via-zinc-900/55" />
 
 										{/* Realistic book spine lighting fold */}
 										<div className="absolute inset-y-0 left-0 w-2.5 bg-gradient-to-r from-black/25 via-white/10 to-transparent pointer-events-none z-10" />
