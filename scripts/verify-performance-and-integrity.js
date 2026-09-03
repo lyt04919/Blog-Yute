@@ -196,6 +196,31 @@ function runTests() {
 		}
 	})
 
+	// 10. Verify Blog Page Structure, Dynamic Tags, and BlogGridCard Component
+	test('Blog page uses dynamic tag extraction, BlogGridCard, isRead integration, and proper padding', () => {
+		const blogPagePath = path.join(ROOT, 'src/app/blog/page.tsx')
+		assert.ok(fs.existsSync(blogPagePath), 'src/app/blog/page.tsx should exist')
+		const blogPageContent = fs.readFileSync(blogPagePath, 'utf8')
+		assert.ok(blogPageContent.includes('dynamicTags'), 'Blog page must compute dynamicTags')
+		assert.ok(blogPageContent.includes('tags={dynamicTags}'), 'Blog page must pass dynamicTags to StandardToolbar')
+		assert.ok(blogPageContent.includes('<BlogGridCard'), 'Blog page must use BlogGridCard component')
+		assert.ok(blogPageContent.includes('isRead={isRead(blog.slug)}'), 'Blog page must pass isRead to BlogGridCard')
+		assert.ok(blogPageContent.includes('pb-48'), 'Blog page must provide pb-48 for bottom dock clearance')
+
+		const blogCardPath = path.join(ROOT, 'src/components/blog-grid-card.tsx')
+		assert.ok(fs.existsSync(blogCardPath), 'src/components/blog-grid-card.tsx should exist')
+		const blogCardContent = fs.readFileSync(blogCardPath, 'utf8')
+		assert.ok(blogCardContent.includes('isRead'), 'BlogGridCard must support isRead state')
+		assert.ok(blogCardContent.includes('Clock'), 'BlogGridCard must include reading time estimate')
+		assert.ok(!blogCardContent.includes('uppercase tracking-[0.1em] font-medium px-2 py-0.5 rounded-full bg-[var(--color-bg)] text-[var(--color-secondary)] border border-[var(--color-border)]">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPublished'), 'BlogGridCard must not display redundant uppercase PUBLISHED label')
+
+		const blogIndexJson = JSON.parse(fs.readFileSync(path.join(ROOT, 'public/blogs/index.json'), 'utf8'))
+		assert.ok(Array.isArray(blogIndexJson), 'public/blogs/index.json should be an array')
+		for (const b of blogIndexJson) {
+			assert.ok(b.slug && b.title && b.date, `Blog item ${b.slug} must have slug, title, and date`)
+		}
+	})
+
 	console.log(`\n🏁 Test Results: ${passed}/${total} passed.`)
 	if (passed === total) {
 		console.log('✨ All performance and integrity tests PASSED successfully!\n')

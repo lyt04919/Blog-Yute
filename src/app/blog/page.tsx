@@ -41,12 +41,11 @@ export default function BlogPage() {
 	const { items, loading } = useBlogIndex()
 	const { categories: categoriesFromServer } = useCategories()
 	const { isRead } = useReadArticles()
-	const { isAuth, setPrivateKey } = useAuthStore()
+	const { isAuth } = useAuthStore()
 	const { siteContent } = useConfigStore()
 	const hideEditButton = siteContent.hideEditButton ?? false
 	const enableCategories = siteContent.enableCategories ?? false
 
-	const keyInputRef = useRef<HTMLInputElement>(null)
 	const [editMode, setEditMode] = useState(false)
 	const [editableItems, setEditableItems] = useState<BlogIndexItem[]>([])
 	const [selectedSlugs, setSelectedSlugs] = useState<Set<string>>(new Set())
@@ -60,7 +59,6 @@ export default function BlogPage() {
 	const [selectedTag, setSelectedTag] = useState<string>('All')
 	const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft'>('all')
 	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-	const [imageLoaded, setImageLoaded] = useState<Record<string, boolean>>({})
 
 	const { cancelCoverPreview, onCoverLinkMouseEnter, hoverCoverPreview, mousePosition } = useBlogCoverHover(editMode)
 
@@ -90,12 +88,14 @@ export default function BlogPage() {
 		})
 	}, [displayItems, statusFilter])
 
-	const standardBlogCategories = ['前端开发', '3D 与图形', 'AI 与工具', '学习笔记', '生活与随感', '游戏程序']
-
-	const tagCounts = useMemo(() => {
-		const counts: Record<string, number> = { All: statusFilteredItems.length, all: statusFilteredItems.length }
+	const dynamicTags = useMemo(() => {
+		const counts: Record<string, number> = {}
 		statusFilteredItems.forEach(item => {
-			if (item.tags) {
+			if (item.category && item.category.trim() && item.category.trim().toLowerCase() !== 'blog') {
+				const cat = item.category.trim()
+				counts[cat] = (counts[cat] || 0) + 1
+			}
+			if (item.tags && Array.isArray(item.tags)) {
 				item.tags.forEach(tag => {
 					const normalized = tag.trim()
 					if (normalized) {
@@ -104,16 +104,25 @@ export default function BlogPage() {
 				})
 			}
 		})
-		return counts
-	}, [statusFilteredItems])
 
-	const allTags = useMemo(() => {
-		return ['All', ...standardBlogCategories]
-	}, [])
+		const sorted = Object.entries(counts)
+			.sort((a, b) => b[1] - a[1])
+			.map(([tag, count]) => ({
+				label: tag,
+				value: tag,
+				count
+			}))
+
+		return [{ label: 'All', value: 'All', count: statusFilteredItems.length }, ...sorted]
+	}, [statusFilteredItems])
 
 	const gridFilteredItems = useMemo(() => {
 		if (selectedTag === 'All' || selectedTag === 'all') return statusFilteredItems
-		return statusFilteredItems.filter(item => item.tags?.some(t => t.toLowerCase() === selectedTag.toLowerCase()))
+		return statusFilteredItems.filter(item => {
+			const matchesCategory = item.category?.toLowerCase() === selectedTag.toLowerCase()
+			const matchesTag = item.tags?.some(t => t.toLowerCase() === selectedTag.toLowerCase())
+			return matchesCategory || matchesTag
+		})
 	}, [statusFilteredItems, selectedTag])
 
 	const { groupedItems, groupKeys, getGroupLabel } = useMemo(() => {
@@ -415,25 +424,11 @@ export default function BlogPage() {
 
 	const handleSaveClick = useCallback(() => {
 		if (!isAuth) {
-			keyInputRef.current?.click()
+			toast.error('未授权，请先在顶部导航栏登录作者账户')
 			return
 		}
 		void handleSave()
 	}, [handleSave, isAuth])
-
-	const handlePrivateKeySelection = useCallback(
-		async (file: File) => {
-			try {
-				const pem = await readFileAsText(file)
-				setPrivateKey(pem)
-				toast.success('密钥导入成功，请再次点击保存')
-			} catch (error) {
-				console.error(error)
-				toast.error('读取密钥失败')
-			}
-		},
-		[setPrivateKey]
-	)
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
@@ -469,17 +464,6 @@ export default function BlogPage() {
 				onClose={() => setStatusModalOpen(false)}
 				editableItems={editableItems}
 				onAssignStatus={handleAssignStatus}
-			/>
-			<input
-				ref={keyInputRef}
-				type='file'
-				accept='.pem'
-				className='hidden'
-				onChange={async e => {
-					const f = e.target.files?.[0]
-					if (f) await handlePrivateKeySelection(f)
-					if (e.currentTarget) e.currentTarget.value = ''
-				}}
 			/>
 
 			{/* Edit Mode Toolbar */}
@@ -561,7 +545,7 @@ export default function BlogPage() {
 				</motion.div>
 			)}
 
-			<div className='min-h-screen relative pb-32'>
+			<div className='min-h-screen relative pb-48'>
 				{(() => {
 					const blogHeaderActions = isAuth ? (
 						<div className="flex items-center gap-2">
@@ -600,7 +584,7 @@ export default function BlogPage() {
 								statusTabs={blogStatusTabs}
 								selectedStatus={statusFilter}
 								onSelectStatus={(s) => setStatusFilter(s as any)}
-								tags={allTags.map(t => ({ label: t, value: t, count: tagCounts[t] }))}
+								tags={dynamicTags}
 								selectedTag={selectedTag}
 								onSelectTag={setSelectedTag}
 								viewMode={viewLayout === 'grid' ? 'grid' : 'list'}
@@ -615,105 +599,22 @@ export default function BlogPage() {
 					{viewLayout === 'grid' ? (
 						<div className="flex flex-col gap-8">
 							{gridFilteredItems.length === 0 ? (
-					<EmptyState type="blog" />
-				) : (
-						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 relative">
-							{gridFilteredItems.map((blog) => {
-								const isSelected = selectedSlugs.has(blog.slug);
-								return (
-									<div key={blog.slug} className={cn("group relative", editMode && "cursor-pointer")}>
-										{editMode && (
-											<button
-												onClick={(e) => {
-													e.preventDefault();
-													e.stopPropagation();
-													toggleSelect(blog.slug);
-												}}
-												className={cn(
-													'absolute top-3 left-3 z-10 flex h-6 w-6 items-center justify-center rounded-full border transition-all',
-													isSelected
-														? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-bg)]'
-														: 'border-[var(--color-border)] bg-[var(--color-card)]/80 backdrop-blur-sm text-transparent hover:border-[var(--color-primary)]'
-												)}>
-												<Check className="h-3.5 w-3.5" />
-											</button>
-										)}
-										<Link href={`/blog/${blog.slug}`} onClick={(e) => handleItemClick(e, blog.slug)}>
-											<article className={cn(
-												"h-full flex flex-col overflow-hidden rounded-xl border transition-all",
-												isSelected
-													? "border-[var(--color-primary)]/40 bg-[var(--color-card)] ring-1 ring-[var(--color-primary)]/10"
-													: "border-[var(--color-border)] bg-[var(--color-card)] hover:border-[var(--color-primary)]/20"
-											)}>
-												{blog.cover ? (
-															<div className="overflow-hidden aspect-[16/10] relative">
-																{!imageLoaded[blog.slug] && (
-																	<div className="absolute inset-0 bg-[var(--color-bg)] animate-pulse" />
-																)}
-																<img
-																	src={blog.cover}
-																	alt={blog.title}
-																	loading="lazy"
-																	onLoad={() => setImageLoaded(prev => ({ ...prev, [blog.slug]: true }))}
-																	onError={(e) => {
-																		setImageLoaded(prev => ({ ...prev, [blog.slug]: true }));
-																		const target = e.target as HTMLImageElement;
-																		target.style.display = 'none';
-																		target.parentElement?.classList.add('bg-[var(--color-bg)]', 'flex', 'items-center', 'justify-center');
-																		const icon = document.createElement('div');
-																		icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>';
-																		icon.className = 'text-[var(--color-secondary)] opacity-30';
-																		target.parentElement?.appendChild(icon);
-																	}}
-																	className={cn(
-																		"w-full h-full object-cover img-curated group-hover:scale-105 transition-all duration-500",
-																		!imageLoaded[blog.slug] && "opacity-0"
-																	)}
-																/>
-															</div>
-														) : (
-															<div className="bg-[var(--color-bg)] flex items-center justify-center aspect-[16/10]">
-																<BookIcon className="h-8 w-8 text-[var(--color-secondary)] opacity-30" />
-															</div>
-														)}
-												<div className="p-5 flex flex-col flex-grow">
-													<div className="flex items-center gap-2 mb-3 flex-wrap">
-														{(blog.status === 'draft' || !blog.status) && (
-															<span className="text-[10px] uppercase tracking-[0.1em] font-medium px-2 py-0.5 rounded-full bg-[var(--color-bg)] text-[var(--color-secondary)] border border-[var(--color-border)]">
-																Draft
-															</span>
-														)}
-														{blog.status === 'published' && (
-															<span className="text-[10px] uppercase tracking-[0.1em] font-medium px-2 py-0.5 rounded-full bg-[var(--color-bg)] text-[var(--color-secondary)] border border-[var(--color-border)]">
-																Published
-															</span>
-														)}
-														<span className="text-[10px] text-[var(--color-secondary)]">{blog.category || 'Blog'}</span>
-														<span className="text-[10px] text-[var(--color-secondary)]">·</span>
-														<span className="text-[10px] text-[var(--color-secondary)]">{dayjs(blog.date).format('MMM DD, YYYY')}</span>
-													</div>
-													<h3 className="font-serif text-lg font-medium text-[var(--color-primary)] mb-2 group-hover:text-[var(--color-brand)] transition-colors line-clamp-2 leading-snug">
-														{blog.title || blog.slug}
-													</h3>
-													{blog.summary && blog.summary !== '暂无描述' && (
-														<p className="text-sm text-[var(--color-secondary)] line-clamp-2 leading-relaxed mb-4">
-															{blog.summary}
-														</p>
-													)}
-													<div className="mt-auto">
-														<span className="inline-flex items-center gap-1 text-xs text-[var(--color-primary)] group-hover:text-[var(--color-brand)] transition-colors">
-															Read essay
-															<ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-														</span>
-													</div>
-												</div>
-											</article>
-										</Link>
-									</div>
-								);
-							})}
-						</div>
-					)}
+								<EmptyState type="blog" />
+							) : (
+								<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 relative">
+									{gridFilteredItems.map((blog) => (
+										<BlogGridCard
+											key={blog.slug}
+											blog={blog}
+											editMode={editMode}
+											isSelected={selectedSlugs.has(blog.slug)}
+											isRead={isRead(blog.slug)}
+											onToggleSelect={toggleSelect}
+											onClick={handleItemClick}
+										/>
+									))}
+								</div>
+							)}
 						</div>
 					) : (
 						<div className='flex flex-col items-center justify-center gap-6 pt-4'>
