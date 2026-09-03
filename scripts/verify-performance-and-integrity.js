@@ -165,6 +165,23 @@ function runTests() {
 		assert.ok(profileContent.includes('BentoCard'), 'ProfileBento must integrate BentoCard')
 	})
 
+	// 9. Verify Projects Page and Data Integrity
+	test('Projects page uses dynamic tag extraction and valid project data assets', () => {
+		const projectsPageContent = fs.readFileSync(path.join(ROOT, 'src/app/projects/page.tsx'), 'utf8')
+		assert.ok(projectsPageContent.includes('toolbarTags'), 'Projects page must compute dynamic toolbarTags')
+		assert.ok(projectsPageContent.includes('extraRightActions={viewModeToggle}'), 'View mode switcher must be integrated in toolbar')
+		assert.ok(projectsPageContent.includes('isFeatured'), 'Projects page must support featured project layout')
+
+		const projectsCardContent = fs.readFileSync(path.join(ROOT, 'src/app/projects/components/project-card.tsx'), 'utf8')
+		assert.ok(projectsCardContent.includes('isFeatured'), 'ProjectCard must support isFeatured')
+
+		const projectsJson = JSON.parse(fs.readFileSync(path.join(ROOT, 'src/data/projects.json'), 'utf8'))
+		for (const p of projectsJson) {
+			assert.ok(!p.image.startsWith('blob:'), `Project ${p.name} image should not be a temporary blob URL`)
+			assert.ok(p.name && p.url && p.description, `Project ${p.name} must have name, url, and description`)
+		}
+	})
+
 	console.log(`\n🏁 Test Results: ${passed}/${total} passed.`)
 	if (passed === total) {
 		console.log('✨ All performance and integrity tests PASSED successfully!\n')

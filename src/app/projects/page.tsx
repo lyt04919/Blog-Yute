@@ -1,7 +1,6 @@
 'use client'
 import { PageTitle } from '@/components/page-title'
-import { useState, useRef, useEffect } from 'react'
-import { motion } from 'motion/react'
+import { useState, useMemo, useEffect } from 'react'
 import { toast } from 'sonner'
 import { ProjectCard, type Project } from './components/project-card'
 import dynamic from 'next/dynamic'
@@ -24,14 +23,13 @@ export default function Page() {
 	const [editingProject, setEditingProject] = useState<Project | null>(null)
 	const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
 	const [imageItems, setImageItems] = useState<Map<string, ImageItem>>(new Map())
-	const keyInputRef = useRef<HTMLInputElement>(null)
 
 	// Search & Tag filter states
 	const [searchTerm, setSearchTerm] = useState('')
 	const [selectedTag, setSelectedTag] = useState('all')
 	const [viewMode, setViewMode] = useState<'grid' | 'stack'>('grid')
 
-	const { isAuth, setPrivateKey } = useAuthStore()
+	const { isAuth } = useAuthStore()
 	const { siteContent } = useConfigStore()
 	const hideEditButton = siteContent.hideEditButton ?? false
 
@@ -63,33 +61,19 @@ export default function Page() {
 
 	const handleSaveProject = (updatedProject: Project) => {
 		if (editingProject) {
-			const updated = projects.map(p => (p.url === editingProject.url ? updatedProject : p))
-			setProjects(updated)
+			setProjects(prev => prev.map(p => (p.url === editingProject.url ? updatedProject : p)))
 		} else {
-			setProjects([...projects, updatedProject])
+			setProjects(prev => [...prev, updatedProject])
 		}
 	}
 
 	const handleDelete = (project: Project) => {
-		if (confirm(`确定要删除 ${project.name} 吗？`)) {
-			setProjects(projects.filter(p => p.url !== project.url))
-		}
-	}
-
-	const handleChoosePrivateKey = async (file: File) => {
-		try {
-			const text = await file.text()
-			setPrivateKey(text)
-			await handleSave()
-		} catch (error) {
-			console.error('Failed to read private key:', error)
-			toast.error('读取密钥文件失败')
-		}
+		setProjects(prev => prev.filter(p => p.url !== project.url))
 	}
 
 	const handleSaveClick = () => {
 		if (!isAuth) {
-			keyInputRef.current?.click()
+			toast.error('未授权，请先在顶部导航栏登录作者账户')
 		} else {
 			handleSave()
 		}
@@ -138,7 +122,7 @@ export default function Page() {
 		setIsEditMode(false)
 	}
 
-	const buttonText = isAuth ? '保存' : '导入密钥'
+	const buttonText = '保存'
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
@@ -154,23 +138,37 @@ export default function Page() {
 		}
 	}, [isEditMode, isAuth])
 
-	// Derived filtering
-	const standardProjectCategories = ['React', 'Next.js', 'Vue', 'SVG / 图形', '开源工具', 'Web 应用']
+	// Dynamically compute tags from active projects, hiding 0-count categories
+	const toolbarTags = useMemo(() => {
+		const counts: Record<string, number> = {}
+		projects.forEach((p) => {
+			p.tags?.forEach((t) => {
+				counts[t] = (counts[t] || 0) + 1
+			})
+		})
 
-	const toolbarTags = [
-		{ label: 'all', value: 'all', count: projects.length },
-		...standardProjectCategories.map(cat => ({
-			label: cat,
-			value: cat,
-			count: projects.filter(p => p.tags?.some(t => t.toLowerCase() === cat.toLowerCase())).length
-		}))
-	]
+		const dynamicTags = Object.entries(counts)
+			.sort((a, b) => b[1] - a[1])
+			.map(([cat, count]) => ({
+				label: cat,
+				value: cat,
+				count
+			}))
 
-	const filteredProjects = projects.filter(p => {
-		const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) || p.description.toLowerCase().includes(searchTerm.toLowerCase())
-		const matchesTag = selectedTag === 'all' || p.tags?.some(t => t.toLowerCase() === selectedTag.toLowerCase())
-		return matchesSearch && matchesTag
-	})
+		return [{ label: 'all', value: 'all', count: projects.length }, ...dynamicTags]
+	}, [projects])
+
+	const filteredProjects = useMemo(() => {
+		return projects.filter(p => {
+			const matchesSearch =
+				p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+				p.description.toLowerCase().includes(searchTerm.toLowerCase())
+			const matchesTag =
+				selectedTag === 'all' ||
+				p.tags?.some(t => t.toLowerCase() === selectedTag.toLowerCase())
+			return matchesSearch && matchesTag
+		})
+	}, [projects, searchTerm, selectedTag])
 
 	const headerActions = (
 		<div className="flex items-center gap-2">
@@ -219,22 +217,39 @@ export default function Page() {
 		</div>
 	)
 
+	const viewModeToggle = (
+		<div className="inline-flex rounded-xl bg-slate-100 dark:bg-slate-800/80 p-1 text-xs font-semibold shrink-0 border border-slate-200 dark:border-slate-700/60">
+			<button
+				type="button"
+				onClick={() => setViewMode('grid')}
+				className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+					viewMode === 'grid'
+						? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+						: 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+				}`}
+			>
+				网格 (Grid)
+			</button>
+			<button
+				type="button"
+				onClick={() => setViewMode('stack')}
+				className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+					viewMode === 'stack'
+						? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+						: 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+				}`}
+			>
+				堆叠 (Stack)
+			</button>
+		</div>
+	)
+
 	return (
 		<>
 			<PageTitle title="Projects" />
-			<input
-				ref={keyInputRef}
-				type='file'
-				accept='.pem'
-				className='hidden'
-				onChange={async e => {
-					const f = e.target.files?.[0]
-					if (f) await handleChoosePrivateKey(f)
-					if (e.currentTarget) e.currentTarget.value = ''
-				}}
-			/>
 
-			<div className='min-h-screen relative pb-32'>
+			{/* Extra bottom padding (pb-48 md:pb-56) ensures content is never obscured by the bottom Dock */}
+			<div className='min-h-screen relative pb-48 md:pb-56'>
 				<StandardPageHeader
 					title="Projects"
 					badge={`${projects.length} ITEMS`}
@@ -249,27 +264,10 @@ export default function Page() {
 					searchValue={searchTerm}
 					onSearchChange={setSearchTerm}
 					searchPlaceholder="搜索项目..."
+					extraRightActions={viewModeToggle}
 				/>
 
-				{/* View Mode Toggle */}
-				<div className="mx-auto w-full max-w-7xl px-6 mb-6 flex justify-end">
-					<div className="inline-flex rounded-xl bg-slate-150/80 dark:bg-zinc-800/80 backdrop-blur-sm p-1 text-xs font-semibold">
-						<button
-							onClick={() => setViewMode('grid')}
-							className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${viewMode === 'grid' ? 'bg-white dark:bg-zinc-900 text-slate-900 dark:text-white shadow' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-350'}`}
-						>
-							网格视图 (Grid)
-						</button>
-						<button
-							onClick={() => setViewMode('stack')}
-							className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${viewMode === 'stack' ? 'bg-white dark:bg-zinc-900 text-slate-900 dark:text-white shadow' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-350'}`}
-						>
-							卡片堆叠 (Stack)
-						</button>
-					</div>
-				</div>
-
-				<div className='mx-auto w-full max-w-7xl px-6 pb-12'>
+				<div className='mx-auto w-full max-w-7xl px-6'>
 					{filteredProjects.length === 0 ? (
 						<div className='flex flex-col items-center justify-center py-20 text-slate-400'>
 							<p className='text-base font-medium'>暂无匹配项目</p>
@@ -279,22 +277,48 @@ export default function Page() {
 							<ScrollStack useWindowScroll={true} itemDistance={60} baseScale={0.92} itemScale={0.02}>
 								{filteredProjects.map((project) => (
 									<ScrollStackItem key={project.url}>
-										<ProjectCard project={project} isEditMode={isEditMode} onUpdate={handleUpdate} onDelete={() => handleDelete(project)} />
+										<ProjectCard
+											project={project}
+											isEditMode={isEditMode}
+											onTagClick={(tag) => setSelectedTag(tag)}
+											onUpdate={handleUpdate}
+											onDelete={() => handleDelete(project)}
+										/>
 									</ScrollStackItem>
 								))}
 							</ScrollStack>
 						</div>
 					) : (
-						<div className='grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6'>
-							{filteredProjects.map((project) => (
-								<ProjectCard key={project.url} project={project} isEditMode={isEditMode} onUpdate={handleUpdate} onDelete={() => handleDelete(project)} />
-							))}
+						<div className='grid w-full grid-cols-1 md:grid-cols-2 gap-6'>
+							{filteredProjects.map((project) => {
+								const isFeatured =
+									Boolean(project.featured) &&
+									selectedTag === 'all' &&
+									!searchTerm
+								return (
+									<ProjectCard
+										key={project.url}
+										project={project}
+										isFeatured={isFeatured}
+										isEditMode={isEditMode}
+										onTagClick={(tag) => setSelectedTag(tag)}
+										onUpdate={handleUpdate}
+										onDelete={() => handleDelete(project)}
+									/>
+								)
+							})}
 						</div>
 					)}
 				</div>
 			</div>
 
-			{isCreateDialogOpen && <CreateDialog project={editingProject} onClose={() => setIsCreateDialogOpen(false)} onSave={handleSaveProject} />}
+			{isCreateDialogOpen && (
+				<CreateDialog
+					project={editingProject}
+					onClose={() => setIsCreateDialogOpen(false)}
+					onSave={handleSaveProject}
+				/>
+			)}
 		</>
 	)
 }
