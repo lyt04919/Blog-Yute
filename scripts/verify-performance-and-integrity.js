@@ -158,6 +158,16 @@ function runTests() {
 
 		const geekBentoPath = path.join(ROOT, 'src/components/geek-identity-bento.tsx')
 		assert.ok(fs.existsSync(geekBentoPath), 'src/components/geek-identity-bento.tsx should exist')
+		const geekContent = fs.readFileSync(geekBentoPath, 'utf8')
+		assert.ok(geekContent.includes('top-10'), 'GeekIdentityBento book marquee should be positioned at top-10')
+		assert.ok(geekContent.includes('w-32'), 'GeekIdentityBento book covers should be w-32 matching Magic UI card dimensions')
+		assert.ok(geekContent.includes('gap="1rem"'), 'GeekIdentityBento book marquee should use 1rem gap')
+		assert.ok(geekContent.includes('[mask-image:linear-gradient(to_top,transparent_40%,#000_100%)]'), 'GeekIdentityBento book marquee should have gradient fade mask')
+
+		const marqueePath = path.join(ROOT, 'src/components/ui/marquee.tsx')
+		assert.ok(fs.existsSync(marqueePath), 'src/components/ui/marquee.tsx should exist')
+		const marqueeContent = fs.readFileSync(marqueePath, 'utf8')
+		assert.ok(marqueeContent.includes('gap?: string | number'), 'Marquee must support custom gap prop')
 
 		const profileBentoPath = path.join(ROOT, 'src/app/about/components/profile-bento.tsx')
 		const profileContent = fs.readFileSync(profileBentoPath, 'utf8')
