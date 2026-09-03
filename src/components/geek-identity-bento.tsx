@@ -1,6 +1,6 @@
 'use client'
 
-import { BentoGrid, BentoCard, ProgressiveBlur } from '@/components/ui/bento-grid'
+import { BentoGrid, BentoCard } from '@/components/ui/bento-grid'
 import { Marquee } from '@/components/ui/marquee'
 import DriftWall, { type DriftWallItem } from '@/components/ui/drift-wall'
 import { InfiniteSpiral } from '@/components/ui/infinite-spiral'
@@ -179,17 +179,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 											className="w-full h-full object-cover transition-transform duration-300 group-hover/book:scale-105 select-none pointer-events-none" 
 										/>
 
-										{/* 2. Continuous gradient progressive blur on lower half */}
-										<ProgressiveBlur
-											direction="bottom"
-											height="50%"
-											blurLevels={[0.5, 1, 2, 4, 8, 14]}
-										/>
-
-										{/* 3. 柔和环境光渐变底色，自然融入卡片 */}
-										<div className="pointer-events-none absolute inset-x-0 bottom-0 h-[50%] bg-gradient-to-t from-white/90 via-white/40 to-transparent dark:from-zinc-900/90 dark:via-zinc-900/40" />
-
-										{/* Realistic book spine lighting fold */}
+										{/* 2. Realistic book spine lighting fold */}
 										<div className="absolute inset-y-0 left-0 w-2.5 bg-gradient-to-r from-black/25 via-white/10 to-transparent pointer-events-none z-10" />
 										<div className="absolute inset-0 ring-1 ring-inset ring-black/10 dark:ring-white/10 rounded-xl pointer-events-none z-10" />
 									</div>

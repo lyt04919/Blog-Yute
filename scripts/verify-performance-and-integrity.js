@@ -165,7 +165,8 @@ function runTests() {
 		assert.ok(geekContent.includes("width: '112px'"), 'GeekIdentityBento book covers should strictly enforce width: 112px for 2:3 vertical book proportion')
 		assert.ok(geekContent.includes('b.isShowOnHome !== false'), 'GeekIdentityBento must filter out inactive books')
 		assert.ok(geekContent.includes('gap="1.5rem"'), 'GeekIdentityBento book marquee should use 1.5rem gap')
-		assert.ok(geekContent.includes('<ProgressiveBlur'), 'GeekIdentityBento book covers must integrate ProgressiveBlur for seamless lower-half blur')
+		assert.ok(geekContent.includes('rounded-xl'), 'GeekIdentityBento book covers must consistently use rounded-xl')
+		assert.ok(bentoContent.includes('<ProgressiveBlur'), 'BentoCard must integrate ProgressiveBlur for seamless lower-half blur')
 		assert.ok(bentoContent.includes('rounded-xl border shadow-xs'), 'BentoCard must feature unified squircle icon badge')
 		assert.ok(geekContent.includes('bg-zinc-100/70 dark:bg-[#08080f]'), 'Movie showcase card must be adaptive in light/dark modes')
 
