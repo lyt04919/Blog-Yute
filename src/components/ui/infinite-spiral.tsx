@@ -302,6 +302,9 @@ export const InfiniteSpiral: React.FC<InfiniteSpiralProps> = ({
 								referrerPolicy="no-referrer"
 								loading={index < 6 ? 'eager' : 'lazy'}
 								draggable={false}
+								onError={(e) => {
+									e.currentTarget.style.opacity = '0'
+								}}
 								style={{
 									width: '100%',
 									height: '100%',

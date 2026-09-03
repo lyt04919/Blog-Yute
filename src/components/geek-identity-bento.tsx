@@ -161,60 +161,35 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 										key={idx}
 										className="group/book relative w-36 h-[180px] rounded-xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-zinc-700/80 shrink-0 select-none bg-zinc-100 dark:bg-zinc-800 transition-all duration-300 ease-out hover:scale-105 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
 									>
-										{/* 1. Sharp book cover (上半截清晰呈现，从 48% 开始渐隐) */}
-										<div
-											className="absolute inset-0"
-											style={{
-												maskImage: 'linear-gradient(to bottom, black 0%, black 48%, rgba(0,0,0,0.3) 70%, transparent 90%)',
-												WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 48%, rgba(0,0,0,0.3) 70%, transparent 90%)',
-											}}
-										>
-											<img 
-												src={item.cover} 
-												alt={item.name} 
-												referrerPolicy="no-referrer"
-												loading="lazy"
-												decoding="async"
-												className="w-full h-full object-cover transition-transform duration-300 group-hover/book:scale-105" 
-											/>
-										</div>
+										{/* 1. Base book cover: 100% visible, always renders */}
+										<img 
+											src={item.cover} 
+											alt={item.name} 
+											referrerPolicy="no-referrer"
+											loading="lazy"
+											decoding="async"
+											className="w-full h-full object-cover transition-transform duration-300 group-hover/book:scale-105" 
+										/>
 
-										{/* 2. Intermediate soft blur layer (46%~75% 开始逐渐柔化) */}
+										{/* 2. Lower-half progressive blur: 从下半截（48%）开始逐渐模糊 */}
 										<div 
-											className="absolute inset-0 pointer-events-none overflow-hidden"
-											style={{
-												maskImage: 'linear-gradient(to bottom, transparent 44%, rgba(0,0,0,0.85) 62%, transparent 82%)',
-												WebkitMaskImage: 'linear-gradient(to bottom, transparent 44%, rgba(0,0,0,0.85) 62%, transparent 82%)',
-											}}
+											className="absolute inset-x-0 bottom-0 pointer-events-none overflow-hidden rounded-b-xl"
+											style={{ height: '52%' }}
 										>
-											<img 
-												src={item.cover} 
-												alt="" 
-												aria-hidden="true"
-												referrerPolicy="no-referrer"
-												loading="lazy"
-												decoding="async"
-												className="w-full h-full object-cover blur-[4px] scale-105 transition-transform duration-300 group-hover/book:scale-110" 
-											/>
-										</div>
-
-										{/* 3. Deep progressive blur layer (从 60% 至底部 100% 深度平滑模糊) */}
-										<div 
-											className="absolute inset-0 pointer-events-none overflow-hidden"
-											style={{
-												maskImage: 'linear-gradient(to bottom, transparent 55%, rgba(0,0,0,0.7) 75%, black 90%)',
-												WebkitMaskImage: 'linear-gradient(to bottom, transparent 55%, rgba(0,0,0,0.7) 75%, black 90%)',
-											}}
-										>
-											<img 
-												src={item.cover} 
-												alt="" 
-												aria-hidden="true"
-												referrerPolicy="no-referrer"
-												loading="lazy"
-												decoding="async"
-												className="w-full h-full object-cover blur-[10px] scale-110 transition-transform duration-300 group-hover/book:scale-115" 
-											/>
+											{/* Blurred clone aligned precisely to full card bounds */}
+											<div className="absolute inset-x-0 -top-[86px] w-full h-[180px] overflow-hidden">
+												<img 
+													src={item.cover} 
+													alt="" 
+													aria-hidden="true"
+													referrerPolicy="no-referrer"
+													loading="lazy"
+													decoding="async"
+													className="w-full h-full object-cover blur-[10px] scale-110" 
+												/>
+											</div>
+											{/* Natural gradient transition from sharp to blurred */}
+											<div className="absolute inset-0 bg-gradient-to-b from-transparent from-5% via-white/30 via-45% to-white/80 dark:via-zinc-900/30 dark:to-zinc-900/80" />
 										</div>
 
 										{/* Realistic book spine lighting fold */}
