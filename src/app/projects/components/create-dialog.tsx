@@ -27,7 +27,8 @@ export default function CreateDialog({ project, onClose, onSave }: CreateDialogP
 		github: undefined,
 		npm: undefined,
 		blogSlug: undefined,
-		status: undefined
+		status: undefined,
+		featured: false
 	})
 	const [showImageDialog, setShowImageDialog] = useState(false)
 	const [tagsInput, setTagsInput] = useState('')
@@ -69,7 +70,7 @@ export default function CreateDialog({ project, onClose, onSave }: CreateDialogP
 
 	useEffect(() => {
 		if (project) {
-			setFormData(project)
+			setFormData({ ...project, featured: project.featured || false })
 			setTagsInput(project.tags.join(', '))
 		} else {
 			setFormData({
@@ -82,7 +83,8 @@ export default function CreateDialog({ project, onClose, onSave }: CreateDialogP
 				github: undefined,
 				npm: undefined,
 				blogSlug: undefined,
-				status: undefined
+				status: undefined,
+				featured: false
 			})
 			setTagsInput('')
 		}
@@ -187,6 +189,18 @@ export default function CreateDialog({ project, onClose, onSave }: CreateDialogP
 									placeholder='主页 URL (必填)'
 									className='flex-1 text-slate-600 dark:text-slate-300 font-medium text-sm bg-transparent border-b border-transparent focus:border-slate-300 dark:focus:border-slate-700 focus:outline-none transition-colors pb-1 placeholder:text-slate-400'
 								/>
+							</div>
+
+							<div className='flex items-center justify-between gap-2 pt-1'>
+								<label className='inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700 dark:text-slate-300 select-none'>
+									<input
+										type='checkbox'
+										checked={formData.featured || false}
+										onChange={e => setFormData({ ...formData, featured: e.target.checked })}
+										className='rounded accent-blue-600 dark:accent-blue-500 w-3.5 h-3.5'
+									/>
+									<span>精选项目 (Bento 宽卡片优先展示)</span>
+								</label>
 							</div>
 
 							<div>

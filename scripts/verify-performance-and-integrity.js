@@ -184,6 +184,11 @@ function runTests() {
 		assert.ok(modalContent.includes('deviceMode'), 'ProjectPreviewModal must support multi-device switcher')
 		assert.ok(modalContent.includes('iframe'), 'ProjectPreviewModal must render iframe preview')
 
+		const createDialogPath = path.join(ROOT, 'src/app/projects/components/create-dialog.tsx')
+		assert.ok(fs.existsSync(createDialogPath), 'CreateDialog component file must exist')
+		const dialogContent = fs.readFileSync(createDialogPath, 'utf8')
+		assert.ok(dialogContent.includes('featured:'), 'CreateDialog must support toggling featured status')
+
 		const projectsJson = JSON.parse(fs.readFileSync(path.join(ROOT, 'src/data/projects.json'), 'utf8'))
 		for (const p of projectsJson) {
 			assert.ok(!p.image.startsWith('blob:'), `Project ${p.name} image should not be a temporary blob URL`)

@@ -35,6 +35,12 @@ export default function ProjectPreviewModal({
 	useEffect(() => {
 		setIsLoading(true)
 		setIframeKey(prev => prev + 1)
+
+		const timer = setTimeout(() => {
+			setIsLoading(false)
+		}, 5000)
+
+		return () => clearTimeout(timer)
 	}, [project?.url, deviceMode])
 
 	if (!project) return null
@@ -166,11 +172,19 @@ export default function ProjectPreviewModal({
 			<div className="relative flex-1 w-full bg-slate-50 dark:bg-zinc-950 overflow-hidden flex items-center justify-center">
 				{/* Loading skeleton */}
 				{isLoading && (
-					<div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm">
+					<div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm p-4 text-center">
 						<RotateCw className="w-6 h-6 animate-spin text-[var(--color-brand)]" />
 						<p className="text-xs text-zinc-500 font-medium">
 							正在载入 {project.name} 运行环境...
 						</p>
+						<a
+							href={project.url}
+							target="_blank"
+							rel="noreferrer"
+							className="text-[11px] text-[var(--color-brand)] font-medium hover:underline pt-1"
+						>
+							加载较慢或提示受限？点击直接打开原网页 ↗
+						</a>
 					</div>
 				)}
 

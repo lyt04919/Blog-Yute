@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'motion/react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
@@ -44,6 +44,11 @@ export function ProjectCard({
 	const [imageError, setImageError] = useState(false)
 	const { maxSM } = useSize()
 	const [localProject, setLocalProject] = useState(project)
+
+	useEffect(() => {
+		setLocalProject(project)
+		setImageError(false)
+	}, [project])
 
 	const handleSave = (updatedProject: Project) => {
 		setLocalProject(updatedProject)

@@ -161,10 +161,13 @@ export default function Page() {
 	}, [projects])
 
 	const filteredProjects = useMemo(() => {
+		const query = searchTerm.trim().toLowerCase()
 		return projects.filter(p => {
 			const matchesSearch =
-				p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-				p.description.toLowerCase().includes(searchTerm.toLowerCase())
+				!query ||
+				p.name.toLowerCase().includes(query) ||
+				p.description.toLowerCase().includes(query) ||
+				p.tags?.some(t => t.toLowerCase().includes(query))
 			const matchesTag =
 				selectedTag === 'all' ||
 				p.tags?.some(t => t.toLowerCase() === selectedTag.toLowerCase())
@@ -271,8 +274,20 @@ export default function Page() {
 
 				<div className='mx-auto w-full max-w-7xl px-6'>
 					{filteredProjects.length === 0 ? (
-						<div className='flex flex-col items-center justify-center py-20 text-slate-400'>
+						<div className='flex flex-col items-center justify-center py-20 text-slate-400 gap-3'>
 							<p className='text-base font-medium'>暂无匹配项目</p>
+							{(searchTerm || selectedTag !== 'all') && (
+								<button
+									type="button"
+									onClick={() => {
+										setSearchTerm('')
+										setSelectedTag('all')
+									}}
+									className="px-4 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
+								>
+									重置所有筛选
+								</button>
+							)}
 						</div>
 					) : viewMode === 'stack' ? (
 						<div className="w-full relative py-6">
