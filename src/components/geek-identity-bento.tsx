@@ -400,8 +400,6 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								pauseOnHover={true}
 								imageFit="contain"
 							/>
-							{/* Soft Ambient Bottom Gradient Fade for readable typography */}
-							<div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-white via-white/85 to-transparent dark:from-zinc-900 dark:via-zinc-900/85 dark:to-transparent pointer-events-none z-5" />
 						</div>
 					}
 				/>

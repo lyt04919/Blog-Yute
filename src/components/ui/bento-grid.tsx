@@ -110,6 +110,17 @@ export function BentoCard({
         {background}
       </div>
 
+      {/* Progressive Blur & Ambient Bottom Fade (越接近底下越模糊 - Magic UI 标准效果) */}
+      <div 
+        className={cn(
+          "pointer-events-none absolute inset-x-0 bottom-0 h-44 z-1",
+          "[mask-image:linear-gradient(to_bottom,transparent_0%,black_100%)] backdrop-blur-md",
+          darkTheme 
+            ? "bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent" 
+            : "bg-gradient-to-t from-white via-white/80 to-transparent dark:from-zinc-900 dark:via-zinc-900/80"
+        )}
+      />
+
       {/* Info Content Block (anchored to bottom, slides UP on hover) */}
       <div 
         style={{
