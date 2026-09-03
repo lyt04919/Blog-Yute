@@ -88,11 +88,12 @@ export function BentoCard({
   name,
   className,
   background,
-  Icon,
   description,
   href,
   cta = "Learn more",
   darkTheme = false,
+  blurLevels = [0.5, 1, 2, 4, 6],
+  progressiveBlurHeight = "46%",
   children,
   ...props
 }: BentoCardProps) {
@@ -154,26 +155,27 @@ export function BentoCard({
           transform: isHovered ? 'scale(1.04)' : 'scale(1)',
           transition: 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
-        className="absolute inset-0 z-0 overflow-hidden [mask-image:linear-gradient(to_bottom,#000_0%,#000_45%,rgba(0,0,0,0.6)_70%,transparent_95%)]"
+        className="absolute inset-0 z-0 overflow-hidden [mask-image:linear-gradient(to_bottom,#000_0%,#000_55%,rgba(0,0,0,0.7)_80%,transparent_98%)]"
       >
         {background}
       </div>
 
-      {/* 渐进式多级平滑模糊：越往下模糊越深 (从 0.5px 缓慢线性递增到 16px，无任何突兀边界) */}
+      {/* 渐进式多级平滑模糊：可控高度与清晰度 */}
       <ProgressiveBlur 
         direction="bottom" 
-        height="55%" 
-        blurLevels={[0.5, 1, 2, 4, 8, 16]}
+        height={progressiveBlurHeight} 
+        blurLevels={blurLevels}
         className="z-1" 
       />
 
-      {/* 极柔和环境渐隐底色 (从 35% 处自然过渡，绝无突兀白块) */}
+      {/* 极柔和环境渐隐底色 */}
       <div 
+        style={{ height: progressiveBlurHeight }}
         className={cn(
-          "pointer-events-none absolute inset-x-0 bottom-0 h-[55%] z-2",
+          "pointer-events-none absolute inset-x-0 bottom-0 z-2",
           darkTheme 
-            ? "bg-gradient-to-b from-transparent via-zinc-950/30 via-50% to-zinc-950/95" 
-            : "bg-gradient-to-b from-transparent via-white/25 via-50% to-white/95 dark:from-transparent dark:via-zinc-900/30 dark:to-zinc-900/95"
+            ? "bg-gradient-to-t from-zinc-950/85 via-zinc-950/30 to-transparent" 
+            : "bg-gradient-to-t from-white/85 via-white/25 to-transparent dark:from-zinc-900/85 dark:via-zinc-900/30 dark:to-transparent"
         )}
       />
 

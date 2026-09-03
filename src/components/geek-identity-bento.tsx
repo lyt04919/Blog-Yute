@@ -208,6 +208,8 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					href="/favorite"
 					cta="进入放映厅"
 					className="col-span-1 md:col-span-2"
+					progressiveBlurHeight="35%"
+					blurLevels={[0.5, 1, 2, 4]}
 					background={
 						<div className="absolute inset-0 w-full h-full overflow-hidden bg-zinc-100/70 dark:bg-[#08080f]">
 							<DriftWall
@@ -227,11 +229,9 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								parallax={0.35}
 								pauseOnHover={true}
 								lift={40}
-								dim={0.2}
+								dim={0.12}
 								overlayColor="transparent"
 							/>
-							{/* Ambient Bottom Fade: adaptive in light mode (fades to white) and dark mode (fades to deep night) */}
-							<div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-white/95 from-20% via-white/80 via-55% to-transparent dark:from-zinc-950 dark:from-30% dark:via-zinc-950/95 dark:via-65% dark:to-transparent pointer-events-none z-10" />
 						</div>
 					}
 				/>
