@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { useSize } from '@/hooks/use-size'
 import CreateDialog from './create-dialog'
-import { Globe, Github, Package, BookOpen, ArrowUpRight, Sparkles } from 'lucide-react'
+import { Globe, Github, Package, BookOpen, ArrowUpRight, Sparkles, Play } from 'lucide-react'
 
 export interface Project {
 	name: string
@@ -25,6 +25,7 @@ interface ProjectCardProps {
 	project: Project
 	isEditMode?: boolean
 	isFeatured?: boolean
+	onPreview?: (project: Project) => void
 	onTagClick?: (tag: string) => void
 	onUpdate?: (project: Project, oldProject: Project) => void
 	onDelete?: () => void
@@ -34,6 +35,7 @@ export function ProjectCard({
 	project,
 	isEditMode = false,
 	isFeatured = false,
+	onPreview,
 	onTagClick,
 	onUpdate,
 	onDelete
@@ -61,6 +63,17 @@ export function ProjectCard({
 			localProject.image.endsWith('.jpeg') ||
 			localProject.image.endsWith('.webp'))
 
+	const handleTriggerPreview = (e: React.MouseEvent) => {
+		if (isEditMode) {
+			setIsEditing(true)
+			return
+		}
+		if (onPreview) {
+			e.stopPropagation()
+			onPreview(localProject)
+		}
+	}
+
 	return (
 		<>
 			<motion.div
@@ -72,11 +85,6 @@ export function ProjectCard({
 					'group relative flex flex-col justify-between overflow-hidden rounded-2xl sm:rounded-3xl border border-zinc-200/90 dark:border-zinc-800 bg-white dark:bg-zinc-900/90 shadow-sm hover:shadow-xl dark:hover:shadow-[0_12px_36px_rgba(0,0,0,0.35)] hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-300 hover:-translate-y-1',
 					isFeatured && 'md:col-span-2'
 				)}
-				onClick={() => {
-					if (isEditMode) {
-						setIsEditing(true)
-					}
-				}}
 			>
 				{/* Admin Edit / Delete Floating Pill */}
 				{isEditMode && (
@@ -103,8 +111,12 @@ export function ProjectCard({
 				)}
 
 				<div>
-					{/* Top Simulated Browser Mockup Viewport */}
-					<div className="w-full bg-slate-50/80 dark:bg-zinc-950/80 border-b border-zinc-200/80 dark:border-zinc-800/80">
+					{/* Top Simulated Browser Mockup Viewport (Clickable for Live Preview) */}
+					<div
+						onClick={handleTriggerPreview}
+						className="w-full bg-slate-50/80 dark:bg-zinc-950/80 border-b border-zinc-200/80 dark:border-zinc-800/80 cursor-pointer group/viewport relative"
+						title={!isEditMode ? '点击快速试玩 / 演示' : undefined}
+					>
 						{/* Title Bar */}
 						<div className="h-8 px-4 flex items-center justify-between border-b border-zinc-200/60 dark:border-zinc-800/60 text-xs select-none">
 							<div className="flex items-center gap-1.5">
@@ -173,13 +185,26 @@ export function ProjectCard({
 									Featured
 								</div>
 							)}
+
+							{/* Live Preview Hover Hint Pill */}
+							{!isEditMode && onPreview && (
+								<div className="absolute inset-0 z-20 bg-black/25 dark:bg-black/40 backdrop-blur-[2px] opacity-0 group-hover/viewport:opacity-100 transition-opacity duration-200 flex items-center justify-center pointer-events-none">
+									<span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/95 dark:bg-zinc-900/95 text-zinc-900 dark:text-white text-xs font-bold shadow-xl border border-white/20 transform translate-y-2 group-hover/viewport:translate-y-0 transition-transform duration-200">
+										<Play className="w-3.5 h-3.5 fill-current text-[var(--color-brand)]" />
+										<span>快速试玩 / 演示</span>
+									</span>
+								</div>
+							)}
 						</div>
 					</div>
 
 					{/* Card Body */}
 					<div className="p-5 sm:p-6 flex flex-col gap-3">
-						<h3 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-[var(--color-brand)] transition-colors leading-tight">
-							{localProject.name}
+						<h3
+							onClick={handleTriggerPreview}
+							className="text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-[var(--color-brand)] transition-colors leading-tight cursor-pointer inline-flex items-center gap-2"
+						>
+							<span>{localProject.name}</span>
 						</h3>
 
 						<p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed line-clamp-3">

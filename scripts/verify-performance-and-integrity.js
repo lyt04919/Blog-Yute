@@ -171,9 +171,18 @@ function runTests() {
 		assert.ok(projectsPageContent.includes('toolbarTags'), 'Projects page must compute dynamic toolbarTags')
 		assert.ok(projectsPageContent.includes('extraRightActions={viewModeToggle}'), 'View mode switcher must be integrated in toolbar')
 		assert.ok(projectsPageContent.includes('isFeatured'), 'Projects page must support featured project layout')
+		assert.ok(projectsPageContent.includes('ProjectPreviewModal'), 'Projects page must dynamically import ProjectPreviewModal')
+		assert.ok(projectsPageContent.includes('onPreview={setPreviewProject}'), 'Projects page must wire onPreview to ProjectCard')
 
 		const projectsCardContent = fs.readFileSync(path.join(ROOT, 'src/app/projects/components/project-card.tsx'), 'utf8')
 		assert.ok(projectsCardContent.includes('isFeatured'), 'ProjectCard must support isFeatured')
+		assert.ok(projectsCardContent.includes('onPreview'), 'ProjectCard must accept onPreview callback')
+
+		const previewModalPath = path.join(ROOT, 'src/app/projects/components/project-preview-modal.tsx')
+		assert.ok(fs.existsSync(previewModalPath), 'ProjectPreviewModal component file must exist')
+		const modalContent = fs.readFileSync(previewModalPath, 'utf8')
+		assert.ok(modalContent.includes('deviceMode'), 'ProjectPreviewModal must support multi-device switcher')
+		assert.ok(modalContent.includes('iframe'), 'ProjectPreviewModal must render iframe preview')
 
 		const projectsJson = JSON.parse(fs.readFileSync(path.join(ROOT, 'src/data/projects.json'), 'utf8'))
 		for (const p of projectsJson) {

@@ -6,6 +6,7 @@ import { ProjectCard, type Project } from './components/project-card'
 import dynamic from 'next/dynamic'
 import ScrollStack, { ScrollStackItem } from '@/components/ui/scroll-stack'
 const CreateDialog = dynamic(() => import('./components/create-dialog'), { ssr: false })
+const ProjectPreviewModal = dynamic(() => import('./components/project-preview-modal'), { ssr: false })
 import { pushProjects } from './services/push-projects'
 import { saveProjectsLocal } from './services/save-projects-local'
 import { useAuthStore } from '@/hooks/use-auth'
@@ -21,6 +22,7 @@ export default function Page() {
 	const [isEditMode, setIsEditMode] = useState(false)
 	const [isSaving, setIsSaving] = useState(false)
 	const [editingProject, setEditingProject] = useState<Project | null>(null)
+	const [previewProject, setPreviewProject] = useState<Project | null>(null)
 	const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
 	const [imageItems, setImageItems] = useState<Map<string, ImageItem>>(new Map())
 
@@ -280,6 +282,7 @@ export default function Page() {
 										<ProjectCard
 											project={project}
 											isEditMode={isEditMode}
+											onPreview={setPreviewProject}
 											onTagClick={(tag) => setSelectedTag(tag)}
 											onUpdate={handleUpdate}
 											onDelete={() => handleDelete(project)}
@@ -301,6 +304,7 @@ export default function Page() {
 										project={project}
 										isFeatured={isFeatured}
 										isEditMode={isEditMode}
+										onPreview={setPreviewProject}
 										onTagClick={(tag) => setSelectedTag(tag)}
 										onUpdate={handleUpdate}
 										onDelete={() => handleDelete(project)}
@@ -317,6 +321,13 @@ export default function Page() {
 					project={editingProject}
 					onClose={() => setIsCreateDialogOpen(false)}
 					onSave={handleSaveProject}
+				/>
+			)}
+
+			{previewProject && (
+				<ProjectPreviewModal
+					project={previewProject}
+					onClose={() => setPreviewProject(null)}
 				/>
 			)}
 		</>
