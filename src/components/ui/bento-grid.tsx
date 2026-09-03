@@ -35,6 +35,55 @@ export function BentoGrid({ children, className, ...props }: BentoGridProps) {
   )
 }
 
+// Progressive Blur (渐进式多层连续模糊，精准模拟 iOS 毛玻璃与 Magic UI 景深效果，告别生硬死边)
+export function ProgressiveBlur({
+  className,
+  direction = "bottom",
+  blurLevels = [0.5, 1, 2, 4, 8, 16],
+  height = "55%",
+}: {
+  className?: string
+  direction?: "top" | "bottom"
+  blurLevels?: number[]
+  height?: string
+}) {
+  const isBottom = direction === "bottom"
+  return (
+    <div
+      className={cn(
+        "pointer-events-none absolute inset-x-0 overflow-hidden select-none",
+        isBottom ? "bottom-0" : "top-0",
+        className
+      )}
+      style={{ height }}
+    >
+      {blurLevels.map((blur, idx) => {
+        const step = 1 / blurLevels.length
+        const start = Math.max(0, idx * step)
+        const mid = Math.min(1, (idx + 1) * step)
+        const end = Math.min(1, (idx + 2) * step)
+
+        const gradient = isBottom
+          ? `linear-gradient(to bottom, transparent ${start * 100}%, rgba(0,0,0,1) ${mid * 100}%, rgba(0,0,0,1) ${end * 100}%, ${end >= 1 ? 'rgba(0,0,0,1)' : 'transparent'} 100%)`
+          : `linear-gradient(to top, transparent ${start * 100}%, rgba(0,0,0,1) ${mid * 100}%, rgba(0,0,0,1) ${end * 100}%, ${end >= 1 ? 'rgba(0,0,0,1)' : 'transparent'} 100%)`
+
+        return (
+          <div
+            key={idx}
+            className="absolute inset-0"
+            style={{
+              backdropFilter: `blur(${blur}px)`,
+              WebkitBackdropFilter: `blur(${blur}px)`,
+              maskImage: gradient,
+              WebkitMaskImage: gradient,
+            }}
+          />
+        )
+      })}
+    </div>
+  )
+}
+
 export function BentoCard({
   name,
   className,
@@ -99,25 +148,32 @@ export function BentoCard({
       )}
       {...props}
     >
-      {/* Background layer spanning upper container */}
+      {/* Background layer spanning upper container (底部柔和自然渐隐，避免硬切) */}
       <div 
         style={{
           transform: isHovered ? 'scale(1.04)' : 'scale(1)',
           transition: 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
-        className="absolute inset-0 z-0 overflow-hidden"
+        className="absolute inset-0 z-0 overflow-hidden [mask-image:linear-gradient(to_bottom,#000_0%,#000_45%,rgba(0,0,0,0.6)_70%,transparent_95%)]"
       >
         {background}
       </div>
 
-      {/* Progressive Blur & Ambient Bottom Fade (越接近底下越模糊 - Magic UI 标准效果) */}
+      {/* 渐进式多级平滑模糊：越往下模糊越深 (从 0.5px 缓慢线性递增到 16px，无任何突兀边界) */}
+      <ProgressiveBlur 
+        direction="bottom" 
+        height="55%" 
+        blurLevels={[0.5, 1, 2, 4, 8, 16]}
+        className="z-1" 
+      />
+
+      {/* 极柔和环境渐隐底色 (从 35% 处自然过渡，绝无突兀白块) */}
       <div 
         className={cn(
-          "pointer-events-none absolute inset-x-0 bottom-0 h-44 z-1",
-          "[mask-image:linear-gradient(to_bottom,transparent_0%,black_100%)] backdrop-blur-md",
+          "pointer-events-none absolute inset-x-0 bottom-0 h-[55%] z-2",
           darkTheme 
-            ? "bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent" 
-            : "bg-gradient-to-t from-white via-white/80 to-transparent dark:from-zinc-900 dark:via-zinc-900/80"
+            ? "bg-gradient-to-b from-transparent via-zinc-950/30 via-50% to-zinc-950/95" 
+            : "bg-gradient-to-b from-transparent via-white/25 via-50% to-white/95 dark:from-transparent dark:via-zinc-900/30 dark:to-zinc-900/95"
         )}
       />
 
