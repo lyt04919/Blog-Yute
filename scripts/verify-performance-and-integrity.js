@@ -159,7 +159,7 @@ function runTests() {
 		const geekBentoPath = path.join(ROOT, 'src/components/geek-identity-bento.tsx')
 		assert.ok(fs.existsSync(geekBentoPath), 'src/components/geek-identity-bento.tsx should exist')
 		const geekContent = fs.readFileSync(geekBentoPath, 'utf8')
-		assert.ok(geekContent.includes("top: '82px'"), 'GeekIdentityBento book marquee should be explicitly positioned at top: 82px via inline style')
+		assert.ok(geekContent.includes("top: '46px'"), 'GeekIdentityBento book marquee should be explicitly positioned at top: 46px via inline style to align with red line')
 		assert.ok(geekContent.includes('w-36'), 'GeekIdentityBento book covers should be enlarged to w-36')
 		assert.ok(geekContent.includes('gap="2.5rem"'), 'GeekIdentityBento book marquee should use 2.5rem gap')
 		assert.ok(geekContent.includes('blur-[8px]'), 'GeekIdentityBento book covers must have progressive blur layer (越向下越模糊)')

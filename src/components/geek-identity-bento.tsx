@@ -153,8 +153,8 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								pauseOnHover
 								duration="25s"
 								gap="2.5rem"
-								style={{ top: '82px' }}
-								className="absolute inset-x-0"
+								style={{ top: '46px' }}
+								className="absolute inset-x-0 py-0"
 							>
 								{realBooks.map((item, idx) => (
 									<div
