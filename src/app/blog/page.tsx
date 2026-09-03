@@ -20,13 +20,14 @@ import { useConfigStore } from '@/app/(home)/stores/config-store'
 import { readFileAsText } from '@/lib/file-utils'
 import { cn } from '@/lib/utils'
 import { saveBlogEdits } from './services/save-blog-edits'
-import { Check, ArrowRight, BookIcon, Trash2, Save, Upload, X, FolderOpen, SquareCheck, Activity } from 'lucide-react'
+import { Check, ArrowRight, BookIcon, Trash2, Save, Upload, X, FolderOpen, SquareCheck, Activity, LayoutGrid, BookOpen, Calendar, Sparkles, Clock, Compass } from 'lucide-react'
 import { BlogCoverHoverPreview, useBlogCoverHover } from './components/blog-cover-hover'
 import { CategoryModal } from './components/category-modal'
 import { StatusModal } from './components/status-modal'
 import { DeleteConfirmDialog } from '@/components/delete-confirm-dialog'
 
 import { BlogGridCard } from '@/components/blog-grid-card'
+import { BlogEditorialCard } from '@/components/blog-editorial-card'
 import { TagFilter } from '@/components/tag-filter'
 import { BlogSearch } from '@/components/blog-search'
 import { PageTitle } from '@/components/page-title'
@@ -55,8 +56,9 @@ export default function BlogPage() {
 	const [statusModalOpen, setStatusModalOpen] = useState(false)
 	const [categoryList, setCategoryList] = useState<string[]>([])
 	const [newCategory, setNewCategory] = useState('')
-	const [viewLayout, setViewLayout] = useState<'timeline' | 'grid'>('grid')
+	const [viewLayout, setViewLayout] = useState<'grid' | 'magazine' | 'timeline'>('grid')
 	const [selectedTag, setSelectedTag] = useState<string>('All')
+	const [searchQuery, setSearchQuery] = useState('')
 	const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft'>('all')
 	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 
@@ -88,6 +90,20 @@ export default function BlogPage() {
 		})
 	}, [displayItems, statusFilter])
 
+	// 实时即刻搜索过滤
+	const searchFilteredItems = useMemo(() => {
+		if (!searchQuery.trim()) return statusFilteredItems
+		const q = searchQuery.toLowerCase().trim()
+		return statusFilteredItems.filter(item => {
+			const titleMatch = item.title?.toLowerCase().includes(q)
+			const slugMatch = item.slug?.toLowerCase().includes(q)
+			const summaryMatch = item.summary?.toLowerCase().includes(q)
+			const tagsMatch = item.tags?.some(t => t.toLowerCase().includes(q))
+			const categoryMatch = item.category?.toLowerCase().includes(q)
+			return Boolean(titleMatch || slugMatch || summaryMatch || tagsMatch || categoryMatch)
+		})
+	}, [statusFilteredItems, searchQuery])
+
 	const dynamicTags = useMemo(() => {
 		const counts: Record<string, number> = {}
 		statusFilteredItems.forEach(item => {
@@ -117,16 +133,38 @@ export default function BlogPage() {
 	}, [statusFilteredItems])
 
 	const gridFilteredItems = useMemo(() => {
-		if (selectedTag === 'All' || selectedTag === 'all') return statusFilteredItems
-		return statusFilteredItems.filter(item => {
+		if (selectedTag === 'All' || selectedTag === 'all') return searchFilteredItems
+		return searchFilteredItems.filter(item => {
 			const matchesCategory = item.category?.toLowerCase() === selectedTag.toLowerCase()
 			const matchesTag = item.tags?.some(t => t.toLowerCase() === selectedTag.toLowerCase())
 			return matchesCategory || matchesTag
 		})
-	}, [statusFilteredItems, selectedTag])
+	}, [searchFilteredItems, selectedTag])
+
+	// 当处于全量无搜索且存在多篇文章时，提炼出精选头条沉浸式卡片
+	const isHeroEligible = useMemo(() => {
+		return (
+			(selectedTag === 'All' || selectedTag === 'all') &&
+			!searchQuery.trim() &&
+			statusFilter === 'all' &&
+			gridFilteredItems.length > 1 &&
+			viewLayout === 'grid' &&
+			!editMode
+		)
+	}, [selectedTag, searchQuery, statusFilter, gridFilteredItems.length, viewLayout, editMode])
+
+	const featuredArticle = useMemo(() => {
+		if (!isHeroEligible) return null
+		return gridFilteredItems.find(item => item.isFeatured) || gridFilteredItems[0]
+	}, [isHeroEligible, gridFilteredItems])
+
+	const remainingArticles = useMemo(() => {
+		if (!featuredArticle) return gridFilteredItems
+		return gridFilteredItems.filter(item => item.slug !== featuredArticle.slug)
+	}, [gridFilteredItems, featuredArticle])
 
 	const { groupedItems, groupKeys, getGroupLabel } = useMemo(() => {
-		const sorted = [...statusFilteredItems].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+		const sorted = [...gridFilteredItems].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
 		const grouped = sorted.reduce(
 			(acc, item) => {
@@ -571,14 +609,77 @@ export default function BlogPage() {
 						{ label: 'Drafts', value: 'draft' },
 					] : undefined
 
+					const viewModeToggle = (
+						<div className="inline-flex rounded-xl bg-slate-100 dark:bg-slate-800/80 p-1 text-xs font-semibold shrink-0 border border-slate-200 dark:border-slate-700/60">
+							<button
+								type="button"
+								onClick={() => setViewLayout('grid')}
+								className={cn(
+									'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer',
+									viewLayout === 'grid'
+										? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+										: 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+								)}
+								title="网格画廊视图"
+							>
+								<LayoutGrid className="w-3.5 h-3.5" />
+								<span className="hidden sm:inline">网格</span>
+							</button>
+							<button
+								type="button"
+								onClick={() => setViewLayout('magazine')}
+								className={cn(
+									'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer',
+									viewLayout === 'magazine'
+										? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+										: 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+								)}
+								title="图文精读视图"
+							>
+								<BookOpen className="w-3.5 h-3.5" />
+								<span className="hidden sm:inline">精读</span>
+							</button>
+							<button
+								type="button"
+								onClick={() => setViewLayout('timeline')}
+								className={cn(
+									'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer',
+									viewLayout === 'timeline'
+										? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+										: 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+								)}
+								title="年表归档视图"
+							>
+								<Calendar className="w-3.5 h-3.5" />
+								<span className="hidden sm:inline">年表</span>
+							</button>
+						</div>
+					)
+
 					return (
 						<>
 							<StandardPageHeader
 								title="Writings & Thoughts"
 								badge={`${items.length} ARTICLES`}
-								subtitle="A collection of essays, technical explorations, and creative experiments."
+								subtitle="探寻前端架构、游戏逆向与生活哲学的数字花园。"
 								actions={blogHeaderActions}
 							/>
+
+							{/* 数字花园概览胶囊 */}
+							<div className="mx-auto w-full max-w-7xl px-6 -mt-3 mb-6">
+								<div className="inline-flex items-center gap-2 sm:gap-3.5 px-3.5 py-1.5 rounded-xl bg-slate-100/70 dark:bg-zinc-800/60 border border-slate-200/60 dark:border-zinc-700/60 text-xs text-slate-600 dark:text-zinc-300 backdrop-blur-sm flex-wrap shadow-2xs">
+									<span className="inline-flex items-center gap-1.5 font-medium text-slate-900 dark:text-white">
+										<Sparkles className="w-3.5 h-3.5 text-amber-500 fill-amber-500/80" />
+										数字花园
+									</span>
+									<span className="text-slate-300 dark:text-zinc-700">·</span>
+									<span>{statusFilteredItems.length} 篇深度沉淀</span>
+									<span className="text-slate-300 dark:text-zinc-700 hidden sm:inline">·</span>
+									<span className="hidden sm:inline">覆盖 {Math.max(1, dynamicTags.length - 1)} 个技术领域</span>
+									<span className="text-slate-300 dark:text-zinc-700 hidden md:inline">·</span>
+									<span className="hidden md:inline">持续精进与记录</span>
+								</div>
+							</div>
 
 							<StandardToolbar
 								statusTabs={blogStatusTabs}
@@ -587,22 +688,72 @@ export default function BlogPage() {
 								tags={dynamicTags}
 								selectedTag={selectedTag}
 								onSelectTag={setSelectedTag}
-								viewMode={viewLayout === 'grid' ? 'grid' : 'list'}
-								onViewModeChange={(m) => setViewLayout(m === 'list' ? 'timeline' : 'grid')}
-								extraRightActions={<BlogSearch items={items} />}
+								searchValue={searchQuery}
+								onSearchChange={setSearchQuery}
+								searchPlaceholder="实时搜索标题、标签、摘要..."
+								extraRightActions={
+									<div className="flex items-center gap-2">
+										{viewModeToggle}
+										<BlogSearch items={items} />
+									</div>
+								}
 							/>
 						</>
 					)
 				})()}
 
 				<div className='mx-auto w-full max-w-7xl px-6'>
-					{viewLayout === 'grid' ? (
-						<div className="flex flex-col gap-8">
-							{gridFilteredItems.length === 0 ? (
-								<EmptyState type="blog" />
-							) : (
+					{/* 实时搜索匹配提示 */}
+					{searchQuery && (
+						<div className="mb-6 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-zinc-900/50 p-3 rounded-xl border border-slate-200/50 dark:border-zinc-800/50">
+							<span>
+								找到 <strong className="text-slate-900 dark:text-white font-semibold">{gridFilteredItems.length}</strong> 篇包含 “<span className="text-brand font-medium">{searchQuery}</span>” 的文章
+							</span>
+							<button
+								type="button"
+								onClick={() => setSearchQuery('')}
+								className="text-xs text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white underline cursor-pointer"
+							>
+								清空搜索
+							</button>
+						</div>
+					)}
+
+					{gridFilteredItems.length === 0 ? (
+						<EmptyState type="blog" />
+					) : viewLayout === 'grid' ? (
+						<div className="flex flex-col gap-10">
+							{/* 沉浸式头条精选 */}
+							{featuredArticle && (
+								<div className="relative">
+									<BlogEditorialCard
+										blog={featuredArticle}
+										isHero={true}
+										editMode={editMode}
+										isSelected={selectedSlugs.has(featuredArticle.slug)}
+										isRead={isRead(featuredArticle.slug)}
+										onToggleSelect={toggleSelect}
+										onClick={handleItemClick}
+									/>
+								</div>
+							)}
+
+							{/* 归档文章分隔头 */}
+							{featuredArticle && remainingArticles.length > 0 && (
+								<div className="flex items-center justify-between pt-4 pb-1 border-t border-[var(--color-border)]/70">
+									<span className="text-xs font-semibold tracking-wider uppercase text-[var(--color-secondary)]">
+										精选沉淀 · ARCHIVED ESSAYS
+									</span>
+									<span className="text-xs text-[var(--color-secondary)] font-medium">
+										{remainingArticles.length} 篇文章
+									</span>
+								</div>
+							)}
+
+							{/* 网格列表 */}
+							{(featuredArticle ? remainingArticles : gridFilteredItems).length > 0 && (
 								<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 relative">
-									{gridFilteredItems.map((blog) => (
+									{(featuredArticle ? remainingArticles : gridFilteredItems).map((blog) => (
 										<BlogGridCard
 											key={blog.slug}
 											blog={blog}
@@ -615,6 +766,21 @@ export default function BlogPage() {
 									))}
 								</div>
 							)}
+						</div>
+					) : viewLayout === 'magazine' ? (
+						<div className="flex flex-col gap-6 max-w-5xl mx-auto">
+							{gridFilteredItems.map((blog, idx) => (
+								<BlogEditorialCard
+									key={blog.slug}
+									blog={blog}
+									isHero={idx === 0 && !searchQuery && (selectedTag === 'All' || selectedTag === 'all') && statusFilter === 'all' && !editMode}
+									editMode={editMode}
+									isSelected={selectedSlugs.has(blog.slug)}
+									isRead={isRead(blog.slug)}
+									onToggleSelect={toggleSelect}
+									onClick={handleItemClick}
+								/>
+							))}
 						</div>
 					) : (
 						<div className='flex flex-col items-center justify-center gap-6 pt-4'>
@@ -720,10 +886,20 @@ export default function BlogPage() {
 															'flex-1 truncate text-sm font-medium transition-all text-[var(--color-secondary)] flex items-center gap-2',
 															editMode ? null : 'group-hover:text-[var(--color-primary)] group-hover:translate-x-2'
 														)}>
-												{it.title || it.slug}
-												{hasRead && <span className='text-secondary ml-2 text-xs'>[已阅读]</span>}
-												{it.status === 'draft' && <span className="text-[10px] bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded font-bold tracking-wide">草稿</span>}
-											</div>
+														<span className={cn(hasRead ? 'text-slate-500 dark:text-zinc-400' : 'text-[var(--color-primary)]')}>
+															{it.title || it.slug}
+														</span>
+														{hasRead && (
+															<span className='inline-flex items-center gap-0.5 text-[10px] text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 dark:bg-emerald-950/30 px-1.5 py-0.5 rounded font-medium border border-emerald-500/20'>
+																<Check className="w-2.5 h-2.5" /> 已读
+															</span>
+														)}
+														{it.status === 'draft' && (
+															<span className="text-[10px] bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded font-medium border border-amber-500/20">
+																草稿
+															</span>
+														)}
+													</div>
 											<div className='flex flex-wrap items-center gap-2 max-sm:hidden'>
 												{(it.tags || []).map(t => (
 													<span key={t} className='text-secondary text-sm'>

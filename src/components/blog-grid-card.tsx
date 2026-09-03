@@ -154,9 +154,23 @@ export function BlogGridCard({
 						</h3>
 
 						{/* 摘要：统一高度节奏 */}
-						<p className="text-xs sm:text-sm text-[var(--color-secondary)] line-clamp-2 leading-relaxed mb-4 min-h-[2.5rem]">
+						<p className="text-xs sm:text-sm text-[var(--color-secondary)] line-clamp-2 leading-relaxed mb-3 min-h-[2.5rem]">
 							{summaryText}
 						</p>
+
+						{/* 标签微标 */}
+						{blog.tags && blog.tags.length > 0 && (
+							<div className="flex items-center gap-1.5 mb-3 flex-wrap">
+								{blog.tags.slice(0, 3).map(tag => (
+									<span
+										key={tag}
+										className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-zinc-800/80 text-slate-500 dark:text-zinc-400 border border-slate-200/40 dark:border-zinc-700/40"
+									>
+										#{tag}
+									</span>
+								))}
+							</div>
+						)}
 
 						{/* 卡片底部操作与预估时长 */}
 						<div className="mt-auto pt-3 border-t border-[var(--color-border)]/60 flex items-center justify-between text-xs text-[var(--color-secondary)]">
