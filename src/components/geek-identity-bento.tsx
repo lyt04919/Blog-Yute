@@ -200,17 +200,16 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					}
 				/>
 
-				{/* ════════════════ 2. 电影胶片流 · React Bits 3D DriftWall (Dedicated Cinematic Dark Theater) ════════════════ */}
+				{/* ════════════════ 2. 电影胶片流 · React Bits 3D DriftWall (Adaptive Film Showcase) ════════════════ */}
 				<BentoCard
 					name="光影放映厅"
 					description="3D 悬浮流动胶片流，收录 130+ 部影史高分神作与心灵共鸣。"
 					Icon={Film}
 					href="/favorite"
 					cta="进入放映厅"
-					darkTheme={true}
-					className="col-span-1 md:col-span-2 text-white bg-zinc-950 dark:bg-zinc-950 border-zinc-800"
+					className="col-span-1 md:col-span-2"
 					background={
-						<div className="absolute inset-0 w-full h-full overflow-hidden bg-[#08080f]">
+						<div className="absolute inset-0 w-full h-full overflow-hidden bg-zinc-100/70 dark:bg-[#08080f]">
 							<DriftWall
 								items={movieDriftItems}
 								columns={5}
@@ -228,16 +227,16 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								parallax={0.35}
 								pauseOnHover={true}
 								lift={40}
-								dim={0.45}
-								overlayColor="#060010"
+								dim={0.2}
+								overlayColor="transparent"
 							/>
-							{/* Cinematic Ambient Bottom Fade */}
-							<div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-black from-30% via-black/95 via-65% to-transparent pointer-events-none z-10" />
+							{/* Ambient Bottom Fade: adaptive in light mode (fades to white) and dark mode (fades to deep night) */}
+							<div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-white/95 from-20% via-white/80 via-55% to-transparent dark:from-zinc-950 dark:from-30% dark:via-zinc-950/95 dark:via-65% dark:to-transparent pointer-events-none z-10" />
 						</div>
 					}
 				/>
 
-				{/* ════════════════ 3. 📸 私享随笔 · 暖调复古拍立得三联画廊 (不同和纸贴纸 + 自然暖黄相纸) ════════════════ */}
+				{/* ════════════════ 3. 📸 私享随笔 · 暖调复古拍立得三联画廊 (不同和纸贴纸 + 自然暖白相纸) ════════════════ */}
 				<BentoCard
 					name="私享随笔"
 					description="记录日常思绪、旅途快照与那些触动心弦的生活切片。"
@@ -257,7 +256,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 										transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
 										boxShadow: '0 4px 6px -1px rgba(50,35,15,0.07), 0 14px 28px -4px rgba(45,30,15,0.15), 0 0 0 1px rgba(160,135,100,0.18)'
 									}}
-									className="relative bg-gradient-to-b from-[#FAF6ED] via-[#F5EFE0] to-[#EAE1CE] p-2.5 pb-6 rounded-[8px] pointer-events-none group-hover:!-rotate-[11deg] group-hover:!-translate-x-3 group-hover:!translate-y-2 group-hover:shadow-2xl flex flex-col shrink-0"
+									className="relative bg-gradient-to-b from-[#FDFBF7] via-[#F8F5EE] to-[#EFEBE0] p-2.5 pb-6 rounded-[8px] pointer-events-none group-hover:!-rotate-[11deg] group-hover:!-translate-x-3 group-hover:!translate-y-2 group-hover:shadow-2xl flex flex-col shrink-0"
 								>
 									{/* 贴纸 1：半透明磨砂微纤维胶带 */}
 									<WashiTape variant="translucent" rotate={3} />
@@ -307,7 +306,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 										zIndex: 10,
 										boxShadow: '0 8px 14px -2px rgba(50,35,15,0.1), 0 22px 42px -6px rgba(45,30,15,0.2), 0 0 0 1px rgba(160,135,100,0.2)'
 									}}
-									className="relative bg-gradient-to-b from-[#FAF6ED] via-[#F5EFE0] to-[#EAE1CE] p-2.5 pb-6 rounded-[8px] pointer-events-none group-hover:!-translate-y-2 group-hover:!scale-104 group-hover:shadow-2xl flex flex-col shrink-0"
+									className="relative bg-gradient-to-b from-[#FDFBF7] via-[#F8F5EE] to-[#EFEBE0] p-2.5 pb-6 rounded-[8px] pointer-events-none group-hover:!-translate-y-2 group-hover:!scale-104 group-hover:shadow-2xl flex flex-col shrink-0"
 								>
 									{/* 贴纸 2：日系手账方格纸胶带（完美还原图一） */}
 									<WashiTape variant="grid" rotate={-2} />
@@ -356,7 +355,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 										transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
 										boxShadow: '0 4px 6px -1px rgba(50,35,15,0.07), 0 14px 28px -4px rgba(45,30,15,0.15), 0 0 0 1px rgba(160,135,100,0.18)'
 									}}
-									className="relative bg-gradient-to-b from-[#FAF6ED] via-[#F5EFE0] to-[#EAE1CE] p-2.5 pb-6 rounded-[8px] pointer-events-none group-hover:!rotate-[11deg] group-hover:!translate-x-3 group-hover:!translate-y-2 group-hover:shadow-2xl flex flex-col shrink-0"
+									className="relative bg-gradient-to-b from-[#FDFBF7] via-[#F8F5EE] to-[#EFEBE0] p-2.5 pb-6 rounded-[8px] pointer-events-none group-hover:!rotate-[11deg] group-hover:!translate-x-3 group-hover:!translate-y-2 group-hover:shadow-2xl flex flex-col shrink-0"
 								>
 									{/* 贴纸 3：暖调复古牛皮纸微波点胶带 */}
 									<WashiTape variant="dots" rotate={2.5} />

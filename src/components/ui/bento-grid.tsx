@@ -188,16 +188,20 @@ export function BentoCard({
         {Icon && (
           <div
             style={{
-              transform: isHovered ? 'scale(0.75)' : 'scale(1)',
+              transform: isHovered ? 'scale(0.88)' : 'scale(1)',
               transformOrigin: 'left center',
               transition: 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
             }}
-            className="mb-1"
+            className="mb-1.5"
           >
-            <Icon className={cn(
-              "h-10 w-10 transition-colors drop-shadow-sm",
-              darkTheme ? "text-amber-400" : "text-zinc-900 dark:text-amber-400"
-            )} />
+            <div className={cn(
+              "flex h-10 w-10 items-center justify-center rounded-xl border shadow-xs backdrop-blur-xs transition-all duration-300",
+              darkTheme
+                ? "bg-zinc-900/90 border-zinc-700/80 text-amber-400"
+                : "bg-white/95 dark:bg-zinc-800/90 border-zinc-200/80 dark:border-zinc-700/80 text-zinc-800 dark:text-amber-400 group-hover:border-[var(--color-brand)]/50 group-hover:text-[var(--color-brand)] dark:group-hover:text-amber-300"
+            )}>
+              <Icon className="h-5 w-5 drop-shadow-xs transition-transform duration-300 group-hover:scale-105" />
+            </div>
           </div>
         )}
         <h3 className={cn(
