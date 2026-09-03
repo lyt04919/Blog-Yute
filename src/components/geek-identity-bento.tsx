@@ -55,8 +55,58 @@ const webToolsSpiralItems = (shareData as any[])
 		target: '_blank'
 	}))
 
-// Realistic translucent washi tape (和纸美纹胶带)
-function WashiTape({ rotate = 0 }: { rotate?: number }) {
+// 3 distinct washi tape styles (3 款质感各异的真实和纸/手账胶带)
+function WashiTape({ variant = 'translucent', rotate = 0 }: { variant?: 'translucent' | 'grid' | 'dots'; rotate?: number }) {
+	if (variant === 'grid') {
+		// 款式 2：日系米黄方格手账胶带（完美还原图一手绘方格纸质感）
+		return (
+			<div
+				style={{
+					width: '60px',
+					height: '20px',
+					top: '-10px',
+					left: '50%',
+					transform: `translateX(-50%) rotate(${rotate}deg)`,
+					backgroundColor: 'rgba(248, 243, 230, 0.88)',
+					backdropFilter: 'blur(2px)',
+					boxShadow: '0 1.5px 3.5px rgba(60, 45, 20, 0.14), inset 0 1px 1px rgba(255,255,255,0.9)',
+					backgroundImage: `
+						linear-gradient(rgba(120, 95, 60, 0.12) 1px, transparent 1px),
+						linear-gradient(90deg, rgba(120, 95, 60, 0.12) 1px, transparent 1px)
+					`,
+					backgroundSize: '4px 4px',
+					borderLeft: '1.5px dashed rgba(120, 95, 60, 0.28)',
+					borderRight: '1.5px dashed rgba(120, 95, 60, 0.28)',
+				}}
+				className="absolute z-30 pointer-events-none rounded-[1px] select-none"
+			/>
+		)
+	}
+
+	if (variant === 'dots') {
+		// 款式 3：暖调复古牛皮纸微波点胶带（深浅质感对比）
+		return (
+			<div
+				style={{
+					width: '52px',
+					height: '18px',
+					top: '-9px',
+					left: '50%',
+					transform: `translateX(-50%) rotate(${rotate}deg)`,
+					backgroundColor: 'rgba(238, 224, 200, 0.85)',
+					backdropFilter: 'blur(2px)',
+					boxShadow: '0 1.5px 3px rgba(60, 45, 20, 0.14), inset 0 1px 1px rgba(255,255,255,0.75)',
+					backgroundImage: `radial-gradient(rgba(130, 95, 55, 0.2) 1px, transparent 1px)`,
+					backgroundSize: '4.5px 4.5px',
+					borderLeft: '1.5px dashed rgba(130, 95, 55, 0.3)',
+					borderRight: '1.5px dashed rgba(130, 95, 55, 0.3)',
+				}}
+				className="absolute z-30 pointer-events-none rounded-[1px] select-none"
+			/>
+		)
+	}
+
+	// 款式 1：半透明磨砂美纹纤维胶带（柔和雾面）
 	return (
 		<div
 			style={{
@@ -65,20 +115,20 @@ function WashiTape({ rotate = 0 }: { rotate?: number }) {
 				top: '-9px',
 				left: '50%',
 				transform: `translateX(-50%) rotate(${rotate}deg)`,
-				backgroundColor: 'rgba(255, 255, 255, 0.78)',
-				backdropFilter: 'blur(2px)',
-				boxShadow: '0 1px 3px rgba(0,0,0,0.12), inset 0 1px 1px rgba(255,255,255,0.85)',
+				backgroundColor: 'rgba(255, 248, 236, 0.76)',
+				backdropFilter: 'blur(2.5px)',
+				boxShadow: '0 1px 3px rgba(60, 45, 20, 0.12), inset 0 1px 1px rgba(255,255,255,0.9)',
 				backgroundImage: `
 					repeating-linear-gradient(
 						45deg,
-						rgba(0, 0, 0, 0.02) 0px,
-						rgba(0, 0, 0, 0.02) 2px,
+						rgba(140, 110, 70, 0.04) 0px,
+						rgba(140, 110, 70, 0.04) 2px,
 						transparent 2px,
 						transparent 4px
 					)
 				`,
-				borderLeft: '1.5px dashed rgba(0,0,0,0.16)',
-				borderRight: '1.5px dashed rgba(0,0,0,0.16)',
+				borderLeft: '1.5px dashed rgba(140, 110, 70, 0.22)',
+				borderRight: '1.5px dashed rgba(140, 110, 70, 0.22)',
 			}}
 			className="absolute z-30 pointer-events-none rounded-[1px] select-none"
 		/>
@@ -160,7 +210,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					}
 				/>
 
-				{/* ════════════════ 3. 📸 私享随笔 · 经典胶带拍立得三联画廊 (参考图一美纹纸胶带与真实质感) ════════════════ */}
+				{/* ════════════════ 3. 📸 私享随笔 · 暖调复古拍立得三联画廊 (不同和纸贴纸 + 自然暖黄相纸) ════════════════ */}
 				<BentoCard
 					name="私享随笔"
 					description="记录日常思绪、旅途快照与那些触动心弦的生活切片。"
@@ -171,26 +221,26 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					background={
 						<div className="absolute inset-x-0 top-0 h-[260px] flex items-center justify-center pt-8 sm:pt-9 px-4 sm:px-6 select-none">
 							<div className="flex items-center justify-center gap-3 sm:gap-5">
-								{/* 1. 左侧拍立得：奥克兰黄昏 (-7°) */}
+								{/* 1. 左侧拍立得：奥克兰黄昏 (-7°) · 搭配半透明磨砂美纹胶带 */}
 								<div
 									style={{
 										width: '146px',
 										height: '182px',
 										transform: 'rotate(-7deg) translateY(12px)',
 										transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
-										boxShadow: '0 4px 6px -1px rgba(0,0,0,0.06), 0 14px 28px -4px rgba(0,0,0,0.13), 0 0 0 1px rgba(0,0,0,0.06)'
+										boxShadow: '0 4px 6px -1px rgba(50,35,15,0.07), 0 14px 28px -4px rgba(45,30,15,0.15), 0 0 0 1px rgba(160,135,100,0.18)'
 									}}
-									className="relative bg-gradient-to-b from-[#FFFFFF] via-[#FDFDFD] to-[#F7F7F7] p-2.5 pb-6 rounded-[8px] pointer-events-none group-hover:!-rotate-[11deg] group-hover:!-translate-x-3 group-hover:!translate-y-2 group-hover:shadow-2xl flex flex-col shrink-0"
+									className="relative bg-gradient-to-b from-[#FAF6ED] via-[#F5EFE0] to-[#EAE1CE] p-2.5 pb-6 rounded-[8px] pointer-events-none group-hover:!-rotate-[11deg] group-hover:!-translate-x-3 group-hover:!translate-y-2 group-hover:shadow-2xl flex flex-col shrink-0"
 								>
-									{/* 和纸美纹胶带 */}
-									<WashiTape rotate={2.5} />
+									{/* 贴纸 1：半透明磨砂微纤维胶带 */}
+									<WashiTape variant="translucent" rotate={3} />
 
 									{/* 经典 1:1 方形照片窗口 */}
 									<div 
 										style={{ 
 											width: '126px', 
 											height: '126px',
-											boxShadow: 'inset 0 1.5px 3px rgba(0,0,0,0.22), inset 0 0 0 1px rgba(0,0,0,0.08)'
+											boxShadow: 'inset 0 1.5px 3px rgba(0,0,0,0.26), inset 0 0 0 1px rgba(0,0,0,0.1)'
 										}} 
 										className="relative rounded-[4px] overflow-hidden bg-zinc-900 shrink-0"
 									>
@@ -204,13 +254,13 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 										<div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/20 pointer-events-none" />
 									</div>
 
-									{/* 拍立得宽下巴手写留白 */}
+									{/* 拍立得暖调复古宽下巴手写留白 */}
 									<div className="flex-1 flex items-center justify-center pt-1.5 px-0.5 overflow-visible">
 										<p 
 											style={{ 
 												fontFamily: 'var(--font-cursive), "Caveat", "Bradley Hand", cursive',
 												fontSize: '15px',
-												color: '#262626',
+												color: '#262017',
 												transform: 'rotate(-0.8deg)'
 											}}
 											className="font-medium tracking-wide text-center whitespace-nowrap select-none opacity-90"
@@ -220,7 +270,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 									</div>
 								</div>
 
-								{/* 2. 中间拍立得：蒂卡波湖 (0° 视觉主位微浮，叠于上方) */}
+								{/* 2. 中间拍立得：蒂卡波湖 (0° 视觉主位微浮) · 搭配日系和纸方格胶带 (参考图一) */}
 								<div
 									style={{
 										width: '150px',
@@ -228,19 +278,19 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 										transform: 'rotate(0deg) translateY(2px)',
 										transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
 										zIndex: 10,
-										boxShadow: '0 8px 14px -2px rgba(0,0,0,0.09), 0 22px 42px -6px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.07)'
+										boxShadow: '0 8px 14px -2px rgba(50,35,15,0.1), 0 22px 42px -6px rgba(45,30,15,0.2), 0 0 0 1px rgba(160,135,100,0.2)'
 									}}
-									className="relative bg-gradient-to-b from-[#FFFFFF] via-[#FDFDFD] to-[#F7F7F7] p-2.5 pb-6 rounded-[8px] pointer-events-none group-hover:!-translate-y-2 group-hover:!scale-104 group-hover:shadow-2xl flex flex-col shrink-0"
+									className="relative bg-gradient-to-b from-[#FAF6ED] via-[#F5EFE0] to-[#EAE1CE] p-2.5 pb-6 rounded-[8px] pointer-events-none group-hover:!-translate-y-2 group-hover:!scale-104 group-hover:shadow-2xl flex flex-col shrink-0"
 								>
-									{/* 和纸美纹胶带 */}
-									<WashiTape rotate={-1.5} />
+									{/* 贴纸 2：日系手账方格纸胶带（完美还原图一） */}
+									<WashiTape variant="grid" rotate={-2} />
 
 									{/* 经典 1:1 方形照片窗口 */}
 									<div 
 										style={{ 
 											width: '130px', 
 											height: '130px',
-											boxShadow: 'inset 0 1.5px 3px rgba(0,0,0,0.22), inset 0 0 0 1px rgba(0,0,0,0.08)'
+											boxShadow: 'inset 0 1.5px 3px rgba(0,0,0,0.26), inset 0 0 0 1px rgba(0,0,0,0.1)'
 										}} 
 										className="relative rounded-[4px] overflow-hidden bg-zinc-900 shrink-0"
 									>
@@ -254,13 +304,13 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 										<div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/20 pointer-events-none" />
 									</div>
 
-									{/* 拍立得宽下巴手写留白 */}
+									{/* 拍立得暖调复古宽下巴手写留白 */}
 									<div className="flex-1 flex items-center justify-center pt-1.5 px-0.5 overflow-visible">
 										<p 
 											style={{ 
 												fontFamily: 'var(--font-cursive), "Caveat", "Bradley Hand", cursive',
 												fontSize: '15px',
-												color: '#262626',
+												color: '#262017',
 												transform: 'rotate(0.5deg)'
 											}}
 											className="font-medium tracking-wide text-center whitespace-nowrap select-none opacity-90"
@@ -270,26 +320,26 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 									</div>
 								</div>
 
-								{/* 3. 右侧拍立得：皇后镇日落 (+7°) */}
+								{/* 3. 右侧拍立得：皇后镇日落 (+7°) · 搭配浅咖牛皮微波点胶带 */}
 								<div
 									style={{
 										width: '146px',
 										height: '182px',
 										transform: 'rotate(7deg) translateY(12px)',
 										transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
-										boxShadow: '0 4px 6px -1px rgba(0,0,0,0.06), 0 14px 28px -4px rgba(0,0,0,0.13), 0 0 0 1px rgba(0,0,0,0.06)'
+										boxShadow: '0 4px 6px -1px rgba(50,35,15,0.07), 0 14px 28px -4px rgba(45,30,15,0.15), 0 0 0 1px rgba(160,135,100,0.18)'
 									}}
-									className="relative bg-gradient-to-b from-[#FFFFFF] via-[#FDFDFD] to-[#F7F7F7] p-2.5 pb-6 rounded-[8px] pointer-events-none group-hover:!rotate-[11deg] group-hover:!translate-x-3 group-hover:!translate-y-2 group-hover:shadow-2xl flex flex-col shrink-0"
+									className="relative bg-gradient-to-b from-[#FAF6ED] via-[#F5EFE0] to-[#EAE1CE] p-2.5 pb-6 rounded-[8px] pointer-events-none group-hover:!rotate-[11deg] group-hover:!translate-x-3 group-hover:!translate-y-2 group-hover:shadow-2xl flex flex-col shrink-0"
 								>
-									{/* 和纸美纹胶带 */}
-									<WashiTape rotate={2} />
+									{/* 贴纸 3：暖调复古牛皮纸微波点胶带 */}
+									<WashiTape variant="dots" rotate={2.5} />
 
 									{/* 经典 1:1 方形照片窗口 */}
 									<div 
 										style={{ 
 											width: '126px', 
 											height: '126px',
-											boxShadow: 'inset 0 1.5px 3px rgba(0,0,0,0.22), inset 0 0 0 1px rgba(0,0,0,0.08)'
+											boxShadow: 'inset 0 1.5px 3px rgba(0,0,0,0.26), inset 0 0 0 1px rgba(0,0,0,0.1)'
 										}} 
 										className="relative rounded-[4px] overflow-hidden bg-zinc-900 shrink-0"
 									>
@@ -303,13 +353,13 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 										<div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/20 pointer-events-none" />
 									</div>
 
-									{/* 拍立得宽下巴手写留白 */}
+									{/* 拍立得暖调复古宽下巴手写留白 */}
 									<div className="flex-1 flex items-center justify-center pt-1.5 px-0.5 overflow-visible">
 										<p 
 											style={{ 
 												fontFamily: 'var(--font-cursive), "Caveat", "Bradley Hand", cursive',
 												fontSize: '15px',
-												color: '#262626',
+												color: '#262017',
 												transform: 'rotate(-0.5deg)'
 											}}
 											className="font-medium tracking-wide text-center whitespace-nowrap select-none opacity-90"
