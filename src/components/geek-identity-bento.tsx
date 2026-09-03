@@ -171,26 +171,25 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 											className="w-full h-full object-cover transition-transform duration-300 group-hover/book:scale-105" 
 										/>
 
-										{/* 2. Lower-half progressive blur: 从下半截（48%）开始逐渐模糊 */}
+										{/* 2. Lower-half progressive blur: 从下半截（48%）开始逐渐模糊溶散 */}
 										<div 
-											className="absolute inset-x-0 bottom-0 pointer-events-none overflow-hidden rounded-b-xl"
-											style={{ height: '52%' }}
-										>
-											{/* Blurred clone aligned precisely to full card bounds */}
-											<div className="absolute inset-x-0 -top-[86px] w-full h-[180px] overflow-hidden">
-												<img 
-													src={item.cover} 
-													alt="" 
-													aria-hidden="true"
-													referrerPolicy="no-referrer"
-													loading="lazy"
-													decoding="async"
-													className="w-full h-full object-cover blur-[10px] scale-110" 
-												/>
-											</div>
-											{/* Natural gradient transition from sharp to blurred */}
-											<div className="absolute inset-0 bg-gradient-to-b from-transparent from-5% via-white/30 via-45% to-white/80 dark:via-zinc-900/30 dark:to-zinc-900/80" />
-										</div>
+											className="absolute inset-x-0 bottom-0 pointer-events-none rounded-b-xl overflow-hidden backdrop-blur-md"
+											style={{
+												height: '52%',
+												maskImage: 'linear-gradient(to bottom, transparent 0%, black 80%)',
+												WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 80%)',
+											}}
+										/>
+										<div 
+											className="absolute inset-x-0 bottom-0 pointer-events-none rounded-b-xl overflow-hidden backdrop-blur-xl"
+											style={{
+												height: '35%',
+												maskImage: 'linear-gradient(to bottom, transparent 0%, black 70%)',
+												WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 70%)',
+											}}
+										/>
+										{/* 渐进环境底色融合：与 BentoCard 底色自然消融 */}
+										<div className="absolute inset-x-0 bottom-0 h-[52%] pointer-events-none rounded-b-xl bg-gradient-to-t from-white/90 via-white/40 via-50% to-transparent dark:from-zinc-900/90 dark:via-zinc-900/40" />
 
 										{/* Realistic book spine lighting fold */}
 										<div className="absolute inset-y-0 left-0 w-2.5 bg-gradient-to-r from-black/25 via-white/10 to-transparent pointer-events-none z-10" />

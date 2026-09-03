@@ -162,7 +162,7 @@ function runTests() {
 		assert.ok(geekContent.includes("top: '46px'"), 'GeekIdentityBento book marquee should be explicitly positioned at top: 46px via inline style to align with red line')
 		assert.ok(geekContent.includes('w-36'), 'GeekIdentityBento book covers should be enlarged to w-36')
 		assert.ok(geekContent.includes('gap="2.5rem"'), 'GeekIdentityBento book marquee should use 2.5rem gap')
-		assert.ok(geekContent.includes('blur-[10px]'), 'GeekIdentityBento book covers must have progressive blur layer (越向下越模糊)')
+		assert.ok(geekContent.includes('backdrop-blur-md'), 'GeekIdentityBento book covers must have progressive blur layer (越向下越模糊)')
 		assert.ok(bentoContent.includes('rounded-xl border shadow-xs'), 'BentoCard must feature unified squircle icon badge')
 		assert.ok(geekContent.includes('bg-zinc-100/70 dark:bg-[#08080f]'), 'Movie showcase card must be adaptive in light/dark modes')
 
