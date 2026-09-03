@@ -148,8 +148,8 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					cta="探索书影音"
 					className="col-span-1 md:col-span-1"
 					background={
-						<div className="absolute inset-x-0 top-0 h-[220px] [mask-image:linear-gradient(to_bottom,#000_65%,transparent_100%)] overflow-hidden">
-							<Marquee pauseOnHover duration="25s" className="py-3 px-2 [gap:14px]">
+						<div className="absolute inset-x-0 top-3 sm:top-4 h-[230px] overflow-hidden">
+							<Marquee pauseOnHover duration="25s" className="py-4 sm:py-5 px-3 [gap:24px]">
 								{realBooks.map((item, idx) => (
 									<div
 										key={idx}
