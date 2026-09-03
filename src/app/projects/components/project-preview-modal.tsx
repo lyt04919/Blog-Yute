@@ -10,10 +10,10 @@ import {
 	RotateCw,
 	ExternalLink,
 	X,
-	Globe,
+	Maximize2,
+	Minimize2,
 	Github,
-	BookOpen,
-	ShieldAlert
+	BookOpen
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -29,6 +29,7 @@ export default function ProjectPreviewModal({
 	onClose
 }: ProjectPreviewModalProps) {
 	const [deviceMode, setDeviceMode] = useState<DeviceMode>('desktop')
+	const [isFullscreen, setIsFullscreen] = useState(false)
 	const [iframeKey, setIframeKey] = useState(0)
 	const [isLoading, setIsLoading] = useState(true)
 
@@ -53,19 +54,23 @@ export default function ProjectPreviewModal({
 		.replace(/^https?:\/\//, '')
 		.replace(/\/.*$/, '')
 
-	const deviceWidths: Record<DeviceMode, string> = {
-		desktop: 'w-full max-w-6xl h-[78vh]',
-		tablet: 'w-[768px] max-w-[95vw] h-[78vh]',
-		mobile: 'w-[390px] max-w-[95vw] h-[78vh]'
+	const deviceWidthClasses: Record<DeviceMode, string> = {
+		desktop: isFullscreen ? 'w-[98vw] max-w-[98vw]' : 'w-[95vw] max-w-7xl',
+		tablet: 'w-[768px] max-w-[95vw]',
+		mobile: 'w-[390px] max-w-[95vw]'
 	}
+
+	const modalHeight = isFullscreen ? '95vh' : '88vh'
 
 	return (
 		<DialogModal
 			open={Boolean(project)}
 			onClose={onClose}
+			overlayClassName="p-2 sm:p-4 md:p-6"
+			style={{ height: modalHeight, maxHeight: '96vh' }}
 			className={cn(
 				'rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl overflow-hidden flex flex-col transition-all duration-300',
-				deviceWidths[deviceMode]
+				deviceWidthClasses[deviceMode]
 			)}
 		>
 			{/* Top Mac Window Control Bar */}
@@ -75,7 +80,7 @@ export default function ProjectPreviewModal({
 					<button
 						type="button"
 						onClick={onClose}
-						className="w-3 h-3 rounded-full bg-[#FF5F56] border border-black/10 hover:opacity-80 transition-opacity flex items-center justify-center group"
+						className="w-3.5 h-3.5 rounded-full bg-[#FF5F56] border border-black/10 hover:opacity-80 transition-opacity flex items-center justify-center group cursor-pointer"
 						title="关闭"
 					>
 						<X className="w-2 h-2 text-black/60 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -86,20 +91,23 @@ export default function ProjectPreviewModal({
 							setIsLoading(true)
 							setIframeKey(k => k + 1)
 						}}
-						className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-black/10 hover:opacity-80 transition-opacity flex items-center justify-center group"
+						className="w-3.5 h-3.5 rounded-full bg-[#FFBD2E] border border-black/10 hover:opacity-80 transition-opacity flex items-center justify-center group cursor-pointer"
 						title="重新加载"
 					>
 						<RotateCw className="w-2 h-2 text-black/60 opacity-0 group-hover:opacity-100 transition-opacity" />
 					</button>
-					<a
-						href={project.url}
-						target="_blank"
-						rel="noreferrer"
-						className="w-3 h-3 rounded-full bg-[#27C93F] border border-black/10 hover:opacity-80 transition-opacity flex items-center justify-center group"
-						title="在新标签页全屏打开"
+					<button
+						type="button"
+						onClick={() => setIsFullscreen(prev => !prev)}
+						className="w-3.5 h-3.5 rounded-full bg-[#27C93F] border border-black/10 hover:opacity-80 transition-opacity flex items-center justify-center group cursor-pointer"
+						title={isFullscreen ? '退出全屏' : '全屏模式'}
 					>
-						<ExternalLink className="w-2 h-2 text-black/60 opacity-0 group-hover:opacity-100 transition-opacity" />
-					</a>
+						{isFullscreen ? (
+							<Minimize2 className="w-2 h-2 text-black/60 opacity-0 group-hover:opacity-100 transition-opacity" />
+						) : (
+							<Maximize2 className="w-2 h-2 text-black/60 opacity-0 group-hover:opacity-100 transition-opacity" />
+						)}
+					</button>
 				</div>
 
 				{/* Center: URL Bar & Device Switcher */}
@@ -116,7 +124,7 @@ export default function ProjectPreviewModal({
 							type="button"
 							onClick={() => setDeviceMode('desktop')}
 							className={cn(
-								'p-1.5 rounded-lg transition-all',
+								'p-1.5 rounded-lg transition-all cursor-pointer',
 								deviceMode === 'desktop'
 									? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-xs'
 									: 'text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'
@@ -129,7 +137,7 @@ export default function ProjectPreviewModal({
 							type="button"
 							onClick={() => setDeviceMode('tablet')}
 							className={cn(
-								'p-1.5 rounded-lg transition-all',
+								'p-1.5 rounded-lg transition-all cursor-pointer',
 								deviceMode === 'tablet'
 									? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-xs'
 									: 'text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'
@@ -142,7 +150,7 @@ export default function ProjectPreviewModal({
 							type="button"
 							onClick={() => setDeviceMode('mobile')}
 							className={cn(
-								'p-1.5 rounded-lg transition-all',
+								'p-1.5 rounded-lg transition-all cursor-pointer',
 								deviceMode === 'mobile'
 									? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-xs'
 									: 'text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'
@@ -156,11 +164,24 @@ export default function ProjectPreviewModal({
 
 				{/* Right: Actions */}
 				<div className="flex items-center gap-2">
+					<button
+						type="button"
+						onClick={() => setIsFullscreen(prev => !prev)}
+						className="hidden sm:inline-flex p-1.5 rounded-lg text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60 transition-colors cursor-pointer"
+						title={isFullscreen ? '还原窗口' : '最大化窗口'}
+					>
+						{isFullscreen ? (
+							<Minimize2 className="w-3.5 h-3.5" />
+						) : (
+							<Maximize2 className="w-3.5 h-3.5" />
+						)}
+					</button>
+
 					<a
 						href={project.url}
 						target="_blank"
 						rel="noreferrer"
-						className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 hover:opacity-90 transition-all shadow-xs"
+						className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-xl bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 hover:opacity-90 transition-all shadow-xs cursor-pointer"
 					>
 						<span>打开新页</span>
 						<ExternalLink className="w-3 h-3" />
@@ -168,20 +189,20 @@ export default function ProjectPreviewModal({
 				</div>
 			</div>
 
-			{/* Main Canvas Viewport */}
-			<div className="relative flex-1 w-full bg-slate-50 dark:bg-zinc-950 overflow-hidden flex items-center justify-center">
+			{/* Main Canvas Viewport (Explicitly flex-1 and takes full remaining height) */}
+			<div className="relative flex-1 min-h-0 w-full h-full bg-slate-50 dark:bg-zinc-950 overflow-hidden flex items-center justify-center">
 				{/* Loading skeleton */}
 				{isLoading && (
-					<div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm p-4 text-center">
-						<RotateCw className="w-6 h-6 animate-spin text-[var(--color-brand)]" />
-						<p className="text-xs text-zinc-500 font-medium">
+					<div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm p-4 text-center">
+						<RotateCw className="w-7 h-7 animate-spin text-[var(--color-brand)]" />
+						<p className="text-sm text-zinc-600 dark:text-zinc-300 font-medium">
 							正在载入 {project.name} 运行环境...
 						</p>
 						<a
 							href={project.url}
 							target="_blank"
 							rel="noreferrer"
-							className="text-[11px] text-[var(--color-brand)] font-medium hover:underline pt-1"
+							className="text-xs text-[var(--color-brand)] font-semibold hover:underline pt-1"
 						>
 							加载较慢或提示受限？点击直接打开原网页 ↗
 						</a>
@@ -219,14 +240,14 @@ export default function ProjectPreviewModal({
 						src={project.url}
 						title={project.name}
 						onLoad={() => setIsLoading(false)}
-						className="w-full h-full border-none bg-white"
+						className="w-full h-full border-none bg-white dark:bg-zinc-900"
 						sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-downloads"
 					/>
 				)}
 			</div>
 
 			{/* Bottom Bar: Project Details & Context */}
-			<div className="px-5 py-3 bg-white dark:bg-zinc-900 border-t border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between gap-4 text-xs">
+			<div className="h-11 px-5 bg-white dark:bg-zinc-900 border-t border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between gap-4 text-xs shrink-0 select-none">
 				<div className="flex items-center gap-3 min-w-0">
 					<span className="font-bold text-zinc-900 dark:text-zinc-100 truncate">
 						{project.name}
@@ -234,18 +255,18 @@ export default function ProjectPreviewModal({
 					<span className="hidden sm:inline-block text-zinc-400 dark:text-zinc-500">
 						|
 					</span>
-					<span className="hidden sm:inline-block text-zinc-500 dark:text-zinc-400 truncate max-w-md">
+					<span className="hidden sm:inline-block text-zinc-500 dark:text-zinc-400 truncate max-w-lg">
 						{project.description}
 					</span>
 				</div>
 
-				<div className="flex items-center gap-2 shrink-0">
+				<div className="flex items-center gap-3 shrink-0">
 					{project.blogSlug && (
 						<a
 							href={`/blog/${project.blogSlug}`}
 							className="inline-flex items-center gap-1 text-[var(--color-brand)] font-semibold hover:underline"
 						>
-							<BookOpen className="w-3 h-3" />
+							<BookOpen className="w-3.5 h-3.5" />
 							<span>阅读手记</span>
 						</a>
 					)}
