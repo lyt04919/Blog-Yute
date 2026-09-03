@@ -161,22 +161,30 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 										key={idx}
 										className="group/book relative w-36 h-[180px] rounded-xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-zinc-700/80 shrink-0 select-none bg-zinc-100 dark:bg-zinc-800 transition-all duration-300 ease-out hover:scale-105 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
 									>
-										{/* 1. Base sharp book cover */}
-										<img 
-											src={item.cover} 
-											alt={item.name} 
-											referrerPolicy="no-referrer"
-											loading="lazy"
-											decoding="async"
-											className="w-full h-full object-cover transition-transform duration-300 group-hover/book:scale-105" 
-										/>
-
-										{/* 2. Progressive blur layer (越向下越模糊，精确复刻灵感工具箱景深层次) */}
-										<div 
-											className="absolute inset-0 pointer-events-none overflow-hidden rounded-xl"
+										{/* 1. Sharp book cover (上半截清晰呈现，从 48% 开始渐隐) */}
+										<div
+											className="absolute inset-0"
 											style={{
-												maskImage: 'linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.45) 55%, black 85%)',
-												WebkitMaskImage: 'linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.45) 55%, black 85%)',
+												maskImage: 'linear-gradient(to bottom, black 0%, black 48%, rgba(0,0,0,0.3) 70%, transparent 90%)',
+												WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 48%, rgba(0,0,0,0.3) 70%, transparent 90%)',
+											}}
+										>
+											<img 
+												src={item.cover} 
+												alt={item.name} 
+												referrerPolicy="no-referrer"
+												loading="lazy"
+												decoding="async"
+												className="w-full h-full object-cover transition-transform duration-300 group-hover/book:scale-105" 
+											/>
+										</div>
+
+										{/* 2. Intermediate soft blur layer (46%~75% 开始逐渐柔化) */}
+										<div 
+											className="absolute inset-0 pointer-events-none overflow-hidden"
+											style={{
+												maskImage: 'linear-gradient(to bottom, transparent 44%, rgba(0,0,0,0.85) 62%, transparent 82%)',
+												WebkitMaskImage: 'linear-gradient(to bottom, transparent 44%, rgba(0,0,0,0.85) 62%, transparent 82%)',
 											}}
 										>
 											<img 
@@ -186,7 +194,26 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 												referrerPolicy="no-referrer"
 												loading="lazy"
 												decoding="async"
-												className="w-full h-full object-cover blur-[8px] scale-105 transition-transform duration-300 group-hover/book:scale-110" 
+												className="w-full h-full object-cover blur-[4px] scale-105 transition-transform duration-300 group-hover/book:scale-110" 
+											/>
+										</div>
+
+										{/* 3. Deep progressive blur layer (从 60% 至底部 100% 深度平滑模糊) */}
+										<div 
+											className="absolute inset-0 pointer-events-none overflow-hidden"
+											style={{
+												maskImage: 'linear-gradient(to bottom, transparent 55%, rgba(0,0,0,0.7) 75%, black 90%)',
+												WebkitMaskImage: 'linear-gradient(to bottom, transparent 55%, rgba(0,0,0,0.7) 75%, black 90%)',
+											}}
+										>
+											<img 
+												src={item.cover} 
+												alt="" 
+												aria-hidden="true"
+												referrerPolicy="no-referrer"
+												loading="lazy"
+												decoding="async"
+												className="w-full h-full object-cover blur-[10px] scale-110 transition-transform duration-300 group-hover/book:scale-115" 
 											/>
 										</div>
 
