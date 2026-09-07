@@ -1,4 +1,4 @@
-import { type ComponentPropsWithoutRef } from 'react'
+import { useState, useEffect, useRef, type ComponentPropsWithoutRef } from 'react'
 import { cn } from '@/lib/utils'
 
 export interface MarqueeProps extends ComponentPropsWithoutRef<'div'> {
@@ -53,11 +53,31 @@ export function Marquee({
 	style,
 	...props
 }: MarqueeProps) {
+	const containerRef = useRef<HTMLDivElement>(null)
+	const [isInView, setIsInView] = useState(false)
+
+	useEffect(() => {
+		const el = containerRef.current
+		if (!el || typeof IntersectionObserver === 'undefined') {
+			setIsInView(true)
+			return
+		}
+		const observer = new IntersectionObserver(
+			([entry]) => {
+				setIsInView(entry.isIntersecting)
+			},
+			{ threshold: 0.05 }
+		)
+		observer.observe(el)
+		return () => observer.disconnect()
+	}, [])
+
 	const durationStr = typeof duration === 'number' ? `${duration}s` : duration
 	const gapStr = typeof gap === 'number' ? `${gap}px` : gap
 
 	return (
 		<div
+			ref={containerRef}
 			{...props}
 			style={{
 				['--gap' as any]: gapStr,
@@ -109,6 +129,7 @@ export function Marquee({
 							animationTimingFunction: 'linear',
 							animationIterationCount: 'infinite',
 							animationDirection: reverse ? 'reverse' : 'normal',
+							animationPlayState: isInView ? 'running' : 'paused',
 							gap: gapStr,
 						}}
 						className={cn('marquee-item-track flex shrink-0', {

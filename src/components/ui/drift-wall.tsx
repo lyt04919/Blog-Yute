@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useRef, useCallback, type CSSProperties } from 'react'
+import { useState, useEffect, useMemo, useRef, useCallback, type CSSProperties } from 'react'
 import './drift-wall.css'
 
 export interface DriftWallItem {
@@ -67,6 +67,21 @@ export default function DriftWall({
 }: DriftWallProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const planeRef = useRef<HTMLDivElement>(null)
+  const rafIdRef = useRef<number | null>(null)
+  const [isInView, setIsInView] = useState(false)
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el || typeof IntersectionObserver === 'undefined') {
+      setIsInView(true)
+      return
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      setIsInView(entry.isIntersecting)
+    }, { threshold: 0.05 })
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
 
   const columnItems = useMemo(() => {
     const validItems = items && items.length > 0 ? items : DEFAULT_ITEMS
@@ -94,19 +109,33 @@ export default function DriftWall({
         return
       }
 
-      const rect = containerRef.current.getBoundingClientRect()
-      if (!rect.width || !rect.height) return
-      const px = ((e.clientX - rect.left) / rect.width - 0.5) * parallax * 8
-      const py = -((e.clientY - rect.top) / rect.height - 0.5) * parallax * 8
-      planeRef.current.style.transform =
-        `translate(-50%, -50%) scale(1.15) ` +
-        `rotateX(${tilt + py}deg) rotateY(${turn + px}deg) rotateZ(${roll}deg) ` +
-        `translateZ(0)`
+      const clientX = e.clientX
+      const clientY = e.clientY
+
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current)
+      }
+
+      rafIdRef.current = requestAnimationFrame(() => {
+        if (!containerRef.current || !planeRef.current) return
+        const rect = containerRef.current.getBoundingClientRect()
+        if (!rect.width || !rect.height) return
+        const px = ((clientX - rect.left) / rect.width - 0.5) * parallax * 8
+        const py = -((clientY - rect.top) / rect.height - 0.5) * parallax * 8
+        planeRef.current.style.transform =
+          `translate(-50%, -50%) scale(1.15) ` +
+          `rotateX(${tilt + py}deg) rotateY(${turn + px}deg) rotateZ(${roll}deg) ` +
+          `translateZ(0)`
+      })
     },
     [parallax, tilt, turn, roll]
   )
 
   const handlePointerLeave = useCallback(() => {
+    if (rafIdRef.current !== null) {
+      cancelAnimationFrame(rafIdRef.current)
+      rafIdRef.current = null
+    }
     if (!planeRef.current) return
     planeRef.current.style.transform =
       `translate(-50%, -50%) scale(1.15) ` +
@@ -161,6 +190,7 @@ export default function DriftWall({
                 style={{
                   animation: `drift-wall-vertical ${duration} linear infinite`,
                   animationDirection: isReverse ? 'reverse' : 'normal',
+                  animationPlayState: isInView ? 'running' : 'paused',
                 }}
               >
                 {/* 2 seamless loops for infinite vertical scroll */}

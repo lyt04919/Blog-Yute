@@ -70,7 +70,8 @@ export const InfiniteSpiral: React.FC<InfiniteSpiralProps> = ({
 	const targetProgressRef = useRef<number>(0)
 	const autoSpeedRef = useRef<number>(0)
 	const hoveredRef = useRef<boolean>(false)
-	const visibleRef = useRef<boolean>(true)
+	const visibleRef = useRef<boolean>(false)
+	const isLoopRunningRef = useRef<boolean>(false)
 	const draggingRef = useRef<boolean>(false)
 	const lastPointerYRef = useRef<number>(0)
 	const dragMovedRef = useRef<boolean>(false)
@@ -89,7 +90,7 @@ export const InfiniteSpiral: React.FC<InfiniteSpiralProps> = ({
 		const root = rootRef.current
 		if (!root || normalizedItems.length === 0) return
 
-		let frameId: number
+		let frameId: number | null = null
 		let previousTime = performance.now()
 		let bounds = root.getBoundingClientRect()
 		const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -106,28 +107,12 @@ export const InfiniteSpiral: React.FC<InfiniteSpiralProps> = ({
 		})
 		resizeObserver.observe(root)
 
-		const intersectionObserver = new IntersectionObserver(
-			([entry]) => {
-				visibleRef.current = entry.isIntersecting
-			},
-			{ threshold: 0.02 }
-		)
-		intersectionObserver.observe(root)
-
-		const handleScroll = () => {
-			const nextScrollY = window.scrollY
-			const scrollDelta = nextScrollY - lastScrollY
-			lastScrollY = nextScrollY
-			if (!scrollEnabled || !visibleRef.current || scrollDelta === 0) return
-			targetProgressRef.current += clamp(
-				(scrollDelta * scrollSpeedMultiplier) / Math.max(verticalSpacing * 2, 1),
-				-1.5,
-				1.5
-			)
-		}
-		window.addEventListener('scroll', handleScroll, { passive: true })
-
 		const render = (time: number) => {
+			if (!visibleRef.current) {
+				isLoopRunningRef.current = false
+				return
+			}
+
 			const delta = Math.min((time - previousTime) / 1000, 0.05)
 			previousTime = time
 
@@ -170,10 +155,8 @@ export const InfiniteSpiral: React.FC<InfiniteSpiralProps> = ({
 				const depthScale = clamp(perspective / Math.max(perspective - z, 1), 0.72, 1.45)
 				const visualScale = scale * depthScale
 				const depth = (z / Math.max(responsiveRadius, 1) + 1) / 2
-				const blur = edgeBlur * smoothstep(0.35, 1, edge)
 				card.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(2)}px, ${(offset * verticalSpacing * fit).toFixed(2)}px, 0) rotateZ(${cardTilt}deg) scale(${visualScale.toFixed(3)})`
 				card.style.opacity = opacity.toFixed(3)
-				card.style.filter = blur > 0.01 ? `blur(${blur.toFixed(2)}px)` : 'none'
 				card.style.zIndex = String(Math.round(depth * 100000) + index)
 				card.style.pointerEvents = opacity > 0.25 ? 'auto' : 'none'
 			})
@@ -181,10 +164,41 @@ export const InfiniteSpiral: React.FC<InfiniteSpiralProps> = ({
 			frameId = requestAnimationFrame(render)
 		}
 
-		frameId = requestAnimationFrame(render)
+		const intersectionObserver = new IntersectionObserver(
+			([entry]) => {
+				const isNowVisible = entry.isIntersecting
+				visibleRef.current = isNowVisible
+				if (isNowVisible && !isLoopRunningRef.current) {
+					previousTime = performance.now()
+					isLoopRunningRef.current = true
+					frameId = requestAnimationFrame(render)
+				} else if (!isNowVisible && isLoopRunningRef.current) {
+					isLoopRunningRef.current = false
+					if (frameId !== null) {
+						cancelAnimationFrame(frameId)
+						frameId = null
+					}
+				}
+			},
+			{ threshold: 0.02 }
+		)
+		intersectionObserver.observe(root)
+
+		const handleScroll = () => {
+			const nextScrollY = window.scrollY
+			const scrollDelta = nextScrollY - lastScrollY
+			lastScrollY = nextScrollY
+			if (!scrollEnabled || !visibleRef.current || scrollDelta === 0) return
+			targetProgressRef.current += clamp(
+				(scrollDelta * scrollSpeedMultiplier) / Math.max(verticalSpacing * 2, 1),
+				-1.5,
+				1.5
+			)
+		}
+		window.addEventListener('scroll', handleScroll, { passive: true })
 
 		return () => {
-			cancelAnimationFrame(frameId)
+			if (frameId !== null) cancelAnimationFrame(frameId)
 			resizeObserver.disconnect()
 			intersectionObserver.disconnect()
 			window.removeEventListener('scroll', handleScroll)

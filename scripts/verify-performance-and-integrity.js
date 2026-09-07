@@ -252,6 +252,46 @@ function runTests() {
 		}
 	})
 
+	// 11. Verify Homepage Performance Overhaul & GPU Optimization
+	test('Homepage animations, ProgressiveBlur, InfiniteSpiral, and thumbnails are optimized for 60FPS performance', () => {
+		// 1. Check ProgressiveBlur layer capping & hardware acceleration
+		const bentoGridContent = fs.readFileSync(path.join(ROOT, 'src/components/ui/bento-grid.tsx'), 'utf8')
+		assert.ok(bentoGridContent.includes('translateZ(0)'), 'ProgressiveBlur must apply translateZ(0) hardware acceleration')
+		assert.ok(bentoGridContent.includes('willChange'), 'ProgressiveBlur must declare willChange')
+
+		// 2. Check InfiniteSpiral offscreen pausing and removal of per-frame filter blur
+		const spiralContent = fs.readFileSync(path.join(ROOT, 'src/components/ui/infinite-spiral.tsx'), 'utf8')
+		assert.ok(spiralContent.includes('cancelAnimationFrame'), 'InfiniteSpiral must cancelAnimationFrame when offscreen')
+		assert.ok(!spiralContent.includes('card.style.filter ='), 'InfiniteSpiral must not execute per-frame style.filter updates')
+
+		// 3. Check DriftWall viewport awareness
+		const driftContent = fs.readFileSync(path.join(ROOT, 'src/components/ui/drift-wall.tsx'), 'utf8')
+		assert.ok(driftContent.includes("animationPlayState: isInView ? 'running' : 'paused'"), 'DriftWall must pause tracks when offscreen')
+
+		// 4. Check Marquee viewport awareness
+		const marqueeContent = fs.readFileSync(path.join(ROOT, 'src/components/ui/marquee.tsx'), 'utf8')
+		assert.ok(marqueeContent.includes("animationPlayState: isInView ? 'running' : 'paused'"), 'Marquee must pause tracks when offscreen')
+
+		// 5. Check SVG WorldMapBase memoization
+		const mapContent = fs.readFileSync(path.join(ROOT, 'src/app/(home)/components/nomad-trajectory-map.tsx'), 'utf8')
+		assert.ok(mapContent.includes('WorldMapBase = React.memo'), 'nomad-trajectory-map must wrap 147KB SVG path in React.memo')
+
+		// 6. Check WebP thumbnails generation and size under 50KB
+		const thumbFiles = [
+			'public/images/uploads/7ef4d45667098fa8.thumb.webp',
+			'public/images/uploads/0c004c6f642839f2.thumb.webp',
+			'public/images/uploads/844b159ea02995f4.thumb.webp',
+			'public/images/footprints/img_1782661993747_6.thumb.webp',
+			'public/images/footprints/img_1782661993749_9.thumb.webp'
+		]
+		for (const thumb of thumbFiles) {
+			const thumbPath = path.join(ROOT, thumb)
+			assert.ok(fs.existsSync(thumbPath), `Thumbnail ${thumb} must exist`)
+			const stat = fs.statSync(thumbPath)
+			assert.ok(stat.size < 50 * 1024, `Thumbnail ${thumb} must be under 50KB (actual: ${(stat.size / 1024).toFixed(1)}KB)`)
+		}
+	})
+
 	console.log(`\n🏁 Test Results: ${passed}/${total} passed.`)
 	if (passed === total) {
 		console.log('✨ All performance and integrity tests PASSED successfully!\n')

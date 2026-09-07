@@ -35,6 +35,8 @@ export default function HeroSection() {
 				}
 				.suni-orbit-item {
 					animation: suni-orbit calc(var(--duration) * 1s) linear infinite;
+					will-change: transform;
+					transform: translateZ(0);
 				}
 				.suni-inner-orbit {
 					stroke: rgba(0, 0, 0, 0.35) !important;
@@ -87,6 +89,7 @@ export default function HeroSection() {
 					alt="VS Code" 
 					className="drop-shadow-lg" 
 					style={{ width: '50px', height: '50px' }}
+					decoding="async"
 					src="https://code.visualstudio.com/favicon.ico"
 				/>
 			</div>
@@ -107,6 +110,7 @@ export default function HeroSection() {
 					alt="React" 
 					className="drop-shadow-lg" 
 					style={{ width: '50px', height: '50px' }}
+					decoding="async"
 					src="https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg"
 				/>
 			</div>
@@ -127,6 +131,7 @@ export default function HeroSection() {
 					alt="Obsidian" 
 					className="drop-shadow-lg" 
 					style={{ width: '40px', height: '40px' }}
+					decoding="async"
 					src="https://obsidian.md/favicon.ico"
 				/>
 			</div>
@@ -147,6 +152,7 @@ export default function HeroSection() {
 					alt="Notion" 
 					className="drop-shadow-lg bg-white rounded-md p-1 border border-neutral-200/50" 
 					style={{ width: '46px', height: '46px' }}
+					decoding="async"
 					src="https://upload.wikimedia.org/wikipedia/commons/e/e9/Notion-logo.svg"
 				/>
 			</div>
@@ -179,6 +185,7 @@ export default function HeroSection() {
 				<img 
 					alt="avatar" 
 					className="relative mr-16 mt-24 shadow-xl rounded-full w-40 h-40 object-cover border-4 border-white dark:border-zinc-900 bg-orange-400" 
+					decoding="async"
 					src={avatarUrl}
 				/>
 			</div>
@@ -199,6 +206,7 @@ export default function HeroSection() {
 					alt="Antigravity" 
 					className="drop-shadow-lg" 
 					style={{ width: '48px', height: '48px' }}
+					decoding="async"
 					src="https://www.gstatic.com/lamda/images/gemini_sparkle_4g_512_lt_f94943af3be039176192d.png"
 				/>
 			</div>
@@ -219,6 +227,7 @@ export default function HeroSection() {
 					alt="Codex" 
 					className="drop-shadow-lg rounded-full" 
 					style={{ width: '46px', height: '46px' }}
+					decoding="async"
 					src="https://chatgpt.com/cdn/assets/favicon-180x180-od45eci6.webp"
 				/>
 			</div>

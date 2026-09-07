@@ -153,6 +153,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								pauseOnHover
 								duration="25s"
 								gap="1.5rem"
+								repeat={2}
 								style={{ top: '36px' }}
 								className="absolute inset-x-0 py-0"
 							>
@@ -198,7 +199,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					cta="进入放映厅"
 					className="col-span-1 md:col-span-2"
 					progressiveBlurHeight="36%"
-					blurLevels={[0.5, 1, 2.5, 4.5]}
+					blurLevels={[1.5, 3]}
 					background={
 						<div className="absolute inset-0 w-full h-full overflow-hidden bg-zinc-100/70 dark:bg-[#08080f]">
 							<DriftWall
@@ -260,10 +261,11 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 										className="relative rounded-[4px] overflow-hidden bg-zinc-900 shrink-0"
 									>
 										<img
-											src="/images/uploads/7ef4d45667098fa8.jpeg"
+											src="/images/uploads/7ef4d45667098fa8.thumb.webp"
 											alt="Auckland Sunset"
 											style={{ width: '100%', height: '100%', objectFit: 'cover' }}
 											loading="lazy"
+											decoding="async"
 										/>
 										{/* 胶片高光反光膜 */}
 										<div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/20 pointer-events-none" />
@@ -310,10 +312,11 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 										className="relative rounded-[4px] overflow-hidden bg-zinc-900 shrink-0"
 									>
 										<img
-											src="/images/uploads/0c004c6f642839f2.jpeg"
+											src="/images/uploads/0c004c6f642839f2.thumb.webp"
 											alt="Lake Tekapo"
 											style={{ width: '100%', height: '100%', objectFit: 'cover' }}
 											loading="lazy"
+											decoding="async"
 										/>
 										{/* 胶片高光反光膜 */}
 										<div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/20 pointer-events-none" />
@@ -359,10 +362,11 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 										className="relative rounded-[4px] overflow-hidden bg-zinc-900 shrink-0"
 									>
 										<img
-											src="/images/uploads/844b159ea02995f4.jpeg"
+											src="/images/uploads/844b159ea02995f4.thumb.webp"
 											alt="Queenstown"
 											style={{ width: '100%', height: '100%', objectFit: 'cover' }}
 											loading="lazy"
+											decoding="async"
 										/>
 										{/* 胶片高光反光膜 */}
 										<div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/20 pointer-events-none" />

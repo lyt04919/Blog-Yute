@@ -596,7 +596,7 @@ export default function AudioCinemaLounge() {
 
 						{/* 左右无缝渐变遮罩 */}
 						<div className="relative w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent_0%,black_36px,black_calc(100%-36px),transparent_100%)]">
-							<Marquee pauseOnHover duration={gamesDuration} className="py-1">
+							<Marquee pauseOnHover duration={gamesDuration} repeat={2} className="py-1">
 								{gamesList.map((game) => (
 									<div
 										key={game.id}
@@ -625,6 +625,8 @@ export default function AudioCinemaLounge() {
 											<img
 												src={game.cover}
 												alt={game.title}
+												loading="lazy"
+												decoding="async"
 												style={{ width: '100%', height: '100%', objectFit: 'cover' }}
 												className="transition-transform duration-500 group-hover/card:scale-106 select-none pointer-events-none"
 											/>
@@ -676,7 +678,7 @@ export default function AudioCinemaLounge() {
 
 						{/* 左右无缝渐变遮罩 */}
 						<div className="relative w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent_0%,black_36px,black_calc(100%-36px),transparent_100%)]">
-							<Marquee reverse pauseOnHover duration={videosDuration} className="py-1">
+							<Marquee reverse pauseOnHover duration={videosDuration} repeat={2} className="py-1">
 								{videosList.map((video) => (
 									<div
 										key={video.id}
@@ -696,6 +698,8 @@ export default function AudioCinemaLounge() {
 											<img
 												src={video.cover}
 												alt={video.title}
+												loading="lazy"
+												decoding="async"
 												style={{ width: '100%', height: '100%', objectFit: 'cover' }}
 												className="transition-transform duration-500 group-hover/card:scale-106 select-none pointer-events-none"
 											/>

@@ -29,7 +29,7 @@
   box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.1);
   transform-style: preserve-3d;
   backface-visibility: hidden;
-  will-change: transform, opacity, filter;
+  will-change: transform, opacity;
   text-decoration: none;
   padding: 8px;
   transition: box-shadow 0.25s ease, border-color 0.25s ease;
