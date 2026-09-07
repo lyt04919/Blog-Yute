@@ -10,6 +10,7 @@ export interface SpiralItem {
 	target?: string
 	label?: string
 	id?: string
+	raw?: any
 }
 
 export interface InfiniteSpiralProps {
@@ -33,6 +34,7 @@ export interface InfiniteSpiralProps {
 	imageFit?: 'cover' | 'contain'
 	grayscale?: number
 	className?: string
+	onItemClick?: (item: SpiralItem, event: React.MouseEvent) => void
 }
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
@@ -62,7 +64,8 @@ export const InfiniteSpiral: React.FC<InfiniteSpiralProps> = ({
 	pauseOnHover = true,
 	imageFit = 'contain',
 	grayscale = 0,
-	className = ''
+	className = '',
+	onItemClick
 }) => {
 	const rootRef = useRef<HTMLDivElement | null>(null)
 	const cardRefs = useRef<(HTMLElement | null)[]>([])
@@ -282,14 +285,14 @@ export const InfiniteSpiral: React.FC<InfiniteSpiralProps> = ({
 				aria-label="Infinite spiral gallery"
 			>
 				{normalizedItems.map((item, index) => {
-					const Card = item.href ? 'a' : 'div'
+					const Card = (item.href && !onItemClick) ? 'a' : 'div'
 					return (
 						<Card
 							key={item.id ?? `${item.src}-${index}`}
 							ref={(node: HTMLElement | null) => {
 								cardRefs.current[index] = node
 							}}
-							className="infinite-spiral__item absolute top-1/2 left-1/2 flex items-center justify-center overflow-hidden rounded-xl bg-white dark:bg-zinc-900 border border-black/10 dark:border-white/15 shadow-md hover:shadow-xl p-2.5 [transform-style:preserve-3d] [backface-visibility:hidden] will-change-transform"
+							className={`infinite-spiral__item absolute top-1/2 left-1/2 flex items-center justify-center overflow-hidden rounded-xl bg-white dark:bg-zinc-900 border border-black/10 dark:border-white/15 shadow-md hover:shadow-xl p-2.5 [transform-style:preserve-3d] [backface-visibility:hidden] will-change-transform ${onItemClick ? 'cursor-pointer' : ''}`}
 							style={{ 
 								position: 'absolute',
 								top: '50%',
@@ -303,11 +306,19 @@ export const InfiniteSpiral: React.FC<InfiniteSpiralProps> = ({
 								boxSizing: 'border-box',
 								overflow: 'hidden'
 							}}
-							href={item.href}
-							target={item.target}
-							rel={item.target === '_blank' ? 'noreferrer' : undefined}
-							role="listitem"
+							href={!onItemClick ? item.href : undefined}
+							target={!onItemClick ? item.target : undefined}
+							rel={!onItemClick && item.target === '_blank' ? 'noreferrer' : undefined}
+							role="button"
+							tabIndex={0}
 							aria-label={item.label ?? item.alt}
+							onClick={(e: React.MouseEvent) => {
+								if (onItemClick) {
+									e.preventDefault()
+									e.stopPropagation()
+									onItemClick(item, e)
+								}
+							}}
 						>
 							<img
 								className="infinite-spiral__image block object-contain pointer-events-none select-none"

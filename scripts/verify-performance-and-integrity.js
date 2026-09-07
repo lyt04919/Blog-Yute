@@ -151,6 +151,19 @@ function runTests() {
 		const geekBentoContent = fs.readFileSync(path.join(ROOT, 'src/components/geek-identity-bento.tsx'), 'utf8')
 		assert.ok(geekBentoContent.includes("import shareData from '@/app/favorite/share/list.json'"), 'GeekIdentityBento must import shareData for Web & Tools')
 		assert.ok(geekBentoContent.includes('InfiniteSpiral'), 'GeekIdentityBento must integrate InfiniteSpiral')
+
+		// Detail modal integrations for homepage items
+		assert.ok(loungeContent.includes('FavoriteItemDetailModal'), 'AudioCinemaLounge must integrate FavoriteItemDetailModal for games')
+		assert.ok(loungeContent.includes('targetType="games"'), 'AudioCinemaLounge must specify targetType="games" for games')
+		assert.ok(geekBentoContent.includes('BookDetailModal'), 'GeekIdentityBento must integrate BookDetailModal for books')
+		assert.ok(geekBentoContent.includes('MovieDetailModal'), 'GeekIdentityBento must integrate MovieDetailModal for movies')
+		assert.ok(geekBentoContent.includes('ShareDetailModal'), 'GeekIdentityBento must integrate ShareDetailModal for tools')
+
+		const driftWallContent = fs.readFileSync(path.join(ROOT, 'src/components/ui/drift-wall.tsx'), 'utf8')
+		assert.ok(driftWallContent.includes('onItemClick'), 'DriftWall must support onItemClick')
+
+		const spiralContent = fs.readFileSync(path.join(ROOT, 'src/components/ui/infinite-spiral.tsx'), 'utf8')
+		assert.ok(spiralContent.includes('onItemClick'), 'InfiniteSpiral must support onItemClick')
 	})
 
 	// 8. Verify Magic UI BentoGrid and GeekIdentityBento components

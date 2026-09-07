@@ -1,14 +1,18 @@
 'use client'
 
+import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import { BentoGrid, BentoCard } from '@/components/ui/bento-grid'
 import { Marquee } from '@/components/ui/marquee'
 import DriftWall, { type DriftWallItem } from '@/components/ui/drift-wall'
 import { InfiniteSpiral } from '@/components/ui/infinite-spiral'
-import { getPosterUrl } from '@/app/favorite/components/movie-card'
+import { getPosterUrl, type Movie } from '@/app/favorite/components/movie-card'
+import type { Book } from '@/app/favorite/components/book-card'
+import type { Share } from '@/app/favorite/share/components/share-card'
 import { 
 	BookOpen, 
 	Film, 
-	Feather,
+	Feather, 
 	Sparkles
 } from 'lucide-react'
 
@@ -17,10 +21,16 @@ import moviesData from '@/data/movies.json'
 import booksData from '@/data/books.json'
 import shareData from '@/app/favorite/share/list.json'
 
+// Dynamically load existing detail modals on demand
+const BookDetailModal = dynamic(() => import('@/app/favorite/components/book-detail-modal'), { ssr: false })
+const MovieDetailModal = dynamic(() => import('@/app/favorite/components/movie-detail-modal'), { ssr: false })
+const ShareDetailModal = dynamic(() => import('@/app/favorite/share/components/share-detail-modal'), { ssr: false })
+
 interface BookItem {
 	name: string
 	author?: string
 	cover: string
+	rawBook: Book
 }
 
 // Extract real books with full covers (strictly active books intended for display)
@@ -29,7 +39,8 @@ const realBooks: BookItem[] = (booksData as any[])
 	.map((b) => ({
 		name: b.name.replace(/\s*\(.*?\)/g, ''), // clean name
 		author: b.author || '',
-		cover: getPosterUrl(b.cover)
+		cover: getPosterUrl(b.cover),
+		rawBook: b as Book
 	}))
 
 // Curated top 30 movies for full-bleed 5-column 3D DriftWall (strictly 2:3 vertical posters)
@@ -40,7 +51,8 @@ const movieDriftItems: DriftWallItem[] = (moviesData as any[])
 	.map((m) => ({
 		title: m.name,
 		image: getPosterUrl(m.poster),
-		href: '/favorite'
+		href: '/favorite',
+		raw: m as Movie
 	}))
 
 // Curated web & tools items for 3D InfiniteSpiral helix
@@ -52,7 +64,8 @@ const webToolsSpiralItems = (shareData as any[])
 		alt: s.name,
 		label: s.name,
 		href: s.url,
-		target: '_blank'
+		target: '_blank',
+		raw: s as Share
 	}))
 
 // 3 distinct washi tape styles (3 款质感各异的真实和纸/手账胶带)
@@ -136,6 +149,10 @@ function WashiTape({ variant = 'translucent', rotate = 0 }: { variant?: 'translu
 }
 
 export function GeekIdentityBento({ className }: { className?: string }) {
+	const [selectedBook, setSelectedBook] = useState<Book | null>(null)
+	const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null)
+	const [selectedShare, setSelectedShare] = useState<Share | null>(null)
+
 	return (
 		<div className={className}>
 			<BentoGrid className="grid-cols-1 md:grid-cols-3 gap-4">
@@ -160,6 +177,11 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								{realBooks.map((item, idx) => (
 									<div
 										key={idx}
+										onClick={(e) => {
+											e.preventDefault()
+											e.stopPropagation()
+											setSelectedBook(item.rawBook)
+										}}
 										style={{
 											width: '112px',
 											height: '168px',
@@ -167,6 +189,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 											maxWidth: '112px',
 											flexShrink: 0,
 										}}
+										title={`点击查阅《${item.name}》读书笔记与详情`}
 										className="group/book relative w-28 h-[168px] rounded-xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-zinc-700/80 shrink-0 select-none bg-zinc-100 dark:bg-zinc-800 transition-all duration-300 ease-out hover:scale-105 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
 									>
 										{/* 1. Base book cover: 100% visible, authentic 2:3 vertical proportion */}
@@ -204,6 +227,11 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 						<div className="absolute inset-0 w-full h-full overflow-hidden bg-zinc-100/70 dark:bg-[#08080f]">
 							<DriftWall
 								items={movieDriftItems}
+								onItemClick={(item) => {
+									if (item.raw) {
+										setSelectedMovie(item.raw)
+									}
+								}}
 								columns={5}
 								tileWidth={105}
 								tileHeight={158}
@@ -404,6 +432,11 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 						<div className="absolute inset-0 w-full h-full overflow-hidden">
 							<InfiniteSpiral
 								items={webToolsSpiralItems}
+								onItemClick={(item) => {
+									if (item.raw) {
+										setSelectedShare(item.raw)
+									}
+								}}
 								animationMode="auto"
 								speed={0.4}
 								radius={82}
@@ -423,6 +456,30 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 					}
 				/>
 			</BentoGrid>
+
+			{/* 📚 复用现有完整书籍详情模态窗 */}
+			{selectedBook && (
+				<BookDetailModal
+					book={selectedBook}
+					onClose={() => setSelectedBook(null)}
+				/>
+			)}
+
+			{/* 🎬 复用现有完整电影详情模态窗 */}
+			{selectedMovie && (
+				<MovieDetailModal
+					movie={selectedMovie}
+					onClose={() => setSelectedMovie(null)}
+				/>
+			)}
+
+			{/* 🌐 复用现有完整网站/工具详情模态窗 */}
+			{selectedShare && (
+				<ShareDetailModal
+					share={selectedShare}
+					onClose={() => setSelectedShare(null)}
+				/>
+			)}
 		</div>
 	)
 }

@@ -7,6 +7,7 @@ export interface DriftWallItem {
   image: string
   title?: string
   href?: string
+  raw?: any
 }
 
 export interface DriftWallProps {
@@ -33,6 +34,7 @@ export interface DriftWallProps {
   overlayColor?: string
   className?: string
   style?: CSSProperties
+  onItemClick?: (item: DriftWallItem, index: number, event: React.MouseEvent) => void
 }
 
 const DEFAULT_ITEMS: DriftWallItem[] = [
@@ -63,7 +65,8 @@ export default function DriftWall({
   grayscale = false,
   overlayColor,
   className = '',
-  style
+  style,
+  onItemClick
 }: DriftWallProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const planeRef = useRef<HTMLDivElement>(null)
@@ -202,7 +205,14 @@ export default function DriftWall({
                         tabIndex={0}
                         role="button"
                         aria-label={item.title ?? 'tile'}
-                        className="drift-wall__tile"
+                        className={`drift-wall__tile ${onItemClick ? 'cursor-pointer' : ''}`}
+                        onClick={(e) => {
+                          if (onItemClick) {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            onItemClick(item, itemIndex, e)
+                          }
+                        }}
                       >
                         <span className="drift-wall__inner">
                           <img

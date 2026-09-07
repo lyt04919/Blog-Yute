@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo, useRef, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { motion, AnimatePresence } from 'motion/react'
 import Link from 'next/link'
 import { 
@@ -25,6 +26,13 @@ import { toast } from 'sonner'
 import { Marquee } from '@/components/ui/marquee'
 import { HeroVideoModal } from '@/components/ui/hero-video-dialog'
 import { useMusicPlayerStore } from '@/hooks/use-music-player'
+import type { FavoriteItem } from '@/app/favorite/components/favorite-item-card'
+
+// Dynamically load existing game detail modal
+const FavoriteItemDetailModal = dynamic(
+	() => import('@/app/favorite/components/favorite-item-detail-modal').then((mod) => mod.FavoriteItemDetailModal),
+	{ ssr: false }
+)
 
 // 数据源引入
 import moviesData from '@/data/movies.json'
@@ -49,6 +57,7 @@ export default function AudioCinemaLounge() {
 	const [isArmHovered, setIsArmHovered] = useState<boolean>(false)
 	const [isCopied, setIsCopied] = useState<boolean>(false)
 	const [activeVideo, setActiveVideo] = useState<{ url: string; title?: string } | null>(null)
+	const [selectedGame, setSelectedGame] = useState<FavoriteItem | null>(null)
 
 	// 选中的详情模态卡片数据
 	const [selectedItem, setSelectedItem] = useState<{
@@ -140,6 +149,7 @@ export default function AudioCinemaLounge() {
 				desc: g.desc,
 				review: g.review,
 				link: g.link || '/favorite/games',
+				rawGame: g as FavoriteItem,
 			}))
 	}, [])
 
@@ -540,20 +550,7 @@ export default function AudioCinemaLounge() {
 								{gamesList.map((game) => (
 									<div
 										key={game.id}
-										onClick={() => setSelectedItem({
-											title: game.title,
-											cover: game.cover,
-											type: 'game',
-											categoryName: '游艺 · Games',
-											subtitle: game.subtitle,
-											stars: game.stars,
-											status: game.status,
-											desc: game.desc,
-											tags: [game.category, game.status],
-											quote: game.review,
-											link: game.link,
-											review: game.review
-										})}
+										onClick={() => setSelectedGame(game.rawGame)}
 										style={{ width: '224px' }}
 										className="shrink-0 group/card cursor-pointer flex flex-col items-center mx-2"
 									>
@@ -910,6 +907,15 @@ export default function AudioCinemaLounge() {
 				videoSrc={activeVideo?.url || ''}
 				animationStyle="from-center"
 			/>
+
+			{/* ════════════════ 🎮 复用现有游戏完整详情模态窗 ════════════════ */}
+			{selectedGame && (
+				<FavoriteItemDetailModal
+					item={selectedGame}
+					targetType="games"
+					onClose={() => setSelectedGame(null)}
+				/>
+			)}
 		</section>
 	)
 }
