@@ -113,10 +113,10 @@ export function CornerMusicPlayer({ onOpenDetail }: CornerMusicPlayerProps = {})
 		<div ref={containerRef} className="fixed right-6 bottom-6 z-50 select-none">
 			{/* 1. 展开态：向左上方弹出的发烧级毛玻璃音乐控制舱 (Popup Glass Audio Console) */}
 			<div
-				className={`fixed right-6 bottom-22 w-[350px] rounded-3xl bg-white/95 dark:bg-[#141416]/95 backdrop-blur-2xl border border-slate-200/90 dark:border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.18)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.7)] p-4 flex flex-col gap-3.5 transition-all duration-300 ease-out origin-bottom-right z-50 ${
+				className={`absolute right-0 bottom-[calc(100%+14px)] w-[360px] max-w-[calc(100vw-3rem)] max-h-[min(76vh,540px)] rounded-3xl bg-white/95 dark:bg-[#141416]/95 backdrop-blur-2xl border border-slate-200/90 dark:border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.18)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.7)] p-4 flex flex-col gap-3.5 transition-all duration-300 ease-out origin-bottom-right [transform-origin:92%_100%] z-50 ${
 					isExpanded
-						? 'opacity-100 scale-100 translate-y-0 pointer-events-auto'
-						: 'opacity-0 scale-90 translate-y-4 pointer-events-none'
+						? 'opacity-100 scale-100 translate-y-0 pointer-events-auto visible'
+						: 'opacity-0 scale-90 translate-y-3 pointer-events-none invisible'
 				}`}
 			>
 				{/* 顶部状态栏 (Header) */}
@@ -394,7 +394,9 @@ export function CornerMusicPlayer({ onOpenDetail }: CornerMusicPlayerProps = {})
 
 			{/* 2. 折叠态（常驻）：右下角发烧黑胶唱片微入口 (Floating Vinyl Disc Toggle) */}
 			<div
-				className="relative group cursor-pointer"
+				className={`relative group cursor-pointer rounded-full transition-all duration-200 ${
+					isExpanded ? 'ring-2 ring-emerald-500/70 dark:ring-emerald-400/70 scale-105' : ''
+				}`}
 				onClick={() => setIsExpanded(!isExpanded)}
 				title={`${activeTrack.name} - ${activeTrack.subtitle || ''} (点击${isExpanded ? '收起' : '展开'}播放器)`}
 			>
