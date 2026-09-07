@@ -18,6 +18,8 @@ import { useAuthStore } from '@/hooks/use-auth'
 
 const ConfigDialog = dynamic(() => import('@/app/(home)/config-dialog'), { ssr: false })
 const HomeDisplayModal = dynamic(() => import('@/app/(home)/components/home-display-modal').then(mod => mod.HomeDisplayModal), { ssr: false })
+const MusicPlayerDock = dynamic(() => import('@/app/favorite/components/music-player-dock').then(mod => mod.MusicPlayerDock), { ssr: false })
+const GlobalAudioEngine = dynamic(() => import('@/components/audio/global-audio-engine').then(mod => mod.GlobalAudioEngine), { ssr: false })
 
 export default function Layout({ children }: PropsWithChildren) {
 	useCenterInit()
@@ -96,10 +98,12 @@ export default function Layout({ children }: PropsWithChildren) {
 				<ConfigDialog open={configDialogOpen} onClose={() => setConfigDialogOpen(false)} />
 			)}
 			{isAuth && <HomeDisplayModal />}
-			{!isFullMap && !isWrite && <TopNav />}
+			{!isWrite && <TopNav />}
+			<GlobalAudioEngine />
+			{!isWrite && <MusicPlayerDock />}
 			{!isHome && !isFullMap && !isWrite && !maxSM && cardStyles.musicCard?.enabled !== false && <MusicCard />}
 
-			{!isHome && !isFullMap && !isWrite && init && <ScrollTopButton className='bg-brand/20 fixed right-6 bottom-28 z-50 shadow-md' />}
+			{!isFullMap && !isWrite && init && <ScrollTopButton className='bg-brand/20 fixed right-6 bottom-28 z-50 shadow-md' />}
 			{!isHome && !isFullMap && <Footer />}
 		</ThemeProvider>
 	)

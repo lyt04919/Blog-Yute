@@ -142,8 +142,8 @@ function runTests() {
 		const loungeContent = fs.readFileSync(path.join(ROOT, 'src/app/(home)/components/audio-cinema-lounge.tsx'), 'utf8')
 		assert.ok(loungeContent.includes('mask-image:linear-gradient'), 'AudioCinemaLounge must use CSS mask-image for feathering')
 		assert.ok(loungeContent.includes('HeroVideoModal'), 'AudioCinemaLounge must integrate HeroVideoModal for cinema video playback')
-		assert.ok(loungeContent.includes('audioRef'), 'AudioCinemaLounge must integrate audioRef for home music playback')
-		assert.ok(loungeContent.includes('playTrackAudio'), 'AudioCinemaLounge must support dynamic audio playback')
+		assert.ok(loungeContent.includes('useMusicPlayerStore'), 'AudioCinemaLounge must integrate useMusicPlayerStore for unified playback')
+		assert.ok(loungeContent.includes('togglePlayState'), 'AudioCinemaLounge must support unified playback control')
 
 		const geekBentoContent = fs.readFileSync(path.join(ROOT, 'src/components/geek-identity-bento.tsx'), 'utf8')
 		assert.ok(geekBentoContent.includes("import shareData from '@/app/favorite/share/list.json'"), 'GeekIdentityBento must import shareData for Web & Tools')
@@ -341,6 +341,42 @@ function runTests() {
 		const heatmapPath = path.join(ROOT, 'src/app/vault/diary/components/memory-heatmap.tsx')
 		const heatmapContent = fs.readFileSync(heatmapPath, 'utf8')
 		assert.ok(heatmapContent.includes('onSelectDate?: (dateStr: string) => void'), 'memory-heatmap must support onSelectDate prop')
+	})
+
+	// 12. Verify Global Audio Ecosystem & High-Performance Decoupled Architecture
+	test('Global Audio Engine, decoupled progress and desktop shortcuts are implemented and integrated', () => {
+		// 1. GlobalAudioEngine
+		const enginePath = path.join(ROOT, 'src/components/audio/global-audio-engine.tsx')
+		assert.ok(fs.existsSync(enginePath), 'global-audio-engine.tsx must exist')
+		const engineContent = fs.readFileSync(enginePath, 'utf8')
+		assert.ok(engineContent.includes('data-global-audio'), 'GlobalAudioEngine must manage single global audio tag')
+		assert.ok(engineContent.includes('useAudioShortcuts'), 'GlobalAudioEngine must integrate desktop shortcuts')
+		assert.ok(engineContent.includes('useMediaSession'), 'GlobalAudioEngine must integrate native MediaSession')
+
+		// 2. use-audio-progress and AudioProgressBar
+		const progressHookPath = path.join(ROOT, 'src/hooks/use-audio-progress.ts')
+		assert.ok(fs.existsSync(progressHookPath), 'use-audio-progress.ts must exist')
+		const progressHookContent = fs.readFileSync(progressHookPath, 'utf8')
+		assert.ok(progressHookContent.includes('audioProgressEmitter'), 'use-audio-progress must export audioProgressEmitter')
+		assert.ok(progressHookContent.includes('seekAudio'), 'use-audio-progress must export seekAudio')
+
+		const progressBarPath = path.join(ROOT, 'src/components/audio/audio-progress-bar.tsx')
+		assert.ok(fs.existsSync(progressBarPath), 'audio-progress-bar.tsx must exist')
+		const progressBarContent = fs.readFileSync(progressBarPath, 'utf8')
+		assert.ok(progressBarContent.includes('useAudioProgress'), 'AudioProgressBar must decouple progress updates')
+		assert.ok(progressBarContent.includes('hoverPosition'), 'AudioProgressBar must support scrubbing tooltip')
+
+		// 3. MusicPlayerDock desktop integration
+		const dockPath = path.join(ROOT, 'src/app/favorite/components/music-player-dock.tsx')
+		const dockContent = fs.readFileSync(dockPath, 'utf8')
+		assert.ok(dockContent.includes('AudioProgressBar'), 'MusicPlayerDock must integrate decoupled AudioProgressBar')
+		assert.ok(dockContent.includes('useMusicPlayerStore'), 'MusicPlayerDock must use unified store')
+		assert.ok(!dockContent.includes('<audio'), 'MusicPlayerDock must not contain private audio elements')
+
+		// 4. Root layout mounting
+		const layoutPath = path.join(ROOT, 'src/layout/index.tsx')
+		const layoutContent = fs.readFileSync(layoutPath, 'utf8')
+		assert.ok(layoutContent.includes('GlobalAudioEngine'), 'Root layout must mount GlobalAudioEngine')
 	})
 
 	console.log(`\n🏁 Test Results: ${passed}/${total} passed.`)

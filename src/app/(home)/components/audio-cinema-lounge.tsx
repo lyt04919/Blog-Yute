@@ -35,17 +35,20 @@ import videosData from '@/app/favorite/videos.json'
 import shareData from '@/app/favorite/share/list.json'
 
 export default function AudioCinemaLounge() {
-	// 核心状态：播放中 / 暂停中 (默认待机，用户点击拨杆或播放键后真实放音)
-	const [isPlaying, setIsPlaying] = useState<boolean>(false)
-	const [currentMusicIndex, setCurrentMusicIndex] = useState<number>(0)
-	const [isLoadingAudio, setIsLoadingAudio] = useState<boolean>(false)
+	// 从全局单例音乐播放器获取状态，彻底消除切页音乐猝死与多实例冲突
+	const {
+		currentTrack,
+		isPlaying,
+		isLoadingAudio,
+		playTrack,
+		togglePlay,
+		nextTrack,
+		prevTrack,
+	} = useMusicPlayerStore()
+
 	const [isArmHovered, setIsArmHovered] = useState<boolean>(false)
 	const [isCopied, setIsCopied] = useState<boolean>(false)
 	const [activeVideo, setActiveVideo] = useState<{ url: string; title?: string } | null>(null)
-
-	// 真实音频播放核心引用与预加载缓存
-	const audioRef = useRef<HTMLAudioElement | null>(null)
-	const audioUrlCache = useRef<Record<string, string>>({})
 
 	// 选中的详情模态卡片数据
 	const [selectedItem, setSelectedItem] = useState<{
@@ -70,112 +73,46 @@ export default function AudioCinemaLounge() {
 		return musicData.filter((m) => m.isShow && m.isShowOnHome !== false)
 	}, [])
 
-	const currentTrack = playlist[currentMusicIndex] || playlist[0]
+	// 当前唱机展示曲目（若全局已有正在播放曲目，则优先映射全局曲目）
+	const activeTrack = useMemo(() => {
+		if (currentTrack) return currentTrack
+		return playlist[0]
+	}, [currentTrack, playlist])
 
-	// 动态加载并播放对应曲目高保真音频流
-	const playTrackAudio = async (index: number) => {
-		const targetTrack = playlist[index]
-		if (!targetTrack) return
+	const currentMusicIndex = useMemo(() => {
+		if (!currentTrack) return 0
+		const idx = playlist.findIndex((m) => m.name === currentTrack.name)
+		return idx !== -1 ? idx : 0
+	}, [currentTrack, playlist])
 
-		setIsLoadingAudio(true)
-
-		try {
-			// 1. 检查缓存
-			let src = audioUrlCache.current[targetTrack.name]
-			if (!src) {
-				const query = encodeURIComponent(`${targetTrack.name} ${targetTrack.subtitle || ''}`)
-				const res = await fetch(`/api/music-preview?term=${query}`)
-				if (res.ok) {
-					const data = await res.json()
-					if (data.previewUrl) {
-						src = data.previewUrl
-						audioUrlCache.current[targetTrack.name] = src
-					}
-				}
-			}
-
-			// 2. 兜底本地高保真音频
-			if (!src) {
-				src = '/music/close-to-you.mp3'
-			}
-
-			if (audioRef.current) {
-				if (audioRef.current.src !== src) {
-					audioRef.current.src = src
-					audioRef.current.load()
-				}
-
-				// 如果底栏全局播放器在播放，先暂停它避免双重发声
-				useMusicPlayerStore.getState().setIsPlaying(false)
-
-				await audioRef.current.play()
-				setIsPlaying(true)
-			}
-		} catch (err) {
-			console.warn('Playback request handled:', err)
-			if (audioRef.current) {
-				audioRef.current.src = '/music/close-to-you.mp3'
-				audioRef.current.load()
-				audioRef.current.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false))
-			}
-		} finally {
-			setIsLoadingAudio(false)
-		}
-	}
-
-	// 核心交互：点击拨杆/唱臂/按键切换播放与暂停真实声音
+	// 核心交互：点击拨杆/唱臂/按键切换播放与暂停
 	const togglePlayState = () => {
-		if (isPlaying) {
-			if (audioRef.current) {
-				audioRef.current.pause()
-			}
-			setIsPlaying(false)
+		if (!currentTrack) {
+			playTrack(playlist[0] as any, playlist as any[])
 		} else {
-			if (audioRef.current && audioRef.current.src && !audioRef.current.src.endsWith('/')) {
-				useMusicPlayerStore.getState().setIsPlaying(false)
-				audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {
-					playTrackAudio(currentMusicIndex)
-				})
-			} else {
-				playTrackAudio(currentMusicIndex)
-			}
+			togglePlay()
 		}
 	}
 
-	// 切换上一首曲目并自动起播
+	// 切换上一首曲目
 	const handlePrevTrack = (e?: React.MouseEvent) => {
 		if (e) e.stopPropagation()
-		const newIndex = (currentMusicIndex - 1 + playlist.length) % playlist.length
-		setCurrentMusicIndex(newIndex)
-		playTrackAudio(newIndex)
+		if (!currentTrack) {
+			playTrack(playlist[playlist.length - 1] as any, playlist as any[])
+		} else {
+			prevTrack()
+		}
 	}
 
-	// 切换下一首曲目并自动起播
+	// 切换下一首曲目
 	const handleNextTrack = (e?: React.MouseEvent) => {
 		if (e) e.stopPropagation()
-		const newIndex = (currentMusicIndex + 1) % playlist.length
-		setCurrentMusicIndex(newIndex)
-		playTrackAudio(newIndex)
-	}
-
-	// 监听全局底栏播放器：如果全局播放器启动，唱机自动暂停；卸载时释放音频资源
-	useEffect(() => {
-		const unsub = useMusicPlayerStore.subscribe((state) => {
-			if (state.isPlaying && isPlaying) {
-				if (audioRef.current) {
-					audioRef.current.pause()
-				}
-				setIsPlaying(false)
-			}
-		})
-		return () => {
-			unsub()
-			if (audioRef.current) {
-				audioRef.current.pause()
-				audioRef.current.src = ''
-			}
+		if (!currentTrack) {
+			playTrack(playlist[1 % playlist.length] as any, playlist as any[])
+		} else {
+			nextTrack()
 		}
-	}, [isPlaying])
+	}
 
 	// 复制链接辅助
 	const handleCopyUrl = (url?: string) => {
@@ -303,8 +240,9 @@ export default function AudioCinemaLounge() {
 										scale: isArmHovered ? 1.02 : 1,
 									}}
 									transition={{
-										duration: 0.85,
-										ease: [0.34, 1.56, 0.64, 1],
+										type: 'spring',
+										stiffness: 260,
+										damping: 20,
 									}}
 									style={{
 										position: 'absolute',
@@ -402,8 +340,8 @@ export default function AudioCinemaLounge() {
 									className="relative shrink-0 rounded-2xl overflow-hidden shadow-md bg-zinc-900 border border-black/15"
 								>
 									<img
-										src={currentTrack?.cover}
-										alt={currentTrack?.name}
+										src={activeTrack?.cover}
+										alt={activeTrack?.name}
 										style={{ width: '100%', height: '100%', objectFit: 'cover' }}
 										className="select-none pointer-events-none"
 									/>
@@ -414,18 +352,18 @@ export default function AudioCinemaLounge() {
 								<div className="flex-1 min-w-0 flex flex-col justify-center">
 									<div className="flex items-center gap-1.5 min-w-0">
 										<h4 
-											title={currentTrack?.name}
+											title={activeTrack?.name}
 											className="text-base font-serif font-bold text-zinc-900 dark:text-zinc-50 truncate tracking-tight"
 										>
-											{currentTrack?.name || '光辉岁月'}
+											{activeTrack?.name || '光辉岁月'}
 										</h4>
 										<Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
 									</div>
 									<p className="text-xs text-[#8C6E46] dark:text-amber-300/90 font-mono font-medium truncate mt-0.5">
-										{currentTrack?.subtitle || 'Beyond'}
+										{activeTrack?.subtitle || 'Beyond'}
 									</p>
 									<p className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
-										{currentTrack?.desc || '粤语流行 · 经典黑胶单曲'}
+										{activeTrack?.desc || '粤语流行 · 经典黑胶单曲'}
 									</p>
 								</div>
 							</div>
@@ -526,47 +464,49 @@ export default function AudioCinemaLounge() {
 
 								{/* 3 张实体感精选黑胶微卡片 */}
 								<div className="grid grid-cols-3 gap-1.5">
-									{playlist.slice(0, 3).map((track, idx) => (
-										<button
-											key={track.name}
-											type="button"
-											onClick={() => {
-												if (currentMusicIndex === idx) {
-													togglePlayState()
-												} else {
-													setCurrentMusicIndex(idx)
-													playTrackAudio(idx)
-												}
-											}}
-											className={`p-1.5 rounded-2xl transition-all flex items-center gap-1.5 text-left cursor-pointer border min-w-0 ${
-												currentMusicIndex === idx
-													? 'bg-[#FAF3EA] dark:bg-amber-950/40 border-[#C8A97E] dark:border-amber-600/60 shadow-xs ring-1 ring-[#C8A97E]/30'
-													: 'bg-black/[0.02] dark:bg-white/[0.02] border-black/5 dark:border-white/5 hover:bg-black/[0.04] dark:hover:bg-white/[0.06]'
-											}`}
-										>
-											<img 
-												src={track.cover} 
-												alt={track.name}
-												style={{ width: '24px', height: '24px' }}
-												className="rounded-lg object-cover shadow-2xs shrink-0"
-											/>
-											<div className="min-w-0 flex-1 overflow-hidden">
-												<h5 
-													title={track.name}
-													className={`text-[11px] font-serif font-bold truncate ${
-														currentMusicIndex === idx 
-															? 'text-[#78461C] dark:text-amber-200' 
-															: 'text-zinc-800 dark:text-zinc-200'
-													}`}
-												>
-													{track.name}
-												</h5>
-												<p className="text-[8.5px] text-zinc-600 dark:text-zinc-300 font-mono truncate">
-													{track.subtitle}
-												</p>
-											</div>
-										</button>
-									))}
+									{playlist.slice(0, 3).map((track, idx) => {
+										const isCardActive = activeTrack?.name === track.name
+										return (
+											<button
+												key={track.name}
+												type="button"
+												onClick={() => {
+													if (currentTrack?.name === track.name) {
+														togglePlayState()
+													} else {
+														playTrack(track as any, playlist as any[])
+													}
+												}}
+												className={`p-1.5 rounded-2xl transition-all flex items-center gap-1.5 text-left cursor-pointer border min-w-0 ${
+													isCardActive
+														? 'bg-[#FAF3EA] dark:bg-amber-950/40 border-[#C8A97E] dark:border-amber-600/60 shadow-xs ring-1 ring-[#C8A97E]/30'
+														: 'bg-black/[0.02] dark:bg-white/[0.02] border-black/5 dark:border-white/5 hover:bg-black/[0.04] dark:hover:bg-white/[0.06]'
+												}`}
+											>
+												<img 
+													src={track.cover} 
+													alt={track.name} 
+													style={{ width: '24px', height: '24px' }}
+													className="rounded-lg object-cover shadow-2xs shrink-0"
+												/>
+												<div className="min-w-0 flex-1 overflow-hidden">
+													<h5 
+														title={track.name}
+														className={`text-[11px] font-serif font-bold truncate ${
+															isCardActive
+																? 'text-[#78461C] dark:text-amber-200' 
+																: 'text-zinc-800 dark:text-zinc-200'
+														}`}
+													>
+														{track.name}
+													</h5>
+													<p className="text-[8.5px] text-zinc-600 dark:text-zinc-300 font-mono truncate">
+														{track.subtitle}
+													</p>
+												</div>
+											</button>
+										)
+									})}
 								</div>
 							</div>
 
@@ -993,22 +933,6 @@ export default function AudioCinemaLounge() {
 				onClose={() => setActiveVideo(null)}
 				videoSrc={activeVideo?.url || ''}
 				animationStyle="from-center"
-			/>
-
-			{/* 实体黑胶唱机专属高保真音频流播放核心 */}
-			<audio
-				ref={audioRef}
-				preload="none"
-				onEnded={() => handleNextTrack()}
-				onError={() => {
-					if (audioRef.current && audioRef.current.src !== '/music/close-to-you.mp3') {
-						audioRef.current.src = '/music/close-to-you.mp3'
-						audioRef.current.load()
-						if (isPlaying) {
-							audioRef.current.play().catch(() => setIsPlaying(false))
-						}
-					}
-				}}
 			/>
 		</section>
 	)
