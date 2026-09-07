@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     // Reference: https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/iTuneSearchAPI/
     const entityMap: Record<string, string> = {
       album: 'album',
-      song: 'musicTrack',  // musicTrack includes both songs and music videos
+      song: 'song',
       artist: 'musicArtist',
       podcast: 'podcast'
     }
@@ -34,26 +34,36 @@ export async function GET(request: NextRequest) {
     const entity = entityMap[type] || 'album'
     const media = mediaMap[type] || 'music'
 
-    // Call iTunes Search API (no auth required)
-    const url = new URL('https://itunes.apple.com/search')
-    url.searchParams.set('term', term.trim())
-    url.searchParams.set('media', media)
-    url.searchParams.set('entity', entity)
-    url.searchParams.set('limit', '20')
-    url.searchParams.set('country', 'CN')
-    url.searchParams.set('lang', 'zh-CN')
+    // 多区域智能检索（若 CN 区受限无结果，自动漫游至 Global / TW / HK / US，确保能搜出任意歌曲）
+    const regions = ['', 'TW', 'HK', 'US', 'CN']
+    let data: any = { results: [], resultCount: 0 }
 
-    const response = await fetch(url.toString(), {
-      headers: {
-        'Accept': 'application/json'
+    for (const region of regions) {
+      const url = new URL('https://itunes.apple.com/search')
+      url.searchParams.set('term', term.trim())
+      url.searchParams.set('media', media)
+      url.searchParams.set('entity', entity)
+      url.searchParams.set('limit', '20')
+      if (region) {
+        url.searchParams.set('country', region)
       }
-    })
 
-    if (!response.ok) {
-      throw new Error(`iTunes API error: ${response.status}`)
+      try {
+        const response = await fetch(url.toString(), {
+          headers: {
+            'Accept': 'application/json'
+          }
+        })
+
+        if (response.ok) {
+          const resJson = await response.json()
+          if (resJson.results && resJson.results.length > 0) {
+            data = resJson
+            break
+          }
+        }
+      } catch {}
     }
-
-    const data = await response.json()
 
     // Transform iTunes results to our format
     const results = data.results.map((item: any) => {
@@ -62,6 +72,20 @@ export async function GET(request: NextRequest) {
       const id = isSong ? (item.trackId || item.collectionId) : (item.collectionId || item.trackId)
       const name = isSong ? (item.trackName || item.collectionName) : (item.collectionName || item.trackName)
       const link = isSong ? (item.trackViewUrl || item.collectionViewUrl) : (item.collectionViewUrl || item.trackViewUrl)
+
+      // Canonical Apple Music Embed URL
+      let embedSrc = ''
+      if (isSong) {
+        if (item.collectionId && item.trackId) {
+          embedSrc = `https://embed.music.apple.com/cn/album/${item.collectionId}?i=${item.trackId}`
+        } else if (id) {
+          embedSrc = `https://embed.music.apple.com/cn/song/${id}`
+        }
+      } else {
+        embedSrc = id ? `https://embed.music.apple.com/cn/album/${id}` : ''
+      }
+
+      const playerHeight = isSong ? 175 : 450
 
       return {
         id,
@@ -76,9 +100,10 @@ export async function GET(request: NextRequest) {
         genre: item.primaryGenreName || '',
         releaseDate: item.releaseDate || '',
         trackCount: item.trackCount || 0,
+        previewUrl: item.previewUrl || '',
         // Generate Apple Music embed code if available
-        embedCode: id
-          ? `<iframe allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameborder="0" height="450" style="width:100%;max-width:660px;overflow:hidden;border-radius:10px;" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="https://embed.music.apple.com/cn/${isSong ? 'song' : 'album'}/${id}"></iframe>`
+        embedCode: embedSrc
+          ? `<iframe allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameborder="0" height="${playerHeight}" style="width:100%;max-width:660px;overflow:hidden;border-radius:10px;" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="${embedSrc}"></iframe>`
           : ''
       }
     })
