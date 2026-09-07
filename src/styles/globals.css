@@ -85,20 +85,129 @@
 		}
 	}
 
-	/* View Transitions ripple rules */
-	::view-transition-group(root) {
-		animation-duration: 0.7s;
-	}
-	::view-transition-old(root),
-	::view-transition-new(root) {
-		animation: none;
+	/* Clay-blog View Transitions Theme Reveal Architecture */
+	html.theme-vt::view-transition-old(root),
+	html.theme-vt::view-transition-new(root) {
 		mix-blend-mode: normal;
 	}
-	::view-transition-old(root) {
+
+	html.theme-vt::view-transition-old(root) {
+		animation: none;
+		opacity: 1;
 		z-index: 1;
 	}
-	::view-transition-new(root) {
-		z-index: 9999;
+
+	html.theme-vt::view-transition-new(root) {
+		animation: theme-reveal 0.52s linear both;
+		opacity: 1;
+		z-index: 2;
+	}
+
+	/* Freeze element-level transitions during theme reveal to ensure 60FPS main-thread performance */
+	html.theme-vt *,
+	html.theme-vt *::before,
+	html.theme-vt *::after {
+		transition: none !important;
+	}
+
+	/* Isolate theme toggle button into its own transition layer */
+	html.theme-vt .theme-toggle {
+		view-transition-name: theme-toggle !important;
+	}
+
+	html.theme-vt .theme-toggle svg {
+		transition: none !important;
+	}
+
+	html.theme-vt::view-transition-group(theme-toggle) {
+		z-index: 4;
+		animation: none;
+	}
+
+	html.theme-vt::view-transition-old(theme-toggle) {
+		animation: theme-toggle-out 0.18s ease-in both;
+		mix-blend-mode: normal;
+	}
+
+	html.theme-vt::view-transition-new(theme-toggle) {
+		animation: theme-toggle-in 0.46s 0.04s cubic-bezier(0.22, 1, 0.36, 1) both;
+		mix-blend-mode: normal;
+	}
+
+	@keyframes theme-toggle-out {
+		to {
+			opacity: 0;
+			transform: rotate(28deg) scale(0.72);
+		}
+	}
+
+	@keyframes theme-toggle-in {
+		from {
+			opacity: 0;
+			transform: rotate(-32deg) scale(0.62);
+		}
+		to {
+			opacity: 1;
+			transform: rotate(0deg) scale(1);
+		}
+	}
+
+	/* Fallback: animate one composited layer when View Transitions are unavailable */
+	html.theme-anim body {
+		animation: theme-settle 0.36s cubic-bezier(0.22, 1, 0.36, 1) both;
+	}
+
+	@keyframes theme-settle {
+		from {
+			opacity: 0.72;
+			filter: saturate(0.82);
+		}
+		to {
+			opacity: 1;
+			filter: saturate(1);
+		}
+	}
+
+	/* Clay-blog Theme Toggle Button Dual Icon Layering */
+	.theme-toggle {
+		position: relative;
+		display: grid !important;
+		place-items: center;
+	}
+
+	.theme-toggle :is(.theme-toggle__moon, .theme-toggle__sun) {
+		grid-area: 1 / 1;
+		transition: opacity 0.26s ease-out, rotate 0.46s cubic-bezier(0.22, 1, 0.36, 1),
+			scale 0.4s cubic-bezier(0.22, 1, 0.36, 1) !important;
+		will-change: opacity, rotate, scale;
+	}
+
+	.theme-toggle .theme-toggle__moon {
+		opacity: 1;
+		rotate: 0deg;
+		scale: 1;
+	}
+
+	.theme-toggle .theme-toggle__sun {
+		opacity: 0;
+		rotate: -78deg;
+		scale: 0.56;
+	}
+
+	.theme-toggle[data-theme-icon="dark"] .theme-toggle__moon {
+		opacity: 0;
+		rotate: 72deg;
+		scale: 0.56;
+	}
+
+	.theme-toggle[data-theme-icon="dark"] .theme-toggle__sun {
+		opacity: 1;
+		rotate: 0deg;
+		scale: 1;
+	}
+
+	.theme-toggle.is-switching {
+		color: var(--color-accent, #0054f9) !important;
 	}
 
 	body {

@@ -408,18 +408,22 @@ function runTests() {
 		assert.ok(layoutContent.includes('prefers-color-scheme: dark'), 'layout.tsx must check system theme preference')
 		assert.ok(layoutContent.includes("classList.add('dark')"), 'layout.tsx must synchronously add dark class')
 
-		// 2. Check globals.css for transition cleanup
+		// 2. Check globals.css for transition cleanup & clay-blog architecture
 		const globalsCssPath = path.join(ROOT, 'src/styles/globals.css')
 		const globalsCssContent = fs.readFileSync(globalsCssPath, 'utf8')
 		assert.ok(!globalsCssContent.includes('*, *::before, *::after {\n\t\ttransition: background-color'), 'globals.css must not apply wildcard transition')
 		assert.ok(globalsCssContent.includes('::view-transition-old(root)'), 'globals.css must support view transitions')
+		assert.ok(globalsCssContent.includes('theme-reveal'), 'globals.css must include theme-reveal animation')
+		assert.ok(globalsCssContent.includes('html.theme-vt *'), 'globals.css must freeze child transitions during reveal')
+		assert.ok(globalsCssContent.includes('view-transition-name: theme-toggle'), 'globals.css must isolate theme-toggle layer')
 
-		// 3. Check use-theme.tsx for clean DOM sync and view transitions
+		// 3. Check use-theme.tsx for clean DOM sync, percentage coordinates and view transitions
 		const useThemePath = path.join(ROOT, 'src/hooks/use-theme.tsx')
 		const useThemeContent = fs.readFileSync(useThemePath, 'utf8')
 		assert.ok(!useThemeContent.includes('#00FF41'), 'use-theme.tsx must not contain hardcoded cyberpunk colors')
 		assert.ok(!useThemeContent.includes('root.style.setProperty'), 'use-theme.tsx must not pollute documentElement inline styles')
 		assert.ok(useThemeContent.includes('startViewTransition'), 'use-theme.tsx must support View Transitions API')
+		assert.ok(useThemeContent.includes('radiusPercent'), 'use-theme.tsx must calculate percentage coordinates to prevent high-DPI clipping')
 		assert.ok(useThemeContent.includes("addEventListener('storage'"), 'use-theme.tsx must sync across tabs')
 
 		// 4. Check theme-toggle-button.tsx for a11y & tactile feedback
@@ -429,6 +433,9 @@ function runTests() {
 		assert.ok(toggleContent.includes('role="switch"'), 'ThemeToggleButton must declare role=switch')
 		assert.ok(toggleContent.includes('aria-checked='), 'ThemeToggleButton must declare aria-checked')
 		assert.ok(toggleContent.includes('aria-label='), 'ThemeToggleButton must declare aria-label')
+		assert.ok(toggleContent.includes('data-theme-toggle'), 'ThemeToggleButton must include data-theme-toggle attribute')
+		assert.ok(toggleContent.includes('theme-toggle__moon'), 'ThemeToggleButton must render moon icon')
+		assert.ok(toggleContent.includes('theme-toggle__sun'), 'ThemeToggleButton must render sun icon')
 		assert.ok(toggleContent.includes('AudioContext'), 'ThemeToggleButton must synthesize haptic sound')
 
 		// 5. Check markdown-renderer.ts for dual themes

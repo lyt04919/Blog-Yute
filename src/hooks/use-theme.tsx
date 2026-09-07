@@ -7,8 +7,9 @@ export type Theme = 'light' | 'dark' | 'system'
 interface ThemeContextType {
 	theme: Theme
 	resolvedTheme: 'light' | 'dark'
+	isSwitching?: boolean
 	setTheme: (theme: Theme) => void
-	toggleTheme: (e?: React.MouseEvent | { clientX: number; clientY: number }) => void
+	toggleTheme: (e?: React.MouseEvent | { clientX: number; clientY: number } | HTMLElement) => void
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
@@ -33,6 +34,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 	const [theme, setThemeState] = useState<Theme>('system')
 	const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light')
 	const [mounted, setMounted] = useState(false)
+	const [isSwitching, setIsSwitching] = useState(false)
 
 	const syncDOM = useCallback((currentTheme: 'light' | 'dark') => {
 		const root = document.documentElement
@@ -95,60 +97,107 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 		syncDOM(resolved)
 	}, [syncDOM])
 
-	const toggleTheme = useCallback((e?: React.MouseEvent | { clientX: number; clientY: number }) => {
+	const toggleTheme = useCallback((target?: React.MouseEvent | { clientX: number; clientY: number } | HTMLElement) => {
 		const nextTheme: 'light' | 'dark' = resolvedTheme === 'dark' ? 'light' : 'dark'
 
-		const prefersReducedMotion =
-			typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+		const motionOK =
+			typeof window !== 'undefined' &&
+			window.matchMedia('(prefers-reduced-motion: no-preference)').matches
 
-		let x: number | undefined
-		let y: number | undefined
-
-		if (e && 'clientX' in e && typeof e.clientX === 'number') {
-			x = e.clientX
-			y = e.clientY
-		}
-
-		// Modern View Transitions API with circular ripple originating from click coordinates
-		if (
-			!prefersReducedMotion &&
-			typeof document !== 'undefined' &&
-			'startViewTransition' in document &&
-			x !== undefined &&
-			y !== undefined
-		) {
-			const endRadius = Math.hypot(
-				Math.max(x, window.innerWidth - x),
-				Math.max(y, window.innerHeight - y)
-			)
-
-			const transition = (document as any).startViewTransition(() => {
-				setTheme(nextTheme)
-			})
-
-			transition.ready?.then(() => {
-				document.documentElement.animate(
-					{
-						clipPath: [
-							`circle(0px at ${x}px ${y}px)`,
-							`circle(${endRadius}px at ${x}px ${y}px)`
-						]
-					},
-					{
-						duration: 700,
-						easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
-						pseudoElement: '::view-transition-new(root)'
-					}
-				)
-			})
+		const root = typeof document !== 'undefined' ? document.documentElement : null
+		if (!root) {
+			setTheme(nextTheme)
 			return
 		}
 
+		let buttonEl: HTMLElement | null = null
+		let x: number | undefined
+		let y: number | undefined
+
+		if (target instanceof HTMLElement) {
+			buttonEl = target
+			const rect = buttonEl.getBoundingClientRect()
+			x = rect.left + rect.width / 2
+			y = rect.top + rect.height / 2
+		} else if (target && 'currentTarget' in target && (target.currentTarget as HTMLElement) instanceof HTMLElement) {
+			buttonEl = target.currentTarget as HTMLElement
+			const rect = buttonEl.getBoundingClientRect()
+			x = rect.left + rect.width / 2
+			y = rect.top + rect.height / 2
+		} else if (target && 'clientX' in target && typeof target.clientX === 'number') {
+			x = target.clientX
+			y = target.clientY
+			buttonEl = document.querySelector<HTMLElement>('[data-theme-toggle]')
+		} else {
+			buttonEl = document.querySelector<HTMLElement>('[data-theme-toggle]')
+			if (buttonEl) {
+				const rect = buttonEl.getBoundingClientRect()
+				x = rect.left + rect.width / 2
+				y = rect.top + rect.height / 2
+			} else {
+				x = window.innerWidth / 2
+				y = window.innerHeight / 2
+			}
+		}
+
+		// Inject literal percentages instead of px values or dynamic vars.
+		// Chrome rasterizes view-transition snapshots at device-pixel density;
+		// px clip coordinates can render at half-size on a 2x screen.
+		// Exact percentages stay in the snapshot's own coordinate space.
+		if (motionOK && 'startViewTransition' in document && x !== undefined && y !== undefined) {
+			const radius =
+				Math.hypot(
+					Math.max(x, window.innerWidth - x),
+					Math.max(y, window.innerHeight - y)
+				) + 20
+
+			const xPercent = (x / window.innerWidth) * 100
+			const yPercent = (y / window.innerHeight) * 100
+			// CSS resolves a circle's percentage radius against normalized diagonal:
+			// hypot(width, height) / sqrt(2)
+			const radiusReference =
+				Math.hypot(window.innerWidth, window.innerHeight) / Math.SQRT2
+			const radiusPercent = (radius / radiusReference) * 100
+
+			let themeRevealStyle = document.getElementById('theme-reveal-style') as HTMLStyleElement | null
+			if (!themeRevealStyle) {
+				themeRevealStyle = document.createElement('style')
+				themeRevealStyle.id = 'theme-reveal-style'
+				document.head.appendChild(themeRevealStyle)
+			}
+
+			themeRevealStyle.textContent = `@keyframes theme-reveal { from { clip-path: circle(0 at ${xPercent.toFixed(4)}% ${yPercent.toFixed(4)}%); } to { clip-path: circle(${radiusPercent.toFixed(4)}% at ${xPercent.toFixed(4)}% ${yPercent.toFixed(4)}%); } }`
+
+			setIsSwitching(true)
+			root.classList.add('theme-vt')
+			buttonEl?.classList.add('is-switching')
+
+			const vt = (document as any).startViewTransition(() => {
+				setTheme(nextTheme)
+			})
+
+			vt.finished
+				.catch(() => {})
+				.finally(() => {
+					setIsSwitching(false)
+					buttonEl?.classList.remove('is-switching')
+					root.classList.remove('theme-vt')
+				})
+			return
+		}
+
+		// Fallback for browsers without View Transitions or when motion is reduced
 		setTheme(nextTheme)
+		if (motionOK) {
+			root.classList.remove('theme-anim')
+			void root.offsetWidth
+			root.classList.add('theme-anim')
+			window.setTimeout(() => root.classList.remove('theme-anim'), 380)
+		}
 	}, [resolvedTheme, setTheme])
 
 	return (
-		<ThemeContext.Provider value={{ theme, resolvedTheme: mounted ? resolvedTheme : 'light', setTheme, toggleTheme }}>
+		<ThemeContext.Provider value={{ theme, resolvedTheme: mounted ? resolvedTheme : 'light', isSwitching, setTheme, toggleTheme }}>
 			{children}
 		</ThemeContext.Provider>
 	)

@@ -1,8 +1,7 @@
 'use client'
 
-import { motion } from 'motion/react'
-import { useTheme } from '@/hooks/use-theme'
 import { useCallback } from 'react'
+import { useTheme } from '@/hooks/use-theme'
 
 // Synthesize lightweight haptic click/pop without external audio files
 function playHapticTick(targetDark: boolean) {
@@ -35,96 +34,69 @@ interface ThemeToggleButtonProps {
 }
 
 export function ThemeToggleButton({ className = '', showLabel = false }: ThemeToggleButtonProps) {
-	const { resolvedTheme, toggleTheme } = useTheme()
+	const { resolvedTheme, toggleTheme, isSwitching } = useTheme()
 	const isDark = resolvedTheme === 'dark'
 
 	const handleClick = useCallback(
 		(e: React.MouseEvent<HTMLButtonElement>) => {
 			playHapticTick(!isDark)
-			const rect = e.currentTarget.getBoundingClientRect()
-			const coords = {
-				clientX: Math.round(rect.left + rect.width / 2),
-				clientY: Math.round(rect.top + rect.height / 2)
-			}
-			toggleTheme(coords)
+			toggleTheme(e.currentTarget)
 		},
 		[isDark, toggleTheme]
 	)
 
 	return (
-		<motion.button
+		<button
+			type="button"
 			onClick={handleClick}
+			data-theme-toggle=""
+			data-theme-icon={resolvedTheme}
 			role="switch"
 			aria-checked={isDark}
-			aria-label={isDark ? '切换至亮色模式' : '切换至暗色模式'}
-			title={isDark ? '切换亮色模式' : '切换暗色模式'}
-			whileHover={{ scale: 1.08 }}
-			whileTap={{ scale: 0.9 }}
-			transition={{ type: 'spring', stiffness: 450, damping: 25 }}
-			className={`relative flex items-center justify-center rounded-full cursor-pointer transition-colors outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 ${className}`}
+			aria-pressed={isDark}
+			aria-label={isDark ? '切换到浅色模式' : '切换到深色模式'}
+			title={isDark ? '切换浅色模式' : '切换深色模式'}
+			className={`theme-toggle size-full flex items-center justify-center rounded-full cursor-pointer transition-colors outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 ${isSwitching ? 'is-switching' : ''} ${className}`}
 		>
-			<motion.svg
-				xmlns="http://www.w3.org/2000/svg"
+			{/* Moon icon from clay-blog */}
+			<svg
+				width="20"
+				height="20"
 				viewBox="0 0 24 24"
 				fill="none"
 				stroke="currentColor"
-				strokeWidth="2"
+				strokeWidth="1.75"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="size-full p-1"
-				animate={{ rotate: isDark ? 90 : 0 }}
-				transition={{ type: 'spring', stiffness: 220, damping: 20 }}
+				className="theme-toggle__moon size-5 p-0.5"
+				aria-hidden="true"
 			>
-				{/* Mask creating the Moon crescent from the Sun sphere */}
-				<mask id="moon-cutout-mask">
-					<rect x="0" y="0" width="100%" height="100%" fill="white" />
-					<motion.circle
-						animate={{
-							cx: isDark ? 19 : 30,
-							cy: isDark ? 4 : -10,
-							r: isDark ? 8 : 0
-						}}
-						transition={{ type: 'spring', stiffness: 240, damping: 22 }}
-						fill="black"
-					/>
-				</mask>
+				<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" />
+			</svg>
 
-				{/* Central Orb */}
-				<motion.circle
-					cx="12"
-					cy="12"
-					animate={{ r: isDark ? 8 : 4.5 }}
-					mask="url(#moon-cutout-mask)"
-					fill="currentColor"
-					stroke="none"
-					transition={{ type: 'spring', stiffness: 240, damping: 22 }}
-				/>
+			{/* Sun icon from clay-blog */}
+			<svg
+				width="20"
+				height="20"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				strokeWidth="1.75"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				className="theme-toggle__sun size-5 p-0.5"
+				aria-hidden="true"
+			>
+				<circle cx="12" cy="12" r="4" />
+				<path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+			</svg>
 
-				{/* Sun Rays - Smoothly collapse and fade out in Dark Mode */}
-				<motion.g
-					animate={{
-						scale: isDark ? 0 : 1,
-						opacity: isDark ? 0 : 1
-					}}
-					transition={{ duration: 0.35, ease: 'easeInOut' }}
-					style={{ originX: '12px', originY: '12px' }}
-				>
-					<line x1="12" y1="1" x2="12" y2="3" />
-					<line x1="12" y1="21" x2="12" y2="23" />
-					<line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-					<line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-					<line x1="1" y1="12" x2="3" y2="12" />
-					<line x1="21" y1="12" x2="23" y2="12" />
-					<line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-					<line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-				</motion.g>
-			</motion.svg>
 			{showLabel && (
 				<span className="sr-only">
-					{isDark ? '切换至亮色模式' : '切换至暗色模式'}
+					{isDark ? '切换到浅色模式' : '切换到深色模式'}
 				</span>
 			)}
-		</motion.button>
+		</button>
 	)
 }
 
