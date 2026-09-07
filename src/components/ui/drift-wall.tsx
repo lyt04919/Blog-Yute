@@ -72,6 +72,60 @@ export default function DriftWall({
   const planeRef = useRef<HTMLDivElement>(null)
   const rafIdRef = useRef<number | null>(null)
   const [isInView, setIsInView] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
+
+  // Tracking click displacement to prevent dropped clicks in 3D animated environment
+  const pointerDownPosRef = useRef<{ x: number; y: number; time: number } | null>(null)
+  const justTriggeredRef = useRef<boolean>(false)
+
+  const handleTilePointerDown = useCallback((e: React.PointerEvent) => {
+    if (e.button !== 0) return // Left click only
+    pointerDownPosRef.current = { x: e.clientX, y: e.clientY, time: Date.now() }
+  }, [])
+
+  const handleTilePointerUp = useCallback((item: DriftWallItem, index: number, e: React.PointerEvent) => {
+    if (!pointerDownPosRef.current) return
+    const dx = Math.abs(e.clientX - pointerDownPosRef.current.x)
+    const dy = Math.abs(e.clientY - pointerDownPosRef.current.y)
+    const dt = Date.now() - pointerDownPosRef.current.time
+    pointerDownPosRef.current = null
+
+    // Tolerant click detection: within 12px displacement and 800ms duration
+    if (dx < 12 && dy < 12 && dt < 800) {
+      justTriggeredRef.current = true
+      setTimeout(() => {
+        justTriggeredRef.current = false
+      }, 250)
+      if (onItemClick) {
+        e.preventDefault()
+        e.stopPropagation()
+        onItemClick(item, index, e as unknown as React.MouseEvent)
+      }
+    }
+  }, [onItemClick])
+
+  const handleTileClick = useCallback((item: DriftWallItem, index: number, e: React.MouseEvent) => {
+    if (justTriggeredRef.current) {
+      e.preventDefault()
+      e.stopPropagation()
+      return
+    }
+    if (onItemClick) {
+      e.preventDefault()
+      e.stopPropagation()
+      onItemClick(item, index, e)
+    }
+  }, [onItemClick])
+
+  const handleTileKeyDown = useCallback((item: DriftWallItem, index: number, e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      e.stopPropagation()
+      if (onItemClick) {
+        onItemClick(item, index, e as unknown as React.MouseEvent)
+      }
+    }
+  }, [onItemClick])
 
   useEffect(() => {
     const el = containerRef.current
@@ -146,6 +200,8 @@ export default function DriftWall({
       `translateZ(0)`
   }, [tilt, turn, roll])
 
+  const isPaused = !isInView || (pauseOnHover && isHovered)
+
   const cssVars = useMemo(() => {
     const vars: Record<string, any> = {
       '--dw-tile-w': `${tileWidth}px`,
@@ -165,10 +221,11 @@ export default function DriftWall({
   return (
     <div
       ref={containerRef}
-      className={`drift-wall ${className}`.trim()}
+      className={`drift-wall ${pauseOnHover && isHovered ? 'drift-wall--paused' : ''} ${className}`.trim()}
       style={cssVars}
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
+      onMouseEnter={() => setIsHovered(true)}
       role="group"
       aria-label="Drifting wall of tiles"
     >
@@ -193,7 +250,7 @@ export default function DriftWall({
                 style={{
                   animation: `drift-wall-vertical ${duration} linear infinite`,
                   animationDirection: isReverse ? 'reverse' : 'normal',
-                  animationPlayState: isInView ? 'running' : 'paused',
+                  animationPlayState: isPaused ? 'paused' : 'running',
                 }}
               >
                 {/* 2 seamless loops for infinite vertical scroll */}
@@ -205,14 +262,12 @@ export default function DriftWall({
                         tabIndex={0}
                         role="button"
                         aria-label={item.title ?? 'tile'}
+                        title={item.title ? `点击查看《${item.title}》电影详情与影评` : undefined}
                         className={`drift-wall__tile ${onItemClick ? 'cursor-pointer' : ''}`}
-                        onClick={(e) => {
-                          if (onItemClick) {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            onItemClick(item, itemIndex, e)
-                          }
-                        }}
+                        onPointerDown={handleTilePointerDown}
+                        onPointerUp={(e) => handleTilePointerUp(item, itemIndex, e)}
+                        onClick={(e) => handleTileClick(item, itemIndex, e)}
+                        onKeyDown={(e) => handleTileKeyDown(item, itemIndex, e)}
                       >
                         <span className="drift-wall__inner">
                           <img

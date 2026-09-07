@@ -246,7 +246,7 @@ export function GeekIdentityBento({ className }: { className?: string }) {
 								variance={0.35}
 								parallax={0.35}
 								pauseOnHover={true}
-								lift={40}
+								lift={12}
 								dim={0.82}
 								overlayColor="transparent"
 							/>

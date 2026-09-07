@@ -9,7 +9,7 @@
   --dw-tile-h: 158px;
   --dw-gap: 14px;
   --dw-radius: 12px;
-  --dw-lift: 40px;
+  --dw-lift: 12px;
   --dw-dim: 0.45;
   --dw-gray: 0;
   --dw-overlay: #060010;
@@ -22,7 +22,7 @@
   left: 50%;
   display: flex;
   flex-direction: row;
-  cursor: pointer;
+  cursor: default;
   transform-origin: 50% 50%;
   transform-style: preserve-3d;
   will-change: transform;
@@ -37,7 +37,7 @@
 }
 
 .drift-wall__col:hover {
-  z-index: 50;
+  z-index: 60;
 }
 
 /* Pure GPU Keyframe vertical scrolling */
@@ -57,7 +57,9 @@
   gap: var(--dw-gap);
 }
 
-/* Instant hardware pause on hovered column */
+/* Instant hardware pause on hovered column or entire wall */
+.drift-wall--paused .drift-wall__track,
+.drift-wall:hover .drift-wall__track,
 .drift-wall__col:hover .drift-wall__track {
   animation-play-state: paused !important;
 }
@@ -74,9 +76,10 @@
   pointer-events: auto;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+  transform-style: preserve-3d;
 }
 
-/* Visual Container: pointer-events: none prevents mouse leave jitter when scaled */
+/* Visual Container: pointer-events: auto ensures clicking anywhere on the poster registers cleanly */
 .drift-wall__inner {
   position: absolute;
   inset: 0;
@@ -86,7 +89,8 @@
   background: #12121c;
   opacity: var(--dw-dim);
   transform: translateZ(0);
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: pointer;
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
   will-change: transform, opacity, box-shadow;
@@ -125,8 +129,8 @@
 
 .drift-wall__tile:hover .drift-wall__inner {
   opacity: 1 !important;
-  transform: translateZ(var(--dw-lift)) scale(1.08) !important;
-  box-shadow: 0 24px 60px -15px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.45) !important;
+  transform: translateZ(var(--dw-lift, 12px)) scale(1.06) !important;
+  box-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.45) !important;
   border-color: rgba(255, 255, 255, 0.6) !important;
 }
 

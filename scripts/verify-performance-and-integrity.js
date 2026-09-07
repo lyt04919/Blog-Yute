@@ -161,6 +161,8 @@ function runTests() {
 
 		const driftWallContent = fs.readFileSync(path.join(ROOT, 'src/components/ui/drift-wall.tsx'), 'utf8')
 		assert.ok(driftWallContent.includes('onItemClick'), 'DriftWall must support onItemClick')
+		assert.ok(driftWallContent.includes('onPointerUp'), 'DriftWall must support robust onPointerUp click handling')
+		assert.ok(driftWallContent.includes('pointerDownPosRef'), 'DriftWall must track pointerDown coordinates for 3D click stability')
 
 		const spiralContent = fs.readFileSync(path.join(ROOT, 'src/components/ui/infinite-spiral.tsx'), 'utf8')
 		assert.ok(spiralContent.includes('onItemClick'), 'InfiniteSpiral must support onItemClick')
@@ -280,9 +282,9 @@ function runTests() {
 		assert.ok(spiralContent.includes('cancelAnimationFrame'), 'InfiniteSpiral must cancelAnimationFrame when offscreen')
 		assert.ok(!spiralContent.includes('card.style.filter ='), 'InfiniteSpiral must not execute per-frame style.filter updates')
 
-		// 3. Check DriftWall viewport awareness
+		// 3. Check DriftWall viewport and hover awareness
 		const driftContent = fs.readFileSync(path.join(ROOT, 'src/components/ui/drift-wall.tsx'), 'utf8')
-		assert.ok(driftContent.includes("animationPlayState: isInView ? 'running' : 'paused'"), 'DriftWall must pause tracks when offscreen')
+		assert.ok(driftContent.includes("isPaused") && driftContent.includes("isInView"), 'DriftWall must pause tracks when offscreen or hovered')
 
 		// 4. Check Marquee viewport awareness
 		const marqueeContent = fs.readFileSync(path.join(ROOT, 'src/components/ui/marquee.tsx'), 'utf8')
