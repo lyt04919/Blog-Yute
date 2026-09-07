@@ -10,9 +10,8 @@ import { useConfigStore } from '@/app/(home)/stores/config-store'
 import { useTheme } from '@/hooks/use-theme'
 import { toast } from 'sonner'
 import { Dock, DockIcon } from '@/components/magicui/dock'
-import { ChevronDown, ChevronUp, Globe } from 'lucide-react'
+import { ChevronUp, Globe } from 'lucide-react'
 import { ThemeToggleButton } from '@/components/theme-toggle-button'
-import { useMusicPlayerStore } from '@/hooks/use-music-player'
 
 // Nav Icons
 import ScrollOutlineSVG from '@/svgs/scroll-outline.svg'
@@ -100,8 +99,6 @@ export default function TopNav() {
 	const { resolvedTheme, toggleTheme } = useTheme()
 
 	const [isDockVisible, setIsDockVisible] = useState(true)
-	const [isDockHovered, setIsDockHovered] = useState(false)
-	const [isBottomHovered, setIsBottomHovered] = useState(false)
 
 	const activeIndex = useMemo(() => {
 		const index = activeNavList.findIndex(item => pathname === item.href)
@@ -139,8 +136,6 @@ export default function TopNav() {
 		}
 	}, [openDropdowns])
 
-	const currentTrack = useMusicPlayerStore((s) => s.currentTrack)
-
 	return (
 		<>
 			{/* Dock */}
@@ -151,11 +146,9 @@ export default function TopNav() {
 						animate={{ y: 0, opacity: 1 }}
 						exit={{ y: 100, opacity: 0 }}
 						transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-						className={cn('dock-nav-container fixed left-1/2 -translate-x-1/2 z-50 transition-all duration-300', currentTrack ? 'bottom-[72px] sm:bottom-[78px]' : 'bottom-8')}
-						onMouseEnter={() => setIsDockHovered(true)}
-						onMouseLeave={() => setIsDockHovered(false)}
+						className="dock-nav-container fixed bottom-8 left-1/2 -translate-x-1/2 z-50"
 					>
-						<Dock style={{ height: currentTrack ? 48 : 56 }} iconMagnification={currentTrack ? 54 : 64} iconDistance={140} className="relative flex p-1.5 sm:p-2 w-fit gap-1.5 sm:gap-2 bg-white/95 dark:bg-[var(--color-card)]/90 border border-[#e4e4e7] dark:border-[var(--color-border)] backdrop-blur-3xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] shadow-black/5 rounded-full">
+						<Dock iconMagnification={64} iconDistance={140} className="relative flex p-1.5 sm:p-2 w-fit gap-1.5 sm:gap-2 bg-white/95 dark:bg-[var(--color-card)]/90 border border-[#e4e4e7] dark:border-[var(--color-border)] backdrop-blur-3xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] shadow-black/5 rounded-full">
 
 							{/* Home */}
 							<DockIcon className="rounded-3xl cursor-pointer bg-white dark:bg-[var(--color-card)] border border-[#e4e4e7] dark:border-[var(--color-border)] shadow-sm">
@@ -273,52 +266,28 @@ export default function TopNav() {
 								</TooltipWrapper>
 							</DockIcon>
 						</Dock>
-
-						{/* 隐藏按钮 - dock下方小箭头 */}
-						<AnimatePresence>
-							{isDockHovered && (
-								<motion.button
-									initial={{ opacity: 0, y: -2 }}
-									animate={{ opacity: 1, y: 0 }}
-									exit={{ opacity: 0, y: -2 }}
-									transition={{ duration: 0.15 }}
-									onClick={() => {
-										setIsDockVisible(false)
-										setIsDockHovered(false)
-									}}
-									className="absolute -bottom-5 left-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-white/80 dark:bg-[var(--color-card)]/80 border border-[#e4e4e7]/60 dark:border-[var(--color-border)]/60 backdrop-blur-sm flex items-center justify-center text-[var(--color-secondary)] hover:text-[var(--color-border)] dark:hover:text-[var(--color-primary)] transition-colors cursor-pointer shadow-sm"
-									title="隐藏导航栏"
-								>
-									<ChevronDown className="w-3 h-3" />
-								</motion.button>
-							)}
-						</AnimatePresence>
 					</motion.div>
 				)}
 			</AnimatePresence>
 
-			{/* 底部触发区域 - 当dock隐藏时，鼠标移到底部显示小指示器 */}
-			{!isDockVisible && (
-				<div
-					className="dock-nav-indicator fixed bottom-0 left-1/2 -translate-x-1/2 z-40 w-32 h-6 flex items-end justify-center"
-					onMouseEnter={() => setIsBottomHovered(true)}
-					onMouseLeave={() => setIsBottomHovered(false)}
-				>
-					<AnimatePresence>
-						{isBottomHovered && (
-							<motion.button
-								initial={{ opacity: 0, y: 5 }}
-								animate={{ opacity: 1, y: 0 }}
-								exit={{ opacity: 0, y: 5 }}
-								transition={{ duration: 0.2 }}
-								onClick={() => setIsDockVisible(true)}
-								className="mb-1 w-8 h-1.5 rounded-full bg-[#d4d4d8]/50 dark:bg-[#52525b]/50 hover:bg-[#a1a1aa]/70 dark:hover:bg-[#71717a]/70 transition-colors cursor-pointer"
-								title="显示导航栏"
-							/>
-						)}
-					</AnimatePresence>
-				</div>
-			)}
+			{/* 展开导航栏按钮 - 当dock隐藏时常驻显示，优雅且随时可点击还原 */}
+			<AnimatePresence>
+				{!isDockVisible && (
+					<motion.button
+						initial={{ y: 20, opacity: 0 }}
+						animate={{ y: 0, opacity: 1 }}
+						exit={{ y: 20, opacity: 0 }}
+						whileHover={{ scale: 1.05 }}
+						whileTap={{ scale: 0.95 }}
+						onClick={() => setIsDockVisible(true)}
+						className="dock-nav-indicator fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/95 dark:bg-[var(--color-card)]/90 border border-[#e4e4e7] dark:border-[var(--color-border)] backdrop-blur-xl shadow-lg text-xs font-medium text-[#52525b] dark:text-[var(--color-secondary)] hover:text-black dark:hover:text-[var(--color-primary)] transition-colors cursor-pointer"
+						title="展开导航栏"
+					>
+						<ChevronUp className="w-3.5 h-3.5" />
+						<span>展开导航</span>
+					</motion.button>
+				)}
+			</AnimatePresence>
 		</>
 	)
 }

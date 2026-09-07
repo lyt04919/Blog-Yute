@@ -436,10 +436,12 @@ function runTests() {
 		const markdownContent = fs.readFileSync(markdownPath, 'utf8')
 		assert.ok(markdownContent.includes('one-dark-pro'), 'markdown-renderer must support dual themes including dark')
 
-		// 6. Check top-nav.tsx for integration
+		// 6. Check top-nav.tsx for integration & dock stability
 		const topNavPath = path.join(ROOT, 'src/components/top-nav.tsx')
 		const topNavContent = fs.readFileSync(topNavPath, 'utf8')
 		assert.ok(topNavContent.includes('ThemeToggleButton'), 'top-nav.tsx must integrate ThemeToggleButton')
+		assert.ok(!topNavContent.includes('transition-all duration-300'), 'top-nav must not mix CSS transitions with Framer Motion')
+		assert.ok(topNavContent.includes('dock-nav-indicator') && topNavContent.includes('ChevronUp'), 'top-nav must provide accessible restore button with ChevronUp')
 	})
 
 	// 14. Verify CornerMusicPlayer inspired by clay-blog: floating vinyl disc and expandable console
