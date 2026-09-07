@@ -138,8 +138,29 @@ export function GlobalAudioEngine() {
 
       if (!src) {
         try {
-          const query = encodeURIComponent(`${currentTrack.name} ${currentTrack.subtitle || ''}`)
-          const res = await fetch(`/api/music-preview?term=${query}`)
+          let trackId: string | null = null
+          let albumId: string | null = null
+
+          if (currentTrack.link) {
+            const trackMatch = currentTrack.link.match(/[\?&]i=(\d+)/) || currentTrack.link.match(/\/song\/[^\/]+\/(\d+)/)
+            if (trackMatch) trackId = trackMatch[1]
+            const albumMatch = currentTrack.link.match(/\/album\/[^\/]+\/(\d+)/)
+            if (albumMatch) albumId = albumMatch[1]
+          }
+
+          if (!trackId && currentTrack.embedCode) {
+            const trackMatch = currentTrack.embedCode.match(/[\?&]i=(\d+)/)
+            if (trackMatch) trackId = trackMatch[1]
+            const albumMatch = currentTrack.embedCode.match(/\/album\/(\d+)/)
+            if (albumMatch) albumId = albumMatch[1]
+          }
+
+          const params = new URLSearchParams()
+          if (trackId) params.set('trackId', trackId)
+          if (albumId) params.set('albumId', albumId)
+          params.set('term', `${currentTrack.name} ${currentTrack.subtitle || ''}`.trim())
+
+          const res = await fetch(`/api/music-preview?${params.toString()}`)
           if (res.ok) {
             const data = await res.json()
             if (data.previewUrl) {
@@ -154,6 +175,7 @@ export function GlobalAudioEngine() {
 
       // 若未获取到预览流，使用默认高保真兜底音频
       if (!src) {
+        console.warn(`[GlobalAudioEngine] 曲目 ${currentTrack.name} 未获取到在线流，降级使用兜底音频`)
         src = '/music/close-to-you.mp3'
       }
 
@@ -180,8 +202,28 @@ export function GlobalAudioEngine() {
         const nextItem = list[nextIdx]
         const nextKey = `${nextItem.name}__${nextItem.subtitle || ''}`
         if (!audioCache.current[nextKey]) {
-          const nextQuery = encodeURIComponent(`${nextItem.name} ${nextItem.subtitle || ''}`)
-          fetch(`/api/music-preview?term=${nextQuery}`)
+          let nextTrackId: string | null = null
+          let nextAlbumId: string | null = null
+
+          if (nextItem.link) {
+            const tMatch = nextItem.link.match(/[\?&]i=(\d+)/) || nextItem.link.match(/\/song\/[^\/]+\/(\d+)/)
+            if (tMatch) nextTrackId = tMatch[1]
+            const aMatch = nextItem.link.match(/\/album\/[^\/]+\/(\d+)/)
+            if (aMatch) nextAlbumId = aMatch[1]
+          }
+          if (!nextTrackId && nextItem.embedCode) {
+            const tMatch = nextItem.embedCode.match(/[\?&]i=(\d+)/)
+            if (tMatch) nextTrackId = tMatch[1]
+            const aMatch = nextItem.embedCode.match(/\/album\/(\d+)/)
+            if (aMatch) nextAlbumId = aMatch[1]
+          }
+
+          const nextParams = new URLSearchParams()
+          if (nextTrackId) nextParams.set('trackId', nextTrackId)
+          if (nextAlbumId) nextParams.set('albumId', nextAlbumId)
+          nextParams.set('term', `${nextItem.name} ${nextItem.subtitle || ''}`.trim())
+
+          fetch(`/api/music-preview?${nextParams.toString()}`)
             .then((res) => (res.ok ? res.json() : null))
             .then((data) => {
               if (data?.previewUrl) {

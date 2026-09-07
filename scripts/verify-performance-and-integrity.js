@@ -377,6 +377,14 @@ function runTests() {
 		const layoutPath = path.join(ROOT, 'src/layout/index.tsx')
 		const layoutContent = fs.readFileSync(layoutPath, 'utf8')
 		assert.ok(layoutContent.includes('GlobalAudioEngine'), 'Root layout must mount GlobalAudioEngine')
+
+		// 5. Accurate music stream resolution
+		const previewRoutePath = path.join(ROOT, 'src/app/api/music-preview/route.ts')
+		const previewRouteContent = fs.readFileSync(previewRoutePath, 'utf8')
+		assert.ok(!previewRouteContent.includes("'country', 'CN'"), 'music-preview must not restrict queries to country=CN')
+		assert.ok(previewRouteContent.includes('trackId'), 'music-preview must support trackId lookup')
+		assert.ok(previewRouteContent.includes('albumId'), 'music-preview must support albumId lookup')
+		assert.ok(engineContent.includes('trackId') && engineContent.includes('albumId'), 'GlobalAudioEngine must extract and pass trackId and albumId')
 	})
 
 	console.log(`\n🏁 Test Results: ${passed}/${total} passed.`)

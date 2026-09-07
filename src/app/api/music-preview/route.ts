@@ -1,41 +1,64 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+const cacheHeaders = {
+  'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800'
+}
+
+async function fetchFromApple(url: string) {
+  try {
+    const res = await fetch(url, {
+      headers: { Accept: 'application/json' },
+      next: { revalidate: 86400 }
+    })
+    if (!res.ok) return null
+    const data = await res.json()
+    return data?.results || null
+  } catch {
+    return null
+  }
+}
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
   const term = searchParams.get('term') || searchParams.get('name')
   const trackId = searchParams.get('trackId')
+  const albumId = searchParams.get('albumId')
 
-  if (!term && !trackId) {
-    return NextResponse.json({ error: 'Term or trackId is required' }, { status: 400 })
+  if (!term && !trackId && !albumId) {
+    return NextResponse.json({ error: 'Term, trackId or albumId is required' }, { status: 400 })
   }
 
   try {
-    const url = new URL(trackId ? 'https://itunes.apple.com/lookup' : 'https://itunes.apple.com/search')
+    let match: any = null
+
+    // 1. 优先通过精确 trackId 获取（最精准，100% 匹配目标音轨）
     if (trackId) {
-      url.searchParams.set('id', trackId)
-    } else if (term) {
-      url.searchParams.set('term', term)
-      url.searchParams.set('media', 'music')
-      url.searchParams.set('entity', 'song')
-      url.searchParams.set('limit', '5')
-      url.searchParams.set('country', 'CN')
+      for (const countryParam of ['', '&country=TW', '&country=US']) {
+        const results = await fetchFromApple(`https://itunes.apple.com/lookup?id=${trackId}${countryParam}`)
+        match = results?.find((r: any) => r.previewUrl)
+        if (match) break
+      }
     }
 
-    const res = await fetch(url.toString(), {
-      headers: { 'Accept': 'application/json' },
-      next: { revalidate: 86400 }
-    })
-
-    const cacheHeaders = {
-      'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800'
+    // 2. 其次通过专辑 albumId 检索专辑内的首选歌曲
+    if (!match && albumId) {
+      for (const countryParam of ['', '&country=TW', '&country=US']) {
+        const results = await fetchFromApple(`https://itunes.apple.com/lookup?id=${albumId}&entity=song${countryParam}`)
+        match = results?.find((r: any) => r.previewUrl)
+        if (match) break
+      }
     }
 
-    if (!res.ok) {
-      return NextResponse.json({ previewUrl: '' }, { headers: cacheHeaders })
+    // 3. 最后通过歌曲名 + 艺术家关键词智能多区域搜索（移除原先狭窄且限制严格的 country=CN）
+    if (!match && term) {
+      const encodedTerm = encodeURIComponent(term)
+      for (const countryParam of ['', '&country=TW', '&country=HK', '&country=US']) {
+        const results = await fetchFromApple(`https://itunes.apple.com/search?term=${encodedTerm}&media=music&entity=song&limit=5${countryParam}`)
+        match = results?.find((r: any) => r.previewUrl)
+        if (match) break
+      }
     }
 
-    const data = await res.json()
-    const match = data.results?.find((r: any) => r.previewUrl) || data.results?.[0]
     return NextResponse.json({
       previewUrl: match?.previewUrl || '',
       trackName: match?.trackName || '',
@@ -51,3 +74,4 @@ export async function GET(request: NextRequest) {
     })
   }
 }
+
