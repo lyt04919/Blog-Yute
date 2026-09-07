@@ -32,7 +32,10 @@ function getStoredTheme(): Theme | null {
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
 	const [theme, setThemeState] = useState<Theme>('system')
-	const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light')
+	const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => {
+		if (typeof window === 'undefined') return 'light'
+		return document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+	})
 	const [mounted, setMounted] = useState(false)
 	const [isSwitching, setIsSwitching] = useState(false)
 
@@ -192,7 +195,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 	}, [resolvedTheme, setTheme])
 
 	return (
-		<ThemeContext.Provider value={{ theme, resolvedTheme: mounted ? resolvedTheme : 'light', isSwitching, setTheme, toggleTheme }}>
+		<ThemeContext.Provider value={{ theme, resolvedTheme, isSwitching, setTheme, toggleTheme }}>
 			{children}
 		</ThemeContext.Provider>
 	)

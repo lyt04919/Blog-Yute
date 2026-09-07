@@ -436,6 +436,7 @@ function runTests() {
 		assert.ok(toggleContent.includes('theme-toggle__moon'), 'ThemeToggleButton must render moon icon')
 		assert.ok(toggleContent.includes('theme-toggle__sun'), 'ThemeToggleButton must render sun icon')
 		assert.ok(toggleContent.includes('lucide-react'), 'ThemeToggleButton must use Lucide vector icons')
+		assert.ok(toggleContent.includes('isDark ?') && toggleContent.includes('theme-toggle__moon'), 'ThemeToggleButton must exclusively render Moon in dark mode and Sun in light mode')
 		assert.ok(toggleContent.includes('AudioContext'), 'ThemeToggleButton must synthesize haptic sound')
 
 		// 5. Check markdown-renderer.ts for dual themes

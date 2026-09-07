@@ -166,11 +166,12 @@
 		}
 	}
 
-	/* Clay-blog Theme Toggle Button Dual Icon Layering */
+	/* Theme Toggle Button */
 	.theme-toggle {
 		position: relative;
-		display: grid !important;
-		place-items: center;
+		display: flex !important;
+		align-items: center;
+		justify-content: center;
 		border: none !important;
 		background: transparent !important;
 		outline: none !important;
@@ -178,33 +179,12 @@
 	}
 
 	.theme-toggle :is(.theme-toggle__moon, .theme-toggle__sun) {
-		grid-area: 1 / 1;
-		transition: opacity 0.28s ease-out, transform 0.44s cubic-bezier(0.22, 1, 0.36, 1) !important;
-		will-change: opacity, transform;
+		transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1) !important;
+		will-change: transform;
 	}
 
-	.theme-toggle .theme-toggle__moon {
-		opacity: 1;
-		transform: scale(1) rotate(0deg);
-		pointer-events: auto;
-	}
-
-	.theme-toggle .theme-toggle__sun {
-		opacity: 0;
-		transform: scale(0.6) rotate(-78deg);
-		pointer-events: none;
-	}
-
-	.theme-toggle[data-theme-icon="dark"] .theme-toggle__moon {
-		opacity: 0;
-		transform: scale(0.6) rotate(72deg);
-		pointer-events: none;
-	}
-
-	.theme-toggle[data-theme-icon="dark"] .theme-toggle__sun {
-		opacity: 1;
-		transform: scale(1) rotate(0deg);
-		pointer-events: auto;
+	.theme-toggle:hover :is(.theme-toggle__moon, .theme-toggle__sun) {
+		transform: scale(1.12);
 	}
 
 	.theme-toggle.is-switching {

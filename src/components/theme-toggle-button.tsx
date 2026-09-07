@@ -65,11 +65,12 @@ export function ThemeToggleButton({ className = '', showLabel = false }: ThemeTo
 			title={isDark ? '切换浅色模式' : '切换深色模式'}
 			className={`theme-toggle size-full cursor-pointer transition-colors border-0 outline-none p-0 ${isSwitching ? 'is-switching' : ''} ${className}`}
 		>
-			{/* Moon icon (displayed in Light Mode to toggle to Dark) */}
-			<Moon className="theme-toggle__moon size-full p-0.5" aria-hidden="true" />
-
-			{/* Sun icon (displayed in Dark Mode to toggle to Light) */}
-			<Sun className="theme-toggle__sun size-full p-0.5" aria-hidden="true" />
+			{/* 暗色模式只显示月亮，浅色模式只显示太阳 */}
+			{isDark ? (
+				<Moon className="theme-toggle__moon size-full p-0.5" aria-hidden="true" />
+			) : (
+				<Sun className="theme-toggle__sun size-full p-0.5" aria-hidden="true" />
+			)}
 
 			{showLabel && (
 				<span className="sr-only">
