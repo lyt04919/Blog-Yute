@@ -39,9 +39,14 @@ export function ThemeToggleButton({ className = '', showLabel = false }: ThemeTo
 	const isDark = resolvedTheme === 'dark'
 
 	const handleClick = useCallback(
-		(e: React.MouseEvent) => {
+		(e: React.MouseEvent<HTMLButtonElement>) => {
 			playHapticTick(!isDark)
-			toggleTheme(e)
+			const rect = e.currentTarget.getBoundingClientRect()
+			const coords = {
+				clientX: Math.round(rect.left + rect.width / 2),
+				clientY: Math.round(rect.top + rect.height / 2)
+			}
+			toggleTheme(coords)
 		},
 		[isDark, toggleTheme]
 	)
@@ -68,7 +73,7 @@ export function ThemeToggleButton({ className = '', showLabel = false }: ThemeTo
 				strokeLinejoin="round"
 				className="size-full p-1"
 				animate={{ rotate: isDark ? 90 : 0 }}
-				transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+				transition={{ type: 'spring', stiffness: 220, damping: 20 }}
 			>
 				{/* Mask creating the Moon crescent from the Sun sphere */}
 				<mask id="moon-cutout-mask">
@@ -79,7 +84,7 @@ export function ThemeToggleButton({ className = '', showLabel = false }: ThemeTo
 							cy: isDark ? 4 : -10,
 							r: isDark ? 8 : 0
 						}}
-						transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+						transition={{ type: 'spring', stiffness: 240, damping: 22 }}
 						fill="black"
 					/>
 				</mask>
@@ -92,7 +97,7 @@ export function ThemeToggleButton({ className = '', showLabel = false }: ThemeTo
 					mask="url(#moon-cutout-mask)"
 					fill="currentColor"
 					stroke="none"
-					transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+					transition={{ type: 'spring', stiffness: 240, damping: 22 }}
 				/>
 
 				{/* Sun Rays - Smoothly collapse and fade out in Dark Mode */}
@@ -101,7 +106,7 @@ export function ThemeToggleButton({ className = '', showLabel = false }: ThemeTo
 						scale: isDark ? 0 : 1,
 						opacity: isDark ? 0 : 1
 					}}
-					transition={{ duration: 0.2 }}
+					transition={{ duration: 0.35, ease: 'easeInOut' }}
 					style={{ originX: '12px', originY: '12px' }}
 				>
 					<line x1="12" y1="1" x2="12" y2="3" />

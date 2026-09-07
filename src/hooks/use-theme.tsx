@@ -8,7 +8,7 @@ interface ThemeContextType {
 	theme: Theme
 	resolvedTheme: 'light' | 'dark'
 	setTheme: (theme: Theme) => void
-	toggleTheme: (e?: React.MouseEvent) => void
+	toggleTheme: (e?: React.MouseEvent | { clientX: number; clientY: number }) => void
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
@@ -95,22 +95,28 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 		syncDOM(resolved)
 	}, [syncDOM])
 
-	const toggleTheme = useCallback((e?: React.MouseEvent) => {
+	const toggleTheme = useCallback((e?: React.MouseEvent | { clientX: number; clientY: number }) => {
 		const nextTheme: 'light' | 'dark' = resolvedTheme === 'dark' ? 'light' : 'dark'
 
 		const prefersReducedMotion =
 			typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+		let x: number | undefined
+		let y: number | undefined
+
+		if (e && 'clientX' in e && typeof e.clientX === 'number') {
+			x = e.clientX
+			y = e.clientY
+		}
 
 		// Modern View Transitions API with circular ripple originating from click coordinates
 		if (
 			!prefersReducedMotion &&
 			typeof document !== 'undefined' &&
 			'startViewTransition' in document &&
-			e?.clientX !== undefined &&
-			e?.clientY !== undefined
+			x !== undefined &&
+			y !== undefined
 		) {
-			const x = e.clientX
-			const y = e.clientY
 			const endRadius = Math.hypot(
 				Math.max(x, window.innerWidth - x),
 				Math.max(y, window.innerHeight - y)
@@ -129,8 +135,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 						]
 					},
 					{
-						duration: 400,
-						easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+						duration: 700,
+						easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
 						pseudoElement: '::view-transition-new(root)'
 					}
 				)

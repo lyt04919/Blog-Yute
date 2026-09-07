@@ -86,6 +86,9 @@
 	}
 
 	/* View Transitions ripple rules */
+	::view-transition-group(root) {
+		animation-duration: 0.7s;
+	}
 	::view-transition-old(root),
 	::view-transition-new(root) {
 		animation: none;
@@ -96,12 +99,6 @@
 	}
 	::view-transition-new(root) {
 		z-index: 9999;
-	}
-	.dark::view-transition-old(root) {
-		z-index: 9999;
-	}
-	.dark::view-transition-new(root) {
-		z-index: 1;
 	}
 
 	body {
