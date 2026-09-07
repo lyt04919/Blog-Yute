@@ -148,7 +148,7 @@ export default function TopNav() {
 						transition={{ type: 'spring', stiffness: 300, damping: 30 }}
 						className="dock-nav-container fixed bottom-8 left-1/2 -translate-x-1/2 z-50"
 					>
-						<Dock iconMagnification={64} iconDistance={140} className="relative flex p-1.5 sm:p-2 w-fit gap-1.5 sm:gap-2 bg-white/95 dark:bg-[var(--color-card)]/90 border border-[#e4e4e7] dark:border-[var(--color-border)] backdrop-blur-3xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] shadow-black/5 rounded-full">
+						<Dock style={{ height: 56 }} iconMagnification={64} iconDistance={140} className="relative flex p-1.5 sm:p-2 w-fit gap-1.5 sm:gap-2 bg-white/95 dark:bg-[var(--color-card)]/90 border border-[#e4e4e7] dark:border-[var(--color-border)] backdrop-blur-3xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] shadow-black/5 rounded-full">
 
 							{/* Home */}
 							<DockIcon className="rounded-3xl cursor-pointer bg-white dark:bg-[var(--color-card)] border border-[#e4e4e7] dark:border-[var(--color-border)] shadow-sm">

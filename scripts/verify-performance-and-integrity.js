@@ -495,10 +495,11 @@ function runTests() {
 		assert.ok(dockContent.includes('iconDistance'), 'Dock must support iconDistance prop')
 		assert.ok(dockContent.includes('overflow-visible'), 'Dock must allow overflow-visible')
 
-		// 2. TopNav integration
+		// 2. TopNav integration with fixed height
 		const topNavPath = path.join(ROOT, 'src/components/top-nav.tsx')
 		const topNavContent = fs.readFileSync(topNavPath, 'utf8')
-		assert.ok(topNavContent.includes('<Dock iconMagnification='), 'TopNav must configure Dock iconMagnification')
+		assert.ok(topNavContent.includes('<Dock') && topNavContent.includes('style={{ height: 56 }}'), 'TopNav must lock Dock to fixed height of 56px')
+		assert.ok(topNavContent.includes('iconMagnification='), 'TopNav must configure Dock iconMagnification')
 		assert.ok(topNavContent.includes('dock-nav-container'), 'TopNav must render dock-nav-container')
 	})
 
