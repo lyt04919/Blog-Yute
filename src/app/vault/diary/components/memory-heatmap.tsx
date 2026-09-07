@@ -3,12 +3,34 @@
 import React, { useState, useMemo } from 'react'
 import dayjs from 'dayjs'
 import type { Diary } from '@/types/diary'
+import { useTheme } from '@/hooks/use-theme'
 import { calculateReadingStats } from '../constants/meta'
 
 interface MemoryHeatmapProps {
 	diaries: Diary[]
 	selectedDate?: string | null
 	onSelectDate?: (dateStr: string) => void
+}
+
+/**
+ * Standard GitHub-style color palette with guaranteed high-contrast borders.
+ * Each empty tile and active tile is guaranteed to be sharply visible on any background.
+ */
+export const HEATMAP_PALETTE = {
+	light: [
+		{ bg: '#ebedf0', border: '#cbd5e1' }, // Level 0: Crisp light tile with defined border
+		{ bg: '#9be9a8', border: '#40c463' }, // Level 1: Soft green
+		{ bg: '#40c463', border: '#30a14e' }, // Level 2: Medium green
+		{ bg: '#30a14e', border: '#216e39' }, // Level 3: Deep green
+		{ bg: '#216e39', border: '#144620' }, // Level 4: Darkest emerald
+	],
+	dark: [
+		{ bg: '#21262d', border: '#374151' }, // Level 0: Crisp dark tile with defined border
+		{ bg: '#0e4429', border: '#006d32' }, // Level 1: Deep forest
+		{ bg: '#006d32', border: '#26a641' }, // Level 2: Medium dark
+		{ bg: '#26a641', border: '#39d353' }, // Level 3: Bright green
+		{ bg: '#39d353', border: '#56e36c' }, // Level 4: Neon green
+	],
 }
 
 /**
@@ -23,15 +45,22 @@ export function getHeatmapLevel(count: number, words: number): 0 | 1 | 2 | 3 | 4
 	return 1
 }
 
-export function getHeatmapCellStyle(count: number, words: number): React.CSSProperties {
+export function getHeatmapCellStyle(count: number, words: number, isDark = false): React.CSSProperties {
 	const level = getHeatmapLevel(count, words)
+	const palette = isDark ? HEATMAP_PALETTE.dark : HEATMAP_PALETTE.light
+	const item = palette[level]
 	return {
-		backgroundColor: `var(--heatmap-bg-${level})`,
-		border: `1px solid var(--heatmap-border-${level})`,
+		backgroundColor: item.bg,
+		borderColor: item.border,
+		borderWidth: '1px',
+		borderStyle: 'solid',
+		boxSizing: 'border-box',
 	}
 }
 
 export default function MemoryHeatmap({ diaries, selectedDate, onSelectDate }: MemoryHeatmapProps) {
+	const { resolvedTheme } = useTheme()
+	const isDark = resolvedTheme === 'dark'
 	const [selectedYear, setSelectedYear] = useState<string>('recent')
 
 	// Distinct available years from diary dataset
@@ -255,7 +284,7 @@ export default function MemoryHeatmap({ diaries, selectedDate, onSelectDate }: M
 											key={day.dateStr}
 											onClick={() => onSelectDate?.(day.dateStr)}
 											title={`${day.dateStr}：${day.count > 0 ? `${day.count} 篇 (${day.words} 字)` : '无回忆 (点击筛选)'}`}
-											className={`rounded-[2.5px] cursor-pointer transition-all duration-150 ${
+											className={`hm-cell hm-cell-${getHeatmapLevel(day.count, day.words)} rounded-[2.5px] cursor-pointer transition-all duration-150 ${
 												selectedDate === day.dateStr
 													? 'ring-2 ring-brand ring-offset-1 dark:ring-offset-neutral-900 scale-125 z-10'
 													: 'hover:scale-125 hover:z-20'
@@ -263,7 +292,8 @@ export default function MemoryHeatmap({ diaries, selectedDate, onSelectDate }: M
 											style={{
 												width: 11,
 												height: 11,
-												...getHeatmapCellStyle(day.count, day.words),
+												boxSizing: 'border-box',
+												...getHeatmapCellStyle(day.count, day.words, isDark),
 											}}
 										/>
 									) : (
@@ -289,22 +319,44 @@ export default function MemoryHeatmap({ diaries, selectedDate, onSelectDate }: M
 				<div className="flex items-center gap-1.5 uppercase tracking-wider">
 					<span>Less</span>
 					<div className="flex gap-1 mx-1">
-						{([0, 1, 2, 3, 4] as const).map(level => (
-							<div
-								key={level}
-								className="rounded-[2px]"
-								style={{
-									width: 9,
-									height: 9,
-									backgroundColor: `var(--heatmap-bg-${level})`,
-									border: `1px solid var(--heatmap-border-${level})`,
-								}}
-							/>
-						))}
+						{([0, 1, 2, 3, 4] as const).map(level => {
+							const palette = isDark ? HEATMAP_PALETTE.dark : HEATMAP_PALETTE.light
+							const item = palette[level]
+							return (
+								<div
+									key={level}
+									className={`hm-cell hm-cell-${level} rounded-[2px]`}
+									style={{
+										width: 9,
+										height: 9,
+										backgroundColor: item.bg,
+										borderColor: item.border,
+										borderWidth: '1px',
+										borderStyle: 'solid',
+										boxSizing: 'border-box',
+									}}
+								/>
+							)
+						})}
 					</div>
 					<span>More</span>
 				</div>
 			</div>
+
+			{/* Guaranteed Local CSS Fallback */}
+			<style>{`
+				.hm-cell-0 { background-color: #ebedf0 !important; border-color: #cbd5e1 !important; border-width: 1px !important; border-style: solid !important; }
+				.hm-cell-1 { background-color: #9be9a8 !important; border-color: #40c463 !important; border-width: 1px !important; border-style: solid !important; }
+				.hm-cell-2 { background-color: #40c463 !important; border-color: #30a14e !important; border-width: 1px !important; border-style: solid !important; }
+				.hm-cell-3 { background-color: #30a14e !important; border-color: #216e39 !important; border-width: 1px !important; border-style: solid !important; }
+				.hm-cell-4 { background-color: #216e39 !important; border-color: #144620 !important; border-width: 1px !important; border-style: solid !important; }
+
+				.dark .hm-cell-0 { background-color: #21262d !important; border-color: #374151 !important; border-width: 1px !important; border-style: solid !important; }
+				.dark .hm-cell-1 { background-color: #0e4429 !important; border-color: #006d32 !important; border-width: 1px !important; border-style: solid !important; }
+				.dark .hm-cell-2 { background-color: #006d32 !important; border-color: #26a641 !important; border-width: 1px !important; border-style: solid !important; }
+				.dark .hm-cell-3 { background-color: #26a641 !important; border-color: #39d353 !important; border-width: 1px !important; border-style: solid !important; }
+				.dark .hm-cell-4 { background-color: #39d353 !important; border-color: #56e36c !important; border-width: 1px !important; border-style: solid !important; }
+			`}</style>
 		</div>
 	)
 }

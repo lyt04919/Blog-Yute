@@ -337,13 +337,14 @@ function runTests() {
 		const calendarContent = fs.readFileSync(calendarPath, 'utf8')
 		assert.ok(calendarContent.includes("day.isSame(endDate, 'day')"), 'diary-calendar must include the end of the week')
 
-		// 7. Verify memory heatmap supports onSelectDate, multi-year switcher, and high-contrast CSS variable styling
+		// 7. Verify memory heatmap supports onSelectDate, multi-year switcher, and high-contrast palette styling
 		const heatmapPath = path.join(ROOT, 'src/app/vault/diary/components/memory-heatmap.tsx')
 		const heatmapContent = fs.readFileSync(heatmapPath, 'utf8')
 		assert.ok(heatmapContent.includes('onSelectDate?: (dateStr: string) => void'), 'memory-heatmap must support onSelectDate prop')
 		assert.ok(heatmapContent.includes('getHeatmapLevel'), 'memory-heatmap must export getHeatmapLevel')
 		assert.ok(heatmapContent.includes('availableYears'), 'memory-heatmap must support multi-year navigation')
-		assert.ok(heatmapContent.includes('var(--heatmap-bg-'), 'memory-heatmap must use guaranteed CSS variables for cell styling')
+		assert.ok(heatmapContent.includes('HEATMAP_PALETTE'), 'memory-heatmap must export HEATMAP_PALETTE')
+		assert.ok(heatmapContent.includes('#ebedf0') && heatmapContent.includes('#cbd5e1'), 'memory-heatmap must use solid hex styling with defined borders')
 
 		// 8. Verify heatmap CSS variables in globals.css
 		const globalsPath = path.join(ROOT, 'src/styles/globals.css')
