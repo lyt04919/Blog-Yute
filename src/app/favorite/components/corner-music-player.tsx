@@ -116,10 +116,11 @@ export function CornerMusicPlayer({ onOpenDetail }: CornerMusicPlayerProps = {})
 				style={{
 					position: 'fixed',
 					right: '24px',
-					bottom: '88px',
+					bottom: '80px',
+					width: '326px',
 					transformOrigin: 'bottom right',
 				}}
-				className={`w-[360px] max-w-[calc(100vw-3rem)] max-h-[min(76vh,540px)] rounded-3xl bg-white/95 dark:bg-[#141416]/95 backdrop-blur-2xl border border-slate-200/90 dark:border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.18)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.7)] p-4 flex flex-col gap-3.5 transition-all duration-300 ease-out z-50 ${
+				className={`rounded-3xl bg-white/95 dark:bg-[#141416]/95 backdrop-blur-2xl border border-slate-200/90 dark:border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.18)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.7)] p-3.5 flex flex-col gap-2.5 transition-all duration-300 ease-out z-50 overflow-hidden ${
 					isExpanded
 						? 'opacity-100 scale-100 translate-y-0 pointer-events-auto visible'
 						: 'opacity-0 scale-90 translate-y-3 pointer-events-none invisible'
@@ -224,9 +225,9 @@ export function CornerMusicPlayer({ onOpenDetail }: CornerMusicPlayerProps = {})
 				</div>
 
 				{/* 当前播放曲目信息 (Hero Track Card) */}
-				<div className="flex items-center gap-3">
+				<div className="flex items-center gap-2.5">
 					<div
-						className="relative w-14 h-14 rounded-2xl overflow-hidden shrink-0 shadow-md border border-black/5 dark:border-white/10 cursor-pointer group"
+						className="relative w-11 h-11 rounded-xl overflow-hidden shrink-0 shadow-md border border-black/5 dark:border-white/10 cursor-pointer group"
 						onClick={() => onOpenDetail && onOpenDetail(activeTrack)}
 						title="查看单曲详情"
 					>
@@ -238,37 +239,34 @@ export function CornerMusicPlayer({ onOpenDetail }: CornerMusicPlayerProps = {})
 							/>
 						) : (
 							<div className="w-full h-full bg-slate-100 dark:bg-neutral-800 flex items-center justify-center">
-								<Music className="w-6 h-6 text-slate-400" />
+								<Music className="w-5 h-5 text-slate-400" />
 							</div>
 						)}
 					</div>
 
 					<div className="flex-1 min-w-0">
 						<h4
-							className="text-sm font-bold text-slate-900 dark:text-white truncate cursor-pointer hover:underline"
+							className="text-xs font-bold text-slate-900 dark:text-white truncate cursor-pointer hover:underline"
 							onClick={() => onOpenDetail && onOpenDetail(activeTrack)}
 						>
 							{activeTrack.name}
 						</h4>
-						<p className="text-xs text-slate-500 dark:text-neutral-400 truncate mt-0.5">
+						<p className="text-[11px] text-slate-500 dark:text-neutral-400 truncate mt-0.5">
 							{activeTrack.subtitle || '群星'}
-						</p>
-						<p className="text-[11px] text-slate-400 dark:text-neutral-500 truncate mt-0.5">
-							{activeTrack.desc || '精选单曲'}
 						</p>
 					</div>
 				</div>
 
 				{/* 解耦音频进度条与洗带控制器 */}
-				<AudioProgressBar showTimeLabels={true} className="py-0.5" />
+				<AudioProgressBar showTimeLabels={true} className="py-0" />
 
 				{/* 播控按键组 (随机、上一首、中央主播控、下一首、循环) */}
-				<div className="flex items-center justify-between px-2 pt-0.5">
+				<div className="flex items-center justify-between px-1">
 					{/* 随机播放开关 */}
 					<button
 						type="button"
 						onClick={() => setPlaybackMode(playbackMode === 'shuffle' ? 'list' : 'shuffle')}
-						className={`p-2 rounded-full transition-all cursor-pointer ${
+						className={`p-1.5 rounded-full transition-all cursor-pointer ${
 							playbackMode === 'shuffle'
 								? 'text-[#FA243C] bg-rose-50 dark:bg-rose-500/15'
 								: 'text-slate-400 hover:text-slate-700 dark:text-neutral-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10'
@@ -282,7 +280,7 @@ export function CornerMusicPlayer({ onOpenDetail }: CornerMusicPlayerProps = {})
 					<button
 						type="button"
 						onClick={prevTrack}
-						className="p-2 rounded-full text-slate-700 dark:text-neutral-300 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors cursor-pointer active:scale-90"
+						className="p-1.5 rounded-full text-slate-700 dark:text-neutral-300 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors cursor-pointer active:scale-90"
 						title="上一首 (快捷键: [ )"
 					>
 						<SkipBack className="w-4 h-4 fill-current" />
@@ -293,7 +291,7 @@ export function CornerMusicPlayer({ onOpenDetail }: CornerMusicPlayerProps = {})
 						type="button"
 						onClick={togglePlay}
 						disabled={isLoadingAudio}
-						className="w-11 h-11 rounded-full bg-slate-900 text-white dark:bg-white dark:text-black flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all cursor-pointer disabled:opacity-80"
+						className="w-10 h-10 rounded-full bg-slate-900 text-white dark:bg-white dark:text-black flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer disabled:opacity-80"
 						title={isPlaying ? '暂停 (空格)' : '播放 (空格)'}
 					>
 						{isLoadingAudio ? (
@@ -309,7 +307,7 @@ export function CornerMusicPlayer({ onOpenDetail }: CornerMusicPlayerProps = {})
 					<button
 						type="button"
 						onClick={nextTrack}
-						className="p-2 rounded-full text-slate-700 dark:text-neutral-300 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors cursor-pointer active:scale-90"
+						className="p-1.5 rounded-full text-slate-700 dark:text-neutral-300 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors cursor-pointer active:scale-90"
 						title="下一首 (快捷键: ] )"
 					>
 						<SkipForward className="w-4 h-4 fill-current" />
@@ -319,7 +317,7 @@ export function CornerMusicPlayer({ onOpenDetail }: CornerMusicPlayerProps = {})
 					<button
 						type="button"
 						onClick={() => setPlaybackMode(playbackMode === 'single' ? 'list' : 'single')}
-						className={`p-2 rounded-full transition-all cursor-pointer ${
+						className={`p-1.5 rounded-full transition-all cursor-pointer ${
 							playbackMode === 'single'
 								? 'text-[#FA243C] bg-rose-50 dark:bg-rose-500/15'
 								: 'text-slate-400 hover:text-slate-700 dark:text-neutral-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10'
@@ -330,22 +328,27 @@ export function CornerMusicPlayer({ onOpenDetail }: CornerMusicPlayerProps = {})
 					</button>
 				</div>
 
-				{/* 播放队列抽屉 (Scrollable Playlist Queue) */}
-				<div className="pt-2 border-t border-slate-100 dark:border-white/5 flex flex-col gap-1.5">
-					<div className="flex items-center justify-between text-xs px-1 text-slate-500 dark:text-neutral-400">
+				{/* 播放队列抽屉 (Scrollable Playlist Queue - 严格展示5首，支持上下滑动) */}
+				<div className="pt-2 border-t border-slate-100 dark:border-white/5 flex flex-col gap-1">
+					<div className="flex items-center justify-between text-[11px] px-1 text-slate-500 dark:text-neutral-400">
 						<div className="flex items-center gap-1 font-medium">
 							<ListMusic className="w-3.5 h-3.5" />
 							<span>播放列表</span>
 						</div>
-						<span className="text-[11px] font-mono">
+						<span className="font-mono">
 							{currentIndex >= 0 ? currentIndex + 1 : 1} / {activeList.length} 首
 						</span>
 					</div>
 
 					<div
 						ref={listContainerRef}
-						className="max-h-36 overflow-y-auto space-y-1 pr-1 overscroll-contain"
-						style={{ scrollbarWidth: 'thin' }}
+						style={{
+							height: '185px',
+							maxHeight: '185px',
+							overflowY: 'auto',
+							scrollbarWidth: 'thin',
+						}}
+						className="space-y-1 pr-1 overscroll-contain custom-scrollbar"
 					>
 						{activeList.map((track, idx) => {
 							const isCurrent = track.name === activeTrack.name
@@ -353,7 +356,7 @@ export function CornerMusicPlayer({ onOpenDetail }: CornerMusicPlayerProps = {})
 								<div
 									key={`${track.name}-${idx}`}
 									onClick={() => playTrack(track, activeList)}
-									className={`group flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs cursor-pointer transition-colors ${
+									className={`group flex items-center justify-between px-2 py-1.5 rounded-lg text-xs cursor-pointer transition-colors h-[34px] shrink-0 ${
 										isCurrent
 											? 'bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white font-medium'
 											: 'text-slate-600 dark:text-neutral-400 hover:bg-slate-50 dark:hover:bg-white/5'
@@ -380,14 +383,14 @@ export function CornerMusicPlayer({ onOpenDetail }: CornerMusicPlayerProps = {})
 											/>
 										</div>
 
-										<div className="min-w-0 flex-1">
-											<p className="truncate text-xs">{track.name}</p>
-											<p className="truncate text-[10px] opacity-70">{track.subtitle || '群星'}</p>
+										<div className="min-w-0 flex-1 flex items-baseline gap-1.5">
+											<span className="truncate text-xs">{track.name}</span>
+											<span className="truncate text-[10px] opacity-60 shrink-0">{track.subtitle || '群星'}</span>
 										</div>
 									</div>
 
 									{isCurrent && (
-										<span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 shrink-0 ml-2">
+										<span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 shrink-0 ml-1.5">
 											{isPlaying ? '播放中' : '暂停'}
 										</span>
 									)}
