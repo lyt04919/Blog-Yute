@@ -140,33 +140,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 			}
 		}
 
-		// Inject literal percentages instead of px values or dynamic vars.
-		// Chrome rasterizes view-transition snapshots at device-pixel density;
-		// px clip coordinates can render at half-size on a 2x screen.
-		// Exact percentages stay in the snapshot's own coordinate space.
-		if (motionOK && 'startViewTransition' in document && x !== undefined && y !== undefined) {
-			const radius =
+		if (motionOK && typeof document !== 'undefined' && 'startViewTransition' in document && x !== undefined && y !== undefined) {
+			const endRadius =
 				Math.hypot(
 					Math.max(x, window.innerWidth - x),
 					Math.max(y, window.innerHeight - y)
 				) + 20
-
-			const xPercent = (x / window.innerWidth) * 100
-			const yPercent = (y / window.innerHeight) * 100
-			// CSS resolves a circle's percentage radius against normalized diagonal:
-			// hypot(width, height) / sqrt(2)
-			const radiusReference =
-				Math.hypot(window.innerWidth, window.innerHeight) / Math.SQRT2
-			const radiusPercent = (radius / radiusReference) * 100
-
-			let themeRevealStyle = document.getElementById('theme-reveal-style') as HTMLStyleElement | null
-			if (!themeRevealStyle) {
-				themeRevealStyle = document.createElement('style')
-				themeRevealStyle.id = 'theme-reveal-style'
-				document.head.appendChild(themeRevealStyle)
-			}
-
-			themeRevealStyle.textContent = `@keyframes theme-reveal { from { clip-path: circle(0 at ${xPercent.toFixed(4)}% ${yPercent.toFixed(4)}%); } to { clip-path: circle(${radiusPercent.toFixed(4)}% at ${xPercent.toFixed(4)}% ${yPercent.toFixed(4)}%); } }`
 
 			setIsSwitching(true)
 			root.classList.add('theme-vt')
@@ -174,6 +153,22 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
 			const vt = (document as any).startViewTransition(() => {
 				setTheme(nextTheme)
+			})
+
+			vt.ready?.then(() => {
+				document.documentElement.animate(
+					{
+						clipPath: [
+							`circle(0px at ${x}px ${y}px)`,
+							`circle(${endRadius}px at ${x}px ${y}px)`
+						]
+					},
+					{
+						duration: 650,
+						easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+						pseudoElement: '::view-transition-new(root)'
+					}
+				)
 			})
 
 			vt.finished

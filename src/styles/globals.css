@@ -85,22 +85,20 @@
 		}
 	}
 
-	/* Clay-blog View Transitions Theme Reveal Architecture */
-	html.theme-vt::view-transition-old(root),
-	html.theme-vt::view-transition-new(root) {
+	/* View Transitions ripple rules */
+	::view-transition-group(root) {
+		animation-duration: 0.7s;
+	}
+	::view-transition-old(root),
+	::view-transition-new(root) {
+		animation: none;
 		mix-blend-mode: normal;
 	}
-
-	html.theme-vt::view-transition-old(root) {
-		animation: none;
-		opacity: 1;
+	::view-transition-old(root) {
 		z-index: 1;
 	}
-
-	html.theme-vt::view-transition-new(root) {
-		animation: theme-reveal 0.52s linear both;
-		opacity: 1;
-		z-index: 2;
+	::view-transition-new(root) {
+		z-index: 9999;
 	}
 
 	/* Freeze element-level transitions during theme reveal to ensure 60FPS main-thread performance */
@@ -120,7 +118,7 @@
 	}
 
 	html.theme-vt::view-transition-group(theme-toggle) {
-		z-index: 4;
+		z-index: 10000;
 		animation: none;
 	}
 
