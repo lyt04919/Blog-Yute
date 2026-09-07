@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback } from 'react'
+import { Sun, Moon } from 'lucide-react'
 import { useTheme } from '@/hooks/use-theme'
 
 // Synthesize lightweight haptic click/pop without external audio files
@@ -39,6 +40,7 @@ export function ThemeToggleButton({ className = '', showLabel = false }: ThemeTo
 
 	const handleClick = useCallback(
 		(e: React.MouseEvent<HTMLButtonElement>) => {
+			e.stopPropagation()
 			playHapticTick(!isDark)
 			const rect = e.currentTarget.getBoundingClientRect()
 			const coords = {
@@ -61,40 +63,13 @@ export function ThemeToggleButton({ className = '', showLabel = false }: ThemeTo
 			aria-pressed={isDark}
 			aria-label={isDark ? '切换到浅色模式' : '切换到深色模式'}
 			title={isDark ? '切换浅色模式' : '切换深色模式'}
-			className={`theme-toggle size-full flex items-center justify-center rounded-full cursor-pointer transition-colors outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 ${isSwitching ? 'is-switching' : ''} ${className}`}
+			className={`theme-toggle size-full cursor-pointer transition-colors border-0 outline-none p-0 ${isSwitching ? 'is-switching' : ''} ${className}`}
 		>
-			{/* Moon icon from clay-blog */}
-			<svg
-				width="20"
-				height="20"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				strokeWidth="1.75"
-				strokeLinecap="round"
-				strokeLinejoin="round"
-				className="theme-toggle__moon size-5 p-0.5"
-				aria-hidden="true"
-			>
-				<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" />
-			</svg>
+			{/* Moon icon (displayed in Light Mode to toggle to Dark) */}
+			<Moon className="theme-toggle__moon size-full p-0.5" aria-hidden="true" />
 
-			{/* Sun icon from clay-blog */}
-			<svg
-				width="20"
-				height="20"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				strokeWidth="1.75"
-				strokeLinecap="round"
-				strokeLinejoin="round"
-				className="theme-toggle__sun size-5 p-0.5"
-				aria-hidden="true"
-			>
-				<circle cx="12" cy="12" r="4" />
-				<path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
-			</svg>
+			{/* Sun icon (displayed in Dark Mode to toggle to Light) */}
+			<Sun className="theme-toggle__sun size-full p-0.5" aria-hidden="true" />
 
 			{showLabel && (
 				<span className="sr-only">

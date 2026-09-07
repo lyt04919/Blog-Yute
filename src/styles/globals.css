@@ -171,37 +171,40 @@
 		position: relative;
 		display: grid !important;
 		place-items: center;
+		border: none !important;
+		background: transparent !important;
+		outline: none !important;
+		padding: 0 !important;
 	}
 
 	.theme-toggle :is(.theme-toggle__moon, .theme-toggle__sun) {
 		grid-area: 1 / 1;
-		transition: opacity 0.26s ease-out, rotate 0.46s cubic-bezier(0.22, 1, 0.36, 1),
-			scale 0.4s cubic-bezier(0.22, 1, 0.36, 1) !important;
-		will-change: opacity, rotate, scale;
+		transition: opacity 0.28s ease-out, transform 0.44s cubic-bezier(0.22, 1, 0.36, 1) !important;
+		will-change: opacity, transform;
 	}
 
 	.theme-toggle .theme-toggle__moon {
 		opacity: 1;
-		rotate: 0deg;
-		scale: 1;
+		transform: scale(1) rotate(0deg);
+		pointer-events: auto;
 	}
 
 	.theme-toggle .theme-toggle__sun {
 		opacity: 0;
-		rotate: -78deg;
-		scale: 0.56;
+		transform: scale(0.6) rotate(-78deg);
+		pointer-events: none;
 	}
 
 	.theme-toggle[data-theme-icon="dark"] .theme-toggle__moon {
 		opacity: 0;
-		rotate: 72deg;
-		scale: 0.56;
+		transform: scale(0.6) rotate(72deg);
+		pointer-events: none;
 	}
 
 	.theme-toggle[data-theme-icon="dark"] .theme-toggle__sun {
 		opacity: 1;
-		rotate: 0deg;
-		scale: 1;
+		transform: scale(1) rotate(0deg);
+		pointer-events: auto;
 	}
 
 	.theme-toggle.is-switching {

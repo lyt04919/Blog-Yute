@@ -262,7 +262,7 @@ export default function TopNav() {
 							{/* Theme Toggle */}
 							<DockIcon className="rounded-3xl cursor-pointer bg-white dark:bg-[var(--color-card)] border border-[#e4e4e7] dark:border-[var(--color-border)] shadow-sm text-[#52525b] dark:text-[var(--color-secondary)] hover:text-black dark:hover:text-[var(--color-primary)] transition-colors">
 								<TooltipWrapper content={resolvedTheme === 'dark' ? '切换亮色' : '切换暗色'}>
-									<ThemeToggleButton className="size-full p-1.5 text-inherit" />
+									<ThemeToggleButton className="size-full text-inherit" />
 								</TooltipWrapper>
 							</DockIcon>
 						</Dock>
