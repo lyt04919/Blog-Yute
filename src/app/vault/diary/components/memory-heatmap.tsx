@@ -13,23 +13,23 @@ interface MemoryHeatmapProps {
 }
 
 /**
- * Authentic, soft GitHub-style color palette.
- * Uses soft, natural outlines and balanced emerald greens to avoid harsh wireframe grids.
+ * Authentic GitHub Contribution Palette (Light & Dark).
+ * Exactly matches GitHub's color standards and contrast.
  */
 export const HEATMAP_PALETTE = {
 	light: [
-		{ bg: '#ebedf0', border: 'rgba(27, 31, 35, 0.08)' }, // Level 0: Soft modern off-white tile
-		{ bg: '#9be9a8', border: 'rgba(27, 31, 35, 0.12)' }, // Level 1: Soft spring green
-		{ bg: '#40c463', border: 'rgba(27, 31, 35, 0.12)' }, // Level 2: Vibrant emerald green
-		{ bg: '#30a14e', border: 'rgba(27, 31, 35, 0.15)' }, // Level 3: Deep rich green
-		{ bg: '#216e39', border: 'rgba(27, 31, 35, 0.2)' },  // Level 4: Dark pine green
+		{ bg: '#ebedf0', border: 'rgba(27, 31, 35, 0.06)' }, // Level 0: GitHub light tile
+		{ bg: '#9be9a8', border: 'rgba(27, 31, 35, 0.08)' }, // Level 1: Soft spring green
+		{ bg: '#40c463', border: 'rgba(27, 31, 35, 0.08)' }, // Level 2: Vibrant emerald green
+		{ bg: '#30a14e', border: 'rgba(27, 31, 35, 0.08)' }, // Level 3: Deep rich green
+		{ bg: '#216e39', border: 'rgba(27, 31, 35, 0.08)' }, // Level 4: Dark forest green
 	],
 	dark: [
-		{ bg: '#161b22', border: 'rgba(255, 255, 255, 0.06)' }, // Level 0: GitHub dark tile
-		{ bg: '#0e4429', border: 'rgba(255, 255, 255, 0.08)' }, // Level 1: Forest green
-		{ bg: '#006d32', border: 'rgba(255, 255, 255, 0.08)' }, // Level 2: Medium dark
-		{ bg: '#26a641', border: 'rgba(255, 255, 255, 0.1)' },  // Level 3: Bright green
-		{ bg: '#39d353', border: 'rgba(255, 255, 255, 0.12)' }, // Level 4: Neon vibrant green
+		{ bg: '#161b22', border: 'rgba(255, 255, 255, 0.05)' }, // Level 0: GitHub dark tile
+		{ bg: '#0e4429', border: 'rgba(255, 255, 255, 0.05)' }, // Level 1: Deep green
+		{ bg: '#006d32', border: 'rgba(255, 255, 255, 0.05)' }, // Level 2: Medium green
+		{ bg: '#26a641', border: 'rgba(255, 255, 255, 0.05)' }, // Level 3: Bright green
+		{ bg: '#39d353', border: 'rgba(255, 255, 255, 0.05)' }, // Level 4: Vibrant neon green
 	],
 }
 
@@ -57,6 +57,15 @@ export function getHeatmapCellStyle(count: number, words: number, isDark = false
 		boxSizing: 'border-box',
 	}
 }
+
+// Layout Constants for GitHub SVG Grid
+const CELL_SIZE = 10
+const CELL_GAP = 3
+const STEP = CELL_SIZE + CELL_GAP // 13px pitch
+const LABEL_WIDTH = 28 // Space for 'Mon', 'Wed', 'Fri'
+const HEADER_HEIGHT = 18 // Space for month labels
+const GRID_HEIGHT = 7 * STEP - CELL_GAP // 88px
+const SVG_HEIGHT = HEADER_HEIGHT + GRID_HEIGHT // 106px
 
 export default function MemoryHeatmap({ diaries, selectedDate, onSelectDate }: MemoryHeatmapProps) {
 	const { resolvedTheme } = useTheme()
@@ -97,14 +106,6 @@ export default function MemoryHeatmap({ diaries, selectedDate, onSelectDate }: M
 		return counts
 	}, [diaries])
 
-	const recentCount = useMemo(() => {
-		const recentStart = dayjs().subtract(364, 'day')
-		return diaries.filter(d => {
-			const date = dayjs(d.date)
-			return (date.isAfter(recentStart) || date.isSame(recentStart, 'day')) && (date.isBefore(dayjs()) || date.isSame(dayjs(), 'day'))
-		}).length
-	}, [diaries])
-
 	// Aggregate words & counts per date
 	const heatmapData = useMemo(() => {
 		const data = new Map<string, { words: number; count: number }>()
@@ -120,81 +121,112 @@ export default function MemoryHeatmap({ diaries, selectedDate, onSelectDate }: M
 		return data
 	}, [diaries])
 
-	// Generate day items for either the last 364 days or the selected calendar year
-	const days = useMemo(() => {
-		const result = []
-		let current: dayjs.Dayjs
-		let end: dayjs.Dayjs
+	// Compute weeks and days strictly aligned to Sunday-Saturday columns (53 weeks)
+	const { weeks, recentCount } = useMemo(() => {
+		const today = dayjs()
+		let computedRecentCount = 0
 
 		if (selectedYear === 'recent') {
-			current = dayjs().subtract(364, 'day')
-			end = dayjs()
+			// GitHub 'last year': 52 weeks back from the current week's Sunday
+			const currentWeekSunday = today.subtract(today.day(), 'day')
+			const startSunday = currentWeekSunday.subtract(52, 'week')
+
+			const wList: ({
+				dateStr: string
+				dayOfWeek: number
+				count: number
+				words: number
+				isFuture: boolean
+			} | null)[][] = []
+
+			for (let w = 0; w < 53; w++) {
+				const weekDays: (typeof wList[0][0])[] = []
+				for (let d = 0; d < 7; d++) {
+					const curDate = startSunday.add(w * 7 + d, 'day')
+					const isFuture = curDate.isAfter(today, 'day')
+					const dateStr = curDate.format('YYYY-MM-DD')
+					const data = heatmapData.get(dateStr)
+					const count = isFuture ? 0 : data?.count || 0
+					const words = isFuture ? 0 : data?.words || 0
+
+					if (!isFuture && count > 0) {
+						computedRecentCount += count
+					}
+
+					weekDays.push({
+						dateStr,
+						dayOfWeek: d,
+						count,
+						words,
+						isFuture,
+					})
+				}
+				wList.push(weekDays)
+			}
+
+			return { weeks: wList, recentCount: computedRecentCount }
 		} else {
-			current = dayjs(`${selectedYear}-01-01`)
-			end = dayjs(`${selectedYear}-12-31`)
-		}
+			// Specific calendar year (Jan 1 to Dec 31)
+			const startOfYear = dayjs(`${selectedYear}-01-01`)
+			const endOfYear = dayjs(`${selectedYear}-12-31`)
+			const startDayOfWeek = startOfYear.day()
+			const calendarStartSunday = startOfYear.subtract(startDayOfWeek, 'day')
 
-		while (current.isBefore(end) || current.isSame(end, 'day')) {
-			const dateStr = current.format('YYYY-MM-DD')
-			const item = heatmapData.get(dateStr)
-			result.push({
-				date: current.toDate(),
-				dateStr,
-				words: item?.words || 0,
-				count: item?.count || 0,
-			})
-			current = current.add(1, 'day')
-		}
-		return result
-	}, [heatmapData, selectedYear])
+			const wList: ({
+				dateStr: string
+				dayOfWeek: number
+				count: number
+				words: number
+				isFuture: boolean
+			} | null)[][] = []
 
-	// Group by weeks for the 7-row grid (starting Sunday)
-	const weeks = useMemo(() => {
-		if (days.length === 0) return []
-		const w: (typeof days[0] | null)[][] = []
-		let currentWeek: (typeof days[0] | null)[] = []
+			for (let w = 0; w < 53; w++) {
+				const weekDays: (typeof wList[0][0])[] = []
+				for (let d = 0; d < 7; d++) {
+					const curDate = calendarStartSunday.add(w * 7 + d, 'day')
+					const isBeforeYear = curDate.isBefore(startOfYear, 'day')
+					const isAfterYear = curDate.isAfter(endOfYear, 'day')
+					const isFuture = curDate.isAfter(today, 'day')
 
-		// Pad first week with nulls to align with Sunday (day 0)
-		const firstDay = dayjs(days[0].date).day()
-		for (let i = 0; i < firstDay; i++) {
-			currentWeek.push(null)
-		}
-
-		for (const day of days) {
-			currentWeek.push(day)
-			if (currentWeek.length === 7) {
-				w.push(currentWeek)
-				currentWeek = []
+					if (isBeforeYear || isAfterYear) {
+						weekDays.push(null)
+					} else {
+						const dateStr = curDate.format('YYYY-MM-DD')
+						const data = heatmapData.get(dateStr)
+						weekDays.push({
+							dateStr,
+							dayOfWeek: d,
+							count: isFuture ? 0 : data?.count || 0,
+							words: isFuture ? 0 : data?.words || 0,
+							isFuture,
+						})
+					}
+				}
+				wList.push(weekDays)
 			}
-		}
 
-		// Pad last week with nulls to maintain consistent 7 rows
-		if (currentWeek.length > 0) {
-			while (currentWeek.length < 7) {
-				currentWeek.push(null)
-			}
-			w.push(currentWeek)
+			return { weeks: wList, recentCount: computedRecentCount }
 		}
-		return w
-	}, [days])
+	}, [selectedYear, heatmapData])
 
-	// Calculate month labels aligned precisely with the week column index
+	// Month labels placed precisely at the column where the month starts (or col 0)
 	const monthLabels = useMemo(() => {
 		const labels: { label: string; colIndex: number }[] = []
-		let currentMonth = -1
+		let lastMonth = -1
+		let lastCol = -10
 
-		weeks.forEach((week, i) => {
+		weeks.forEach((week, colIndex) => {
 			const firstValidDay = week.find(d => d !== null)
 			if (firstValidDay) {
-				const month = dayjs(firstValidDay.date).month()
-				if (month !== currentMonth) {
-					const lastLabel = labels[labels.length - 1]
-					if (!lastLabel || i - lastLabel.colIndex >= 2) {
+				const curMonth = dayjs(firstValidDay.dateStr).month()
+				if (curMonth !== lastMonth) {
+					if (colIndex - lastCol >= 2) {
 						labels.push({
-							label: dayjs(firstValidDay.date).format('MMM'),
-							colIndex: i,
+							label: dayjs(firstValidDay.dateStr).format('MMM'),
+							colIndex,
 						})
-						currentMonth = month
+						lastMonth = curMonth
+						lastCol = colIndex
 					}
 				}
 			}
@@ -202,40 +234,41 @@ export default function MemoryHeatmap({ diaries, selectedDate, onSelectDate }: M
 		return labels
 	}, [weeks])
 
-	// Range summary metrics
-	const rangeSummary = useMemo(() => {
-		const totalEntries = days.reduce((acc, d) => acc + d.count, 0)
-		const totalWords = days.reduce((acc, d) => acc + d.words, 0)
-		return `${totalEntries} 篇回忆 · ${totalWords.toLocaleString()} 字`
-	}, [days])
+	// Summary count for the currently active tab
+	const currentTabCount = useMemo(() => {
+		if (selectedYear === 'recent') {
+			return recentCount
+		}
+		return yearCounts[selectedYear] || 0
+	}, [selectedYear, recentCount, yearCounts])
 
-	const gridWidth = weeks.length * 14 - 3
+	const currentTabLabel = useMemo(() => {
+		if (selectedYear === 'recent') {
+			return '最近 1 年'
+		}
+		return `${selectedYear} 年`
+	}, [selectedYear])
+
+	const palette = isDark ? HEATMAP_PALETTE.dark : HEATMAP_PALETTE.light
+	const svgWidth = LABEL_WIDTH + weeks.length * STEP - CELL_GAP
 
 	return (
-		<div className="flex flex-col w-full select-none">
-			{/* Header: Title, Stats & Year Tabs */}
-			<div className="flex flex-wrap items-center justify-between gap-3 mb-4 w-full">
-				<div className="flex items-center gap-2.5">
-					<div className="flex items-center gap-1.5">
-						<div className="w-2 h-2 rounded-full bg-emerald-500 shadow-xs shadow-emerald-500/40" />
-						<span className="text-xs font-bold text-neutral-700 dark:text-neutral-200 tracking-wider uppercase font-mono">
-							Memory Heatmap
-						</span>
-					</div>
-					<span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 border border-neutral-200/50 dark:border-neutral-700/50">
-						{rangeSummary}
-					</span>
-				</div>
+		<div className="w-full flex flex-col select-none font-sans">
+			{/* GitHub-style Header: Contributions count on left, Year navigation on right */}
+			<div className="flex flex-wrap items-center justify-between gap-3 mb-2.5">
+				<h3 className="text-sm sm:text-[15px] font-normal text-neutral-800 dark:text-neutral-200 tracking-tight">
+					<span className="font-semibold text-neutral-900 dark:text-neutral-100">{currentTabCount}</span> 篇回忆在 {currentTabLabel}
+				</h3>
 
-				{/* Apple-style Year Switcher Tabs */}
-				<div className="flex items-center gap-0.5 bg-neutral-100 dark:bg-neutral-800/80 p-0.5 rounded-xl border border-neutral-200/60 dark:border-neutral-700/60 shadow-2xs">
+				{/* GitHub-style Clean Year Switcher */}
+				<div className="flex items-center gap-1">
 					<button
 						type="button"
 						onClick={() => setSelectedYear('recent')}
-						className={`px-2.5 py-1 rounded-lg transition-all text-[11px] font-medium ${
+						className={`px-2.5 py-1 text-xs rounded-md transition-colors cursor-pointer ${
 							selectedYear === 'recent'
-								? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 shadow-xs font-semibold'
-								: 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200'
+								? 'bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 font-semibold border border-neutral-200/90 dark:border-neutral-700/80 shadow-2xs'
+								: 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100'
 						}`}
 					>
 						最近1年 {recentCount > 0 && <span className="opacity-60 text-[10px]">({recentCount})</span>}
@@ -247,10 +280,10 @@ export default function MemoryHeatmap({ diaries, selectedDate, onSelectDate }: M
 								key={year}
 								type="button"
 								onClick={() => setSelectedYear(year)}
-								className={`px-2.5 py-1 rounded-lg transition-all text-[11px] font-medium ${
+								className={`px-2.5 py-1 text-xs rounded-md transition-colors cursor-pointer ${
 									selectedYear === year
-										? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 shadow-xs font-semibold'
-										: 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200'
+										? 'bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 font-semibold border border-neutral-200/90 dark:border-neutral-700/80 shadow-2xs'
+										: 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100'
 								}`}
 							>
 								{year} {count > 0 && <span className="opacity-60 text-[10px]">({count})</span>}
@@ -260,48 +293,99 @@ export default function MemoryHeatmap({ diaries, selectedDate, onSelectDate }: M
 				</div>
 			</div>
 
-			{/* Heatmap Grid Area */}
-			<div className="w-full overflow-x-auto pb-2 pt-1 scrollbar-none">
-				<div className="inline-flex flex-col min-w-max">
-					{/* Month Labels (Mathematically aligned with week columns) */}
-					<div className="relative h-4 mb-2.5" style={{ marginLeft: 26, width: gridWidth }}>
-						{monthLabels.map((m, i) => (
-							<span
-								key={i}
-								className="absolute text-[10px] font-medium text-neutral-400 dark:text-neutral-500 select-none pointer-events-none"
-								style={{ left: m.colIndex * 14 }}
+			{/* GitHub-style Bordered Card Container */}
+			<div className="w-full bg-white dark:bg-[#0d1117] border border-[#d0d7de] dark:border-[#30363d] rounded-lg p-4 sm:p-5 shadow-2xs overflow-x-auto scrollbar-none">
+				<div className="min-w-max flex flex-col items-start">
+					{/* GitHub-style Scalable SVG Contribution Calendar */}
+					<svg
+						width={svgWidth}
+						height={SVG_HEIGHT}
+						className="overflow-visible select-none"
+					>
+						{/* Month Labels */}
+						<g className="month-labels" transform={`translate(${LABEL_WIDTH}, 11)`}>
+							{monthLabels.map(m => (
+								<text
+									key={m.colIndex}
+									x={m.colIndex * STEP}
+									y={0}
+									className="text-[10px] font-sans fill-[#57606a] dark:fill-[#7d8590]"
+								>
+									{m.label}
+								</text>
+							))}
+						</g>
+
+						{/* Weekday Labels (Only Mon, Wed, Fri like GitHub) */}
+						<g className="weekday-labels" transform={`translate(0, ${HEADER_HEIGHT})`}>
+							<text
+								x={LABEL_WIDTH - 6}
+								y={1 * STEP + 8}
+								textAnchor="end"
+								className="text-[9px] font-sans fill-[#57606a] dark:fill-[#7d8590]"
 							>
-								{m.label}
-							</span>
-						))}
-					</div>
+								Mon
+							</text>
+							<text
+								x={LABEL_WIDTH - 6}
+								y={3 * STEP + 8}
+								textAnchor="end"
+								className="text-[9px] font-sans fill-[#57606a] dark:fill-[#7d8590]"
+							>
+								Wed
+							</text>
+							<text
+								x={LABEL_WIDTH - 6}
+								y={5 * STEP + 8}
+								textAnchor="end"
+								className="text-[9px] font-sans fill-[#57606a] dark:fill-[#7d8590]"
+							>
+								Fri
+							</text>
+						</g>
 
-					{/* Body: Weekday Labels + Grid */}
-					<div className="flex items-start">
-						{/* Weekday Labels (Mon, Wed, Fri aligned with rows) */}
-						<div
-							className="relative shrink-0 text-[9px] font-medium text-neutral-400 dark:text-neutral-500 select-none pointer-events-none"
-							style={{ width: 22, marginRight: 4, height: 7 * 11 + 6 * 3 }}
-						>
-							<span className="absolute" style={{ top: 14, height: 11, lineHeight: '11px' }}>
-								周一
-							</span>
-							<span className="absolute" style={{ top: 42, height: 11, lineHeight: '11px' }}>
-								周三
-							</span>
-							<span className="absolute" style={{ top: 70, height: 11, lineHeight: '11px' }}>
-								周五
-							</span>
-						</div>
+						{/* 53-Week Days Grid */}
+						<g className="weeks-grid" transform={`translate(${LABEL_WIDTH}, ${HEADER_HEIGHT})`}>
+							{weeks.map((week, colIndex) => (
+								<g key={colIndex} transform={`translate(${colIndex * STEP}, 0)`}>
+									{week.map((day, rowIndex) => {
+										if (!day) return null
+										if (day.isFuture) {
+											return (
+												<rect
+													key={`future-${rowIndex}`}
+													x={0}
+													y={rowIndex * STEP}
+													width={CELL_SIZE}
+													height={CELL_SIZE}
+													rx={2}
+													ry={2}
+													fill="transparent"
+												/>
+											)
+										}
 
-						{/* Weeks Grid (Locked with shrink-0 so it never squishes) */}
-						<div className="flex gap-[3px] shrink-0" style={{ width: gridWidth }}>
-							{weeks.map((week, i) => (
-								<div key={i} className="flex flex-col gap-[3px] shrink-0 w-[11px]">
-									{week.map((day, j) =>
-										day ? (
-											<div
+										const isSelected = selectedDate === day.dateStr
+										const level = getHeatmapLevel(day.count, day.words)
+										const cellColor = palette[level]
+
+										return (
+											<rect
 												key={day.dateStr}
+												x={0}
+												y={rowIndex * STEP}
+												width={CELL_SIZE}
+												height={CELL_SIZE}
+												rx={2}
+												ry={2}
+												fill={cellColor.bg}
+												stroke={isSelected ? '#10b981' : cellColor.border}
+												strokeWidth={isSelected ? 1.5 : 1}
+												className={`cursor-pointer transition-opacity duration-150 ${
+													isSelected
+														? 'filter drop-shadow-xs'
+														: 'hover:opacity-80'
+												}`}
 												onClick={() => onSelectDate?.(day.dateStr)}
 												onMouseEnter={e => {
 													const rect = e.currentTarget.getBoundingClientRect()
@@ -314,114 +398,84 @@ export default function MemoryHeatmap({ diaries, selectedDate, onSelectDate }: M
 													})
 												}}
 												onMouseLeave={() => setHoveredDay(null)}
-												className={`hm-cell hm-cell-${getHeatmapLevel(day.count, day.words)} rounded-[2.5px] cursor-pointer transition-all duration-150 ${
-													selectedDate === day.dateStr
-														? 'ring-2 ring-brand ring-offset-1 dark:ring-offset-neutral-900 scale-125 z-10'
-														: 'hover:scale-125 hover:z-20'
-												}`}
-												style={{
-													width: 11,
-													height: 11,
-													boxSizing: 'border-box',
-													...getHeatmapCellStyle(day.count, day.words, isDark),
-												}}
 											/>
-										) : (
-											<div key={`empty-${j}`} className="shrink-0" style={{ width: 11, height: 11 }} />
 										)
-									)}
-								</div>
+									})}
+								</g>
 							))}
+						</g>
+					</svg>
+
+					{/* GitHub-style Footer: Left status / rules, Right legend */}
+					<div
+						className="flex items-center justify-between text-[11px] text-[#57606a] dark:text-[#7d8590] mt-3 pt-2 w-full"
+						style={{ width: svgWidth }}
+					>
+						<div>
+							{selectedDate ? (
+								<div className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+									<span>已选日期：{selectedDate}</span>
+									<button
+										type="button"
+										onClick={() => onSelectDate?.(selectedDate)}
+										className="hover:underline font-bold ml-1 cursor-pointer"
+									>
+										✕ 清除
+									</button>
+								</div>
+							) : (
+								<span className="text-[11px] text-[#57606a] dark:text-[#7d8590]">
+									点击方格筛选当天回忆
+								</span>
+							)}
+						</div>
+
+						{/* GitHub-standard Legend: Less [0][1][2][3][4] More */}
+						<div className="flex items-center gap-1 text-[11px]">
+							<span>Less</span>
+							<div className="flex items-center gap-[3px] mx-1">
+								{([0, 1, 2, 3, 4] as const).map(lvl => (
+									<span
+										key={lvl}
+										className="inline-block rounded-[2px]"
+										style={{
+											width: CELL_SIZE,
+											height: CELL_SIZE,
+											backgroundColor: palette[lvl].bg,
+											borderColor: palette[lvl].border,
+											borderWidth: '1px',
+											borderStyle: 'solid',
+											boxSizing: 'border-box',
+										}}
+									/>
+								))}
+							</div>
+							<span>More</span>
 						</div>
 					</div>
 				</div>
 			</div>
 
-			{/* Floating Interactive Hover Tooltip */}
+			{/* GitHub-style Interactive Tooltip */}
 			{hoveredDay && (
 				<div
-					className="fixed z-50 -translate-x-1/2 -translate-y-full mb-2 pointer-events-none px-2.5 py-1.5 rounded-lg bg-neutral-900/90 dark:bg-neutral-800/95 text-white text-[11px] font-medium shadow-xl backdrop-blur-xs flex flex-col items-center gap-0.5 whitespace-nowrap transition-all duration-75 border border-white/10"
+					className="fixed z-50 -translate-x-1/2 -translate-y-full mb-2 pointer-events-none px-2.5 py-1.5 rounded-md bg-[#24292f] text-white text-[11px] font-sans shadow-xl flex flex-col items-center gap-0.5 whitespace-nowrap transition-all duration-75"
 					style={{
 						left: hoveredDay.x,
-						top: hoveredDay.y - 6,
+						top: hoveredDay.y - 4,
 					}}
 				>
-					<div className="font-semibold text-[11px] tracking-tight">
-						{dayjs(hoveredDay.dateStr).format('YYYY年M月D日')}
-					</div>
-					<div className="text-[10px] text-neutral-300 dark:text-neutral-400">
+					<div className="font-semibold text-[11px]">
 						{hoveredDay.count > 0
 							? `${hoveredDay.count} 篇回忆 · ${hoveredDay.words} 字`
-							: '无回忆 · 点击可筛选'}
+							: '暂无回忆'}
 					</div>
-					<div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-neutral-900/90 dark:border-t-neutral-800/95" />
+					<div className="text-[10px] text-neutral-300">
+						{dayjs(hoveredDay.dateStr).format('YYYY年M月D日 dddd')}
+					</div>
+					<div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#24292f]" />
 				</div>
 			)}
-
-			{/* Footer: Selection Status & Color Legend */}
-			<div className="flex items-center justify-between w-full mt-3 pt-2 border-t border-neutral-100 dark:border-neutral-800/60 text-[11px] text-neutral-400 dark:text-neutral-500 font-medium">
-				<div className="flex items-center gap-2">
-					{selectedDate ? (
-						<div className="flex items-center gap-1.5 text-xs text-brand font-medium bg-brand/10 dark:bg-brand/20 px-2.5 py-1 rounded-lg border border-brand/20">
-							<span>已选日期：{selectedDate}</span>
-							<button
-								type="button"
-								onClick={() => onSelectDate?.(selectedDate)}
-								className="hover:underline font-bold text-[11px] ml-1"
-							>
-								✕ 清除
-							</button>
-						</div>
-					) : (
-						<span className="text-[11px] text-neutral-400 dark:text-neutral-500">
-							点击方格可聚焦当天回忆
-						</span>
-					)}
-				</div>
-
-				<div className="flex items-center gap-1.5 text-[10px] text-neutral-400 dark:text-neutral-500 uppercase font-mono tracking-wider">
-					<span>Less</span>
-					<div className="flex gap-1 mx-1 items-center">
-						{([0, 1, 2, 3, 4] as const).map(level => {
-							const palette = isDark ? HEATMAP_PALETTE.dark : HEATMAP_PALETTE.light
-							const item = palette[level]
-							return (
-								<div
-									key={level}
-									className={`hm-cell hm-cell-${level} rounded-[2px]`}
-									style={{
-										width: 10,
-										height: 10,
-										backgroundColor: item.bg,
-										borderColor: item.border,
-										borderWidth: '1px',
-										borderStyle: 'solid',
-										boxSizing: 'border-box',
-									}}
-								/>
-							)
-						})}
-					</div>
-					<span>More</span>
-				</div>
-			</div>
-
-			{/* Guaranteed Local CSS Fallback */}
-			<style>{`
-				.hm-cell-0 { background-color: #ebedf0 !important; border-color: rgba(27, 31, 35, 0.08) !important; border-width: 1px !important; border-style: solid !important; }
-				.hm-cell-1 { background-color: #9be9a8 !important; border-color: rgba(27, 31, 35, 0.12) !important; border-width: 1px !important; border-style: solid !important; }
-				.hm-cell-2 { background-color: #40c463 !important; border-color: rgba(27, 31, 35, 0.12) !important; border-width: 1px !important; border-style: solid !important; }
-				.hm-cell-3 { background-color: #30a14e !important; border-color: rgba(27, 31, 35, 0.15) !important; border-width: 1px !important; border-style: solid !important; }
-				.hm-cell-4 { background-color: #216e39 !important; border-color: rgba(27, 31, 35, 0.2) !important; border-width: 1px !important; border-style: solid !important; }
-
-				.dark .hm-cell-0 { background-color: #161b22 !important; border-color: rgba(255, 255, 255, 0.06) !important; border-width: 1px !important; border-style: solid !important; }
-				.dark .hm-cell-1 { background-color: #0e4429 !important; border-color: rgba(255, 255, 255, 0.08) !important; border-width: 1px !important; border-style: solid !important; }
-				.dark .hm-cell-2 { background-color: #006d32 !important; border-color: rgba(255, 255, 255, 0.08) !important; border-width: 1px !important; border-style: solid !important; }
-				.dark .hm-cell-3 { background-color: #26a641 !important; border-color: rgba(255, 255, 255, 0.1) !important; border-width: 1px !important; border-style: solid !important; }
-				.dark .hm-cell-4 { background-color: #39d353 !important; border-color: rgba(255, 255, 255, 0.12) !important; border-width: 1px !important; border-style: solid !important; }
-			`}</style>
 		</div>
 	)
 }
-
-
