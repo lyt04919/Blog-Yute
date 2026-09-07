@@ -480,6 +480,33 @@ function runTests() {
 		assert.ok(dockContent.includes('CornerMusicPlayer'), 'music-player-dock must export CornerMusicPlayer')
 	})
 
+	// 15. Verify Dock Fixed Width Invariant Layout & Pop-Out Overflow Animation
+	test('Dock implements invariant layout width and pop-out overflowing icon animation', () => {
+		const dockPath = path.join(ROOT, 'src/components/magicui/dock.tsx')
+		assert.ok(fs.existsSync(dockPath), 'dock.tsx must exist')
+		const dockContent = fs.readFileSync(dockPath, 'utf8')
+
+		// 1. Invariant layout width: outer slot must be fixed size, inner motion must be absolute
+		assert.ok(dockContent.includes('style={{ width: BASE_SIZE, height: BASE_SIZE }}'), 'DockIcon outer slot must be strictly fixed to BASE_SIZE to prevent dock width expansion')
+		assert.ok(dockContent.includes('position: "absolute"'), 'DockIcon inner tile must be absolutely positioned to prevent layout reflow')
+		assert.ok(dockContent.includes('bottom: 0'), 'DockIcon inner tile must anchor to bottom to overflow upwards')
+		
+		// 2. Pop-out icon overflow & spring physics
+		assert.ok(dockContent.includes('lift'), 'DockIcon must implement vertical lift for overflowing effect')
+		assert.ok(dockContent.includes('zIndex'), 'DockIcon must dynamically compute zIndex to overlap neighbors')
+		assert.ok(dockContent.includes('e.clientX'), 'Dock must use e.clientX for viewport-accurate distance calculation')
+		assert.ok(dockContent.includes('overflow-visible'), 'Dock must allow overflow-visible for blooming icons')
+
+		// 3. Click target delegation
+		assert.ok(dockContent.includes('handleCardClick') || dockContent.includes('clickable'), 'DockIcon must ensure full card area is clickable')
+
+		// 4. TopNav integration
+		const topNavPath = path.join(ROOT, 'src/components/top-nav.tsx')
+		const topNavContent = fs.readFileSync(topNavPath, 'utf8')
+		assert.ok(topNavContent.includes('<Dock iconMagnification='), 'TopNav must configure Dock iconMagnification')
+		assert.ok(topNavContent.includes('dock-nav-container'), 'TopNav must render dock-nav-container')
+	})
+
 	console.log(`\n🏁 Test Results: ${passed}/${total} passed.`)
 	if (passed === total) {
 		console.log('✨ All performance and integrity tests PASSED successfully!\n')
