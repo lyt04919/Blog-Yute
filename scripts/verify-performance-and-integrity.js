@@ -292,6 +292,57 @@ function runTests() {
 		}
 	})
 
+	// 12. Verify Diary Module Architecture, Data Integrity & Code Quality
+	test('Diary module implements decoupled architecture, unified metadata, and clean component contracts', () => {
+		// 1. Verify types exist and are properly structured
+		const typesPath = path.join(ROOT, 'src/types/diary.ts')
+		assert.ok(fs.existsSync(typesPath), 'src/types/diary.ts must exist')
+		const typesContent = fs.readFileSync(typesPath, 'utf8')
+		assert.ok(typesContent.includes('export interface Diary'), 'Diary interface must be exported')
+		assert.ok(typesContent.includes('export type MoodType'), 'MoodType must be exported')
+		assert.ok(typesContent.includes('export type WeatherType'), 'WeatherType must be exported')
+
+		// 2. Verify metadata constants and reading stats calculation
+		const metaPath = path.join(ROOT, 'src/app/vault/diary/constants/meta.ts')
+		assert.ok(fs.existsSync(metaPath), 'src/app/vault/diary/constants/meta.ts must exist')
+		const metaContent = fs.readFileSync(metaPath, 'utf8')
+		assert.ok(metaContent.includes('export const MOOD_LIST'), 'MOOD_LIST must be exported')
+		assert.ok(metaContent.includes('export const WEATHER_LIST'), 'WEATHER_LIST must be exported')
+		assert.ok(metaContent.includes('export function calculateReadingStats'), 'calculateReadingStats must be exported')
+
+		// 3. Verify diary.json data validity
+		const diaryJsonPath = path.join(ROOT, 'src/data/private/diary.json')
+		assert.ok(fs.existsSync(diaryJsonPath), 'src/data/private/diary.json must exist')
+		const diaries = JSON.parse(fs.readFileSync(diaryJsonPath, 'utf8'))
+		assert.ok(Array.isArray(diaries), 'diary.json must be an array')
+		for (const item of diaries) {
+			assert.ok(item.id, `Diary item ${item.id} must have id`)
+			assert.ok(/^\d{4}-\d{2}-\d{2}$/.test(item.date), `Diary item ${item.id} date must be formatted YYYY-MM-DD (got: ${item.date})`)
+			assert.ok(typeof item.content === 'string', `Diary item ${item.id} must have string content`)
+		}
+
+		// 4. Verify no inline <style> tags in modal
+		const modalPath = path.join(ROOT, 'src/app/vault/diary/components/diary-detail-modal.tsx')
+		const modalContent = fs.readFileSync(modalPath, 'utf8')
+		assert.ok(!modalContent.includes('<style>'), 'diary-detail-modal.tsx must not contain inline <style> tags')
+
+		// 5. Verify push-diaries has no deprecated unescape and supports GitHub commit
+		const pushPath = path.join(ROOT, 'src/app/vault/diary/services/push-diaries.ts')
+		const pushContent = fs.readFileSync(pushPath, 'utf8')
+		assert.ok(!pushContent.includes('unescape('), 'push-diaries.ts must not use deprecated unescape')
+		assert.ok(pushContent.includes('commitFilesToGitHub'), 'push-diaries.ts must support commitFilesToGitHub for production')
+
+		// 6. Verify calendar boundary check
+		const calendarPath = path.join(ROOT, 'src/app/vault/diary/components/diary-calendar.tsx')
+		const calendarContent = fs.readFileSync(calendarPath, 'utf8')
+		assert.ok(calendarContent.includes("day.isSame(endDate, 'day')"), 'diary-calendar must include the end of the week')
+
+		// 7. Verify memory heatmap supports onSelectDate
+		const heatmapPath = path.join(ROOT, 'src/app/vault/diary/components/memory-heatmap.tsx')
+		const heatmapContent = fs.readFileSync(heatmapPath, 'utf8')
+		assert.ok(heatmapContent.includes('onSelectDate?: (dateStr: string) => void'), 'memory-heatmap must support onSelectDate prop')
+	})
+
 	console.log(`\n🏁 Test Results: ${passed}/${total} passed.`)
 	if (passed === total) {
 		console.log('✨ All performance and integrity tests PASSED successfully!\n')

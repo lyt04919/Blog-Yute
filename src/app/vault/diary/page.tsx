@@ -1,239 +1,74 @@
 'use client'
 
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { toast } from 'sonner'
 import TimelineView from './timeline-view'
 import CreateDialog from './components/create-dialog'
-import { pushDiaries } from './services/push-diaries'
 import { useConfigStore } from '@/app/(home)/stores/config-store'
-import { useAuthStore } from '@/hooks/use-auth'
-import type { ImageItem } from '@/app/projects/components/image-upload-dialog'
-import type { Diary } from './components/diary-card'
-import dayjs from 'dayjs'
+import type { Diary, DiaryViewMode } from '@/types/diary'
 
-import { LayoutGrid, Calendar as CalendarIcon, List, Search, Filter, ArrowDownWideNarrow, ArrowUpNarrowWide } from 'lucide-react'
+import { LayoutGrid, Calendar as CalendarIcon, List, Search, Filter, ArrowDownWideNarrow, ArrowUpNarrowWide, X } from 'lucide-react'
 import DiaryCalendar from './components/diary-calendar'
 import ChangelogView from './changelog-view'
 import OnThisDay from './components/on-this-day'
 import DiaryFilterPanel from './components/diary-filter-panel'
 import MemoryHeatmap from './components/memory-heatmap'
+import DiaryEmptyState from './components/diary-empty-state'
+import DiarySkeleton from './components/diary-skeleton'
+import { useDiaryData } from './hooks/use-diary-data'
+import { useDiaryFilters } from './hooks/use-diary-filters'
 
 export default function Page() {
-	const { isAuth, getAuthToken } = useAuthStore()
-	const [diaries, setDiaries] = useState<Diary[]>([])
-	const [originalDiaries, setOriginalDiaries] = useState<Diary[]>([])
-	const [isLoading, setIsLoading] = useState(true)
+	const {
+		isAuth,
+		isLoading,
+		diaries,
+		handleUpdateDiary,
+		handleSaveDiary,
+		handleDeleteDiary
+	} = useDiaryData()
+
+	const {
+		searchQuery,
+		setSearchQuery,
+		sortOrder,
+		setSortOrder,
+		filters,
+		setFilters,
+		filteredDiaries,
+		activeFilterCount,
+		resetFilters,
+		setSingleDateFilter
+	} = useDiaryFilters(diaries)
 
 	const [isEditMode, setIsEditMode] = useState(false)
-	const [isSaving, setIsSaving] = useState(false)
 	const [editingDiary, setEditingDiary] = useState<Diary | null>(null)
 	const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-	const [imageItems, setImageItems] = useState<Map<string, ImageItem>>(new Map())
-
-	const [viewMode, setViewMode] = useState<'grid' | 'calendar' | 'changelog'>('grid')
-	const [searchQuery, setSearchQuery] = useState('')
+	const [viewMode, setViewMode] = useState<DiaryViewMode>('grid')
 	const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false)
-	const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc')
-	const [filters, setFilters] = useState<import('./components/diary-filter-panel').FilterState>({
-		year: null,
-		month: null,
-		tags: [],
-		locations: [],
-		moods: [],
-		weathers: [],
-		mediaType: 'all'
-	})
 
 	const { siteContent } = useConfigStore()
 	const hideEditButton = siteContent.hideEditButton ?? false
-
-	const [quickContent, setQuickContent] = useState('')
-
-	useEffect(() => {
-		let isMounted = true
-		const fetchData = async () => {
-			try {
-				if (!isAuth) {
-					setIsLoading(false)
-					return
-				}
-				
-				let token = ''
-				try {
-					if (isAuth) {
-						token = await getAuthToken()
-					}
-				} catch(e) {
-					console.error('No auth token available locally, proceeding with dev mode.')
-				}
-
-				const headers: Record<string, string> = {}
-				if (token) {
-					headers['Authorization'] = `Bearer ${token}`
-				}
-
-				const res = await fetch('/api/private/diary', {
-					headers
-				})
-				if (res.ok) {
-					const data = await res.json()
-					if (isMounted) {
-						setDiaries(data)
-						setOriginalDiaries(data)
-					}
-				}
-			} catch (error) {
-				console.error('Failed to fetch diaries:', error)
-			} finally {
-				if (isMounted) setIsLoading(false)
-			}
-		}
-		fetchData()
-		return () => { isMounted = false }
-	}, [isAuth, getAuthToken])
-
-	const filteredDiaries = useMemo(() => {
-		const filtered = diaries.filter(d => {
-			const q = searchQuery.toLowerCase()
-			const matchesSearch = !q || 
-				(d.content && d.content.toLowerCase().includes(q)) || 
-				(d.tags && d.tags.some(t => t.toLowerCase().includes(q))) || 
-				(d.location && d.location.toLowerCase().includes(q))
-			
-			if (!matchesSearch) return false
-
-			// Year and Month
-			if (filters.year) {
-				const date = dayjs(d.date)
-				if (date.format('YYYY') !== filters.year) return false
-				if (filters.month && date.format('MM') !== filters.month) return false
-			}
-
-			// Array filters (OR within the same category)
-			if (filters.tags.length > 0 && (!d.tags || !filters.tags.some(t => d.tags!.includes(t)))) return false
-			if (filters.locations.length > 0 && (!d.location || !filters.locations.includes(d.location))) return false
-			if (filters.moods.length > 0 && (!d.mood || !filters.moods.includes(d.mood))) return false
-			if (filters.weathers.length > 0 && (!d.weather || !filters.weathers.includes(d.weather))) return false
-
-			// Media Type
-			if (filters.mediaType !== 'all') {
-				const hasMedia = (d.media && d.media.length > 0) || !!d.image
-				if (filters.mediaType === 'media-only' && !hasMedia) return false
-				if (filters.mediaType === 'text-only' && hasMedia) return false
-			}
-			
-			return true
-		})
-
-		// Sort
-		return filtered.sort((a, b) => {
-			const dateA = dayjs(a.date).valueOf()
-			const dateB = dayjs(b.date).valueOf()
-			// Fallback to ID if dates are the same
-			if (dateA === dateB) {
-				return sortOrder === 'desc' 
-					? parseInt(b.id) - parseInt(a.id)
-					: parseInt(a.id) - parseInt(b.id)
-			}
-			return sortOrder === 'desc' ? dateB - dateA : dateA - dateB
-		})
-	}, [diaries, searchQuery, filters, sortOrder])
-
-	const activeFilterCount = 
-		(filters.year ? 1 : 0) + 
-		(filters.month ? 1 : 0) + 
-		filters.tags.length + 
-		filters.locations.length + 
-		filters.moods.length + 
-		filters.weathers.length + 
-		(filters.mediaType !== 'all' ? 1 : 0)
-
-	const autoSaveDiaries = async (newDiaries: Diary[]) => {
-		try {
-			await pushDiaries({ diaries: newDiaries, imageItems })
-			setOriginalDiaries(newDiaries)
-		} catch (error: any) {
-			console.error('Failed to auto-save:', error)
-			toast.error(`自动保存失败: ${error?.message || '未知错误'}`)
-		}
-	}
-
-	const handleUpdate = (updatedDiary: Diary, oldDiary: Diary, imageItem?: any) => {
-		const newDiaries = diaries.map(s => (s.id === oldDiary.id ? updatedDiary : s))
-		setDiaries(newDiaries)
-		if (imageItem) {
-			setImageItems(prev => {
-				const newMap = new Map(prev)
-				newMap.set(updatedDiary.id, imageItem)
-				return newMap
-			})
-		}
-		autoSaveDiaries(newDiaries)
-	}
 
 	const handleAdd = () => {
 		setEditingDiary(null)
 		setIsCreateDialogOpen(true)
 	}
 
-	const handleQuickAdd = () => {
-		if (!quickContent.trim()) return
-		const newDiary: Diary = {
+	const handleAddForDate = (dateStr: string) => {
+		setEditingDiary({
 			id: Date.now().toString(),
-			date: dayjs().format('YYYY-MM-DD'),
-			content: quickContent
-		}
-		const newDiaries = [newDiary, ...diaries]
-		setDiaries(newDiaries)
-		setQuickContent('')
-		toast.success('记录成功')
-		autoSaveDiaries(newDiaries)
+			date: dateStr,
+			content: ''
+		})
+		setIsCreateDialogOpen(true)
 	}
 
-	const handleSaveDiary = (updatedDiary: Diary) => {
-		const newDiaries = editingDiary 
-			? diaries.map(s => (s.id === editingDiary.id ? updatedDiary : s))
-			: [updatedDiary, ...diaries]
-		setDiaries(newDiaries)
-		autoSaveDiaries(newDiaries)
-	}
-
-	const handleDelete = (diary: Diary) => {
-		if (confirm(`确定要删除这篇日记吗？`)) {
-			const newDiaries = diaries.filter(s => s.id !== diary.id)
-			setDiaries(newDiaries)
-			autoSaveDiaries(newDiaries)
-		}
-	}
-
-	const handleSave = async () => {
-		setIsSaving(true)
-
-		try {
-			await pushDiaries({
-				diaries,
-				imageItems
-			})
-
-			setOriginalDiaries(diaries)
-			setImageItems(new Map())
-			setIsEditMode(false)
-			toast.success('保存成功！')
-		} catch (error: any) {
-			console.error('Failed to save:', error)
-			toast.error(`保存失败: ${error?.message || '未知错误'}`)
-		} finally {
-			setIsSaving(false)
-		}
-	}
-
-	const handleExitEditMode = () => {
-		if (diaries !== originalDiaries) {
-			handleSave()
-		} else {
-			setIsEditMode(false)
-		}
+	const onSaveFromDialog = (updated: Diary) => {
+		handleSaveDiary(updated, editingDiary?.id)
+		setIsCreateDialogOpen(false)
+		setEditingDiary(null)
 	}
 
 	useEffect(() => {
@@ -251,7 +86,7 @@ export default function Page() {
 	}, [isEditMode])
 
 	if (isLoading) {
-		return <div className="min-h-[100dvh] flex items-center justify-center text-slate-500 font-mono text-sm tracking-widest uppercase">Opening Vault...</div>
+		return <DiarySkeleton />
 	}
 
 	if (!isAuth) {
@@ -279,7 +114,6 @@ export default function Page() {
 										try {
 											await useAuthStore.getState().setPassword(key)
 											toast.success('Access granted. Decoding vault...')
-											// Reload to trigger useEffect
 											window.location.reload()
 										} catch (err: any) {
 											toast.error(err.message || 'Access denied.')
@@ -296,10 +130,9 @@ export default function Page() {
 	}
 
 	return (
-		<div className='relative min-h-screen px-4 pb-20 pt-16 md:px-8 max-w-6xl mx-auto'>
-			
+		<div className='relative min-h-screen px-4 pb-28 pt-16 md:px-8 max-w-6xl mx-auto'>
 			{/* Dashboard Layered Layout */}
-			<div className="flex flex-col gap-8 mb-10">
+			<div className="flex flex-col gap-8 mb-8">
 				{/* Layer 1: Title & Global Actions */}
 				<div className="flex items-center justify-between">
 					<h1 className='text-4xl font-medium tracking-tight lg:text-5xl font-serif text-[var(--color-primary)]'>
@@ -309,22 +142,16 @@ export default function Page() {
 					<div className="flex items-center gap-2">
 						{!hideEditButton && (
 							<button 
-								onClick={() => {
-									if (isEditMode) {
-										handleExitEditMode()
-									} else {
-										setIsEditMode(true)
-									}
-								}} 
-								className={`px-4 py-2 rounded-xl flex items-center gap-2 text-[13px] font-medium transition-all duration-300 shadow-sm border border-black/5 ${isEditMode ? 'bg-neutral-900 text-white hover:bg-neutral-800' : 'bg-white dark:bg-neutral-900 text-[var(--color-secondary)] hover:text-[var(--color-primary)]'}`}
+								onClick={() => setIsEditMode(prev => !prev)} 
+								className={`px-4 py-2 rounded-xl flex items-center gap-2 text-[13px] font-medium transition-all duration-300 shadow-xs border border-black/5 dark:border-white/10 ${isEditMode ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900' : 'bg-white dark:bg-neutral-900 text-[var(--color-secondary)] hover:text-[var(--color-primary)]'}`}
 							>
 								{isEditMode ? '完成' : '编辑模式'}
 							</button>
 						)}
 						{!hideEditButton && (
 							<button 
-								onClick={() => setIsCreateDialogOpen(true)}
-								className="bg-brand text-white px-4 py-2 rounded-xl hover:brightness-110 active:scale-95 transition-all shadow-sm text-[13px] font-medium"
+								onClick={handleAdd}
+								className="bg-brand text-white px-4 py-2 rounded-xl hover:brightness-110 active:scale-95 transition-all shadow-xs text-[13px] font-medium"
 							>
 								写日记
 							</button>
@@ -332,36 +159,54 @@ export default function Page() {
 					</div>
 				</div>
 
-				{/* Layer 2: Data Dashboard */}
-				<div className="flex flex-col md:flex-row items-center justify-between gap-8 bg-neutral-50/50 dark:bg-neutral-800/20 rounded-3xl p-8 border border-neutral-100 dark:border-neutral-800/50 w-full mb-2 overflow-x-auto scrollbar-none">
-					<div className="flex-shrink-0">
+				{/* Layer 2: Memory Dashboard (OnThisDay & Interactive Heatmap) */}
+				<div className="flex flex-col md:flex-row items-center justify-between gap-8 bg-neutral-50/50 dark:bg-neutral-800/20 rounded-3xl p-6 md:p-8 border border-neutral-100 dark:border-neutral-800/60 w-full overflow-x-auto scrollbar-none">
+					<div className="shrink-0">
 						<OnThisDay diaries={diaries} />
 					</div>
-					<div className="w-[1px] h-32 bg-neutral-200 dark:bg-neutral-700 hidden md:block shrink-0"></div>
+					<div className="w-[1px] h-32 bg-neutral-200 dark:bg-neutral-800 hidden md:block shrink-0" />
 					<div className="flex-1 w-full flex md:justify-end shrink-0 min-w-max">
-						<MemoryHeatmap diaries={diaries} />
+						<MemoryHeatmap 
+							diaries={diaries} 
+							selectedDate={filters.date} 
+							onSelectDate={setSingleDateFilter} 
+						/>
 					</div>
 				</div>
+
+				{/* Heatmap Active Date Banner */}
+				{filters.date && (
+					<div className="flex items-center justify-between px-4 py-2.5 rounded-2xl bg-brand/10 border border-brand/20 text-xs font-medium text-brand">
+						<span>当前筛选日期：{filters.date}</span>
+						<button 
+							onClick={() => setSingleDateFilter(filters.date!)} 
+							className="flex items-center gap-1 hover:underline"
+						>
+							<X className="w-3.5 h-3.5" />
+							<span>清除日期筛选</span>
+						</button>
+					</div>
+				)}
 
 				{/* Layer 3: Controls Row */}
 				<div className='flex flex-col md:flex-row items-center justify-between gap-4 w-full'>
 					{/* Left: Search & Filter */}
 					<div className="flex flex-wrap items-center gap-3 w-full md:w-auto flex-1">
 						<div className='relative flex-1 min-w-[240px] md:max-w-[320px]'>
-							<Search className='absolute left-4 top-1/2 -translate-y-1/2 w-[16px] h-[16px] text-[var(--color-secondary)]' />
+							<Search className='absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400' />
 							<input 
 								type="text"
-								placeholder="搜索回忆、地点、标签..."
+								placeholder="搜索回忆、地点、标签、情绪..."
 								value={searchQuery}
 								onChange={e => setSearchQuery(e.target.value)}
-								className='w-full bg-white dark:bg-neutral-900 border border-[var(--color-border)] rounded-full pl-10 pr-5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition-all shadow-sm placeholder:text-neutral-400'
+								className='w-full bg-white dark:bg-neutral-900 border border-[var(--color-border)] rounded-full pl-10 pr-5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition-all shadow-xs placeholder:text-neutral-400'
 							/>
 						</div>
 						
 						<div className="flex items-center gap-2">
 							<button 
 								onClick={() => setIsFilterPanelOpen(true)}
-								className={`shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-full text-sm font-medium transition-all shadow-sm ${
+								className={`shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-full text-sm font-medium transition-all shadow-xs ${
 									activeFilterCount > 0
 										? 'bg-brand text-white border-transparent'
 										: 'bg-white dark:bg-neutral-900 border border-[var(--color-border)] text-[var(--color-secondary)] hover:text-[var(--color-primary)]'
@@ -370,7 +215,7 @@ export default function Page() {
 								<Filter className="w-3.5 h-3.5" />
 								<span className="max-sm:hidden">高级筛选</span>
 								{activeFilterCount > 0 && (
-									<span className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-white/20 text-[10px] font-bold text-white ml-0.5">
+									<span className="flex h-4 w-4 items-center justify-center rounded-full bg-white/25 text-[10px] font-bold text-white ml-0.5">
 										{activeFilterCount}
 									</span>
 								)}
@@ -378,8 +223,8 @@ export default function Page() {
 
 							<button
 								onClick={() => setSortOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
-								className="shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-white dark:bg-neutral-900 border border-[var(--color-border)] text-[var(--color-secondary)] text-sm font-medium hover:text-[var(--color-primary)] transition-all shadow-sm"
-								title={sortOrder === 'desc' ? '当前：按时间倒序（最新优先）' : '当前：按时间正序（最旧优先）'}
+								className="shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-white dark:bg-neutral-900 border border-[var(--color-border)] text-[var(--color-secondary)] text-sm font-medium hover:text-[var(--color-primary)] transition-all shadow-xs"
+								title={sortOrder === 'desc' ? '按时间倒序（最新优先）' : '按时间正序（最旧优先）'}
 							>
 								{sortOrder === 'desc' ? <ArrowDownWideNarrow className="w-3.5 h-3.5" /> : <ArrowUpNarrowWide className="w-3.5 h-3.5" />}
 								<span className="max-sm:hidden">{sortOrder === 'desc' ? '最新' : '最旧'}</span>
@@ -388,7 +233,7 @@ export default function Page() {
 					</div>
 
 					{/* Right: View Mode Toggle */}
-					<div className='flex items-center bg-white dark:bg-neutral-900 border border-[var(--color-border)] p-1 rounded-full shrink-0 shadow-sm w-full md:w-auto justify-center'>
+					<div className='flex items-center bg-white dark:bg-neutral-900 border border-[var(--color-border)] p-1 rounded-full shrink-0 shadow-xs w-full md:w-auto justify-center'>
 						<button
 							onClick={() => setViewMode('grid')}
 							className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-medium transition-colors ${
@@ -396,7 +241,7 @@ export default function Page() {
 							}`}
 						>
 							<LayoutGrid className='w-3.5 h-3.5' />
-							<span className="max-md:hidden">卡片</span>
+							<span>卡片</span>
 						</button>
 						<button
 							onClick={() => setViewMode('calendar')}
@@ -405,7 +250,7 @@ export default function Page() {
 							}`}
 						>
 							<CalendarIcon className='w-3.5 h-3.5' />
-							<span className="max-md:hidden">日历</span>
+							<span>日历</span>
 						</button>
 						<button
 							onClick={() => setViewMode('changelog')}
@@ -414,50 +259,84 @@ export default function Page() {
 							}`}
 						>
 							<List className='w-3.5 h-3.5' />
-							<span className="max-md:hidden">时间轴</span>
+							<span>时间轴</span>
 						</button>
 					</div>
 				</div>
 			</div>
 
-			{viewMode === 'grid' && (
-				<TimelineView diaries={filteredDiaries} isEditMode={isEditMode} onUpdate={handleUpdate} onDelete={handleDelete} />
-			)}
-			{viewMode === 'calendar' && (
-				<DiaryCalendar diaries={filteredDiaries} isEditMode={isEditMode} onUpdate={handleUpdate} onDelete={handleDelete} />
-			)}
-			{viewMode === 'changelog' && (
-				<ChangelogView diaries={filteredDiaries} isEditMode={isEditMode} onUpdate={handleUpdate} onDelete={handleDelete} />
+			{/* Views or Empty State */}
+			{filteredDiaries.length === 0 ? (
+				<DiaryEmptyState
+					isFiltered={activeFilterCount > 0 || !!searchQuery}
+					onResetFilter={resetFilters}
+					onCreateDiary={handleAdd}
+				/>
+			) : (
+				<>
+					{viewMode === 'grid' && (
+						<TimelineView 
+							diaries={filteredDiaries} 
+							isEditMode={isEditMode} 
+							onUpdate={handleUpdateDiary} 
+							onDelete={handleDeleteDiary} 
+						/>
+					)}
+					{viewMode === 'calendar' && (
+						<DiaryCalendar 
+							diaries={filteredDiaries} 
+							isEditMode={isEditMode} 
+							onUpdate={handleUpdateDiary} 
+							onDelete={handleDeleteDiary}
+							onAddForDate={handleAddForDate}
+						/>
+					)}
+					{viewMode === 'changelog' && (
+						<ChangelogView 
+							diaries={filteredDiaries} 
+							isEditMode={isEditMode} 
+							onUpdate={handleUpdateDiary} 
+							onDelete={handleDeleteDiary} 
+						/>
+					)}
+				</>
 			)}
 
+			{/* Floating Edit Mode Bar */}
 			<AnimatePresence>
 				{isEditMode && (
 					<motion.div 
-						initial={{ y: 100, opacity: 0 }}
+						initial={{ y: 80, opacity: 0 }}
 						animate={{ y: 0, opacity: 1 }}
-						exit={{ y: 100, opacity: 0 }}
-						className='fixed bottom-32 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 p-2 rounded-full bg-white/40 dark:bg-neutral-900/40 backdrop-blur-xl border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.12)]'
+						exit={{ y: 80, opacity: 0 }}
+						className='fixed bottom-24 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 p-2 rounded-full bg-white/70 dark:bg-neutral-900/80 backdrop-blur-xl border border-neutral-200/60 dark:border-neutral-700/60 shadow-2xl'
 					>
-						<motion.button
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
-							onClick={handleExitEditMode}
-							className='rounded-full bg-white dark:bg-neutral-800 shadow-sm px-6 py-3 text-sm font-bold text-neutral-600 dark:text-neutral-300 transition-colors hover:text-neutral-900 dark:hover:text-white'>
-							完成编辑
-						</motion.button>
-						<motion.button
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
+						<button
+							onClick={() => setIsEditMode(false)}
+							className='rounded-full bg-white dark:bg-neutral-800 shadow-xs px-5 py-2.5 text-xs font-bold text-neutral-700 dark:text-neutral-200 transition-colors hover:text-black dark:hover:text-white'
+						>
+							退出编辑
+						</button>
+						<button
 							onClick={handleAdd}
-							className='rounded-full bg-[#18181b] text-white shadow-sm px-6 py-3 text-sm font-bold transition-colors hover:bg-neutral-800'>
+							className='rounded-full bg-brand text-white shadow-xs px-5 py-2.5 text-xs font-bold transition-opacity hover:brightness-110'
+						>
 							+ 添加日记
-						</motion.button>
+						</button>
 					</motion.div>
 				)}
 			</AnimatePresence>
 
-			{isCreateDialogOpen && <CreateDialog diary={editingDiary} onClose={() => setIsCreateDialogOpen(false)} onSave={handleSaveDiary} />}
+			{/* Create/Edit Dialog */}
+			{isCreateDialogOpen && (
+				<CreateDialog 
+					diary={editingDiary} 
+					onClose={() => { setIsCreateDialogOpen(false); setEditingDiary(null); }} 
+					onSave={onSaveFromDialog} 
+				/>
+			)}
 
+			{/* Advanced Filter Panel Drawer */}
 			<DiaryFilterPanel
 				isOpen={isFilterPanelOpen}
 				onClose={() => setIsFilterPanelOpen(false)}

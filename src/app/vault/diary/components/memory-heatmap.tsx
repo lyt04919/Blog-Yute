@@ -1,18 +1,27 @@
+'use client'
+
 import React, { useMemo } from 'react'
 import dayjs from 'dayjs'
-import type { Diary } from './diary-card'
+import type { Diary } from '@/types/diary'
+import { calculateReadingStats } from '../constants/meta'
 
 interface MemoryHeatmapProps {
 	diaries: Diary[]
+	selectedDate?: string | null
+	onSelectDate?: (dateStr: string) => void
 }
 
-export default function MemoryHeatmap({ diaries }: MemoryHeatmapProps) {
+export default function MemoryHeatmap({ diaries, selectedDate, onSelectDate }: MemoryHeatmapProps) {
 	const heatmapData = useMemo(() => {
-		const data = new Map<string, number>()
+		const data = new Map<string, { words: number; count: number }>()
 		diaries.forEach(d => {
 			const dateStr = dayjs(d.date).format('YYYY-MM-DD')
-			const count = d.content?.length || 0
-			data.set(dateStr, (data.get(dateStr) || 0) + count)
+			const { wordCount } = calculateReadingStats(d.content)
+			const existing = data.get(dateStr) || { words: 0, count: 0 }
+			data.set(dateStr, {
+				words: existing.words + wordCount,
+				count: existing.count + 1
+			})
 		})
 		return data
 	}, [diaries])
@@ -25,10 +34,12 @@ export default function MemoryHeatmap({ diaries }: MemoryHeatmapProps) {
 		
 		while (current.isBefore(end) || current.isSame(end, 'day')) {
 			const dateStr = current.format('YYYY-MM-DD')
+			const item = heatmapData.get(dateStr)
 			result.push({
 				date: current.toDate(),
 				dateStr,
-				count: heatmapData.get(dateStr) || 0
+				words: item?.words || 0,
+				count: item?.count || 0
 			})
 			current = current.add(1, 'day')
 		}
@@ -79,18 +90,29 @@ export default function MemoryHeatmap({ diaries }: MemoryHeatmapProps) {
 		return labels
 	}, [weeks])
 
-	const getColorHex = (count: number) => {
-		if (count === 0) return '#f5f5f5' // light gray
-		if (count < 50) return '#9be9a8' // light green
-		if (count < 200) return '#40c463' // medium green
-		if (count < 500) return '#30a14e' // dark green
-		return '#216e39' // very dark green
+	const getCellClass = (words: number, isSelected: boolean) => {
+		const base = "rounded-[3px] transition-all hover:scale-150 hover:z-20 cursor-pointer "
+		const selectedRing = isSelected ? "ring-2 ring-brand ring-offset-1 dark:ring-offset-neutral-900 scale-125 z-10 " : ""
+
+		if (words === 0) {
+			return `${base} ${selectedRing} bg-neutral-200/70 dark:bg-neutral-800/80 hover:bg-neutral-300 dark:hover:bg-neutral-700`
+		}
+		if (words < 50) {
+			return `${base} ${selectedRing} bg-emerald-200 dark:bg-emerald-900/60`
+		}
+		if (words < 200) {
+			return `${base} ${selectedRing} bg-emerald-400 dark:bg-emerald-700/80`
+		}
+		if (words < 500) {
+			return `${base} ${selectedRing} bg-emerald-500 dark:bg-emerald-600`
+		}
+		return `${base} ${selectedRing} bg-emerald-600 dark:bg-emerald-500`
 	}
 
 	return (
-		<div className="flex flex-col items-end w-full">
-			<div className="text-[10px] font-bold text-neutral-400 mb-3 uppercase tracking-[0.2em] flex items-center gap-2">
-				<div className="w-1.5 h-1.5 rounded-full bg-neutral-500"></div>
+		<div className="flex flex-col items-end w-full select-none">
+			<div className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500 mb-3 uppercase tracking-[0.2em] flex items-center gap-2">
+				<div className="w-1.5 h-1.5 rounded-full bg-brand"></div>
 				Memory Heatmap
 			</div>
 			
@@ -99,7 +121,7 @@ export default function MemoryHeatmap({ diaries }: MemoryHeatmapProps) {
 					{monthLabels.map((m, i) => (
 						<div 
 							key={i} 
-							className="absolute top-0 text-[10px] text-neutral-400 font-medium"
+							className="absolute top-0 text-[10px] text-neutral-400 dark:text-neutral-500 font-medium"
 							style={{ left: m.colIndex * 14 }}
 						>
 							{m.label}
@@ -108,32 +130,33 @@ export default function MemoryHeatmap({ diaries }: MemoryHeatmapProps) {
 					<div className="flex gap-1">
 						{weeks.map((week, i) => (
 							<div key={i} className="flex flex-col gap-1">
-							{week.map((day, j) => (
-								day ? (
-									<div 
-										key={day.dateStr}
-										title={`${day.dateStr}: ${day.count} 字`}
-										className="rounded-[3px] transition-all hover:scale-150 hover:z-10 hover:shadow-md cursor-crosshair"
-										style={{ width: 10, height: 10, backgroundColor: getColorHex(day.count) }}
-									/>
-								) : (
-									<div key={`empty-${j}`} style={{ width: 10, height: 10 }} />
-								)
-							))}
-						</div>
-					))}
+								{week.map((day, j) => (
+									day ? (
+										<div 
+											key={day.dateStr}
+											onClick={() => onSelectDate?.(day.dateStr)}
+											title={`${day.dateStr}：${day.count > 0 ? `${day.count} 篇 (${day.words} 字)` : '无回忆 (点击筛选)'}`}
+											className={getCellClass(day.words, selectedDate === day.dateStr)}
+											style={{ width: 10, height: 10 }}
+										/>
+									) : (
+										<div key={`empty-${j}`} style={{ width: 10, height: 10 }} />
+									)
+								))}
+							</div>
+						))}
 					</div>
 				</div>
 			</div>
 			
-			<div className="flex items-center gap-1.5 mt-2 text-[9px] text-neutral-400 font-medium uppercase tracking-wider">
+			<div className="flex items-center gap-1.5 mt-2 text-[9px] text-neutral-400 dark:text-neutral-500 font-medium uppercase tracking-wider">
 				<span>Less</span>
 				<div className="flex gap-0.5 mx-1">
-					<div className="rounded-[2px]" style={{ width: 8, height: 8, backgroundColor: '#f5f5f5' }} />
-					<div className="rounded-[2px]" style={{ width: 8, height: 8, backgroundColor: '#9be9a8' }} />
-					<div className="rounded-[2px]" style={{ width: 8, height: 8, backgroundColor: '#40c463' }} />
-					<div className="rounded-[2px]" style={{ width: 8, height: 8, backgroundColor: '#30a14e' }} />
-					<div className="rounded-[2px]" style={{ width: 8, height: 8, backgroundColor: '#216e39' }} />
+					<div className="rounded-[2px] bg-neutral-200/70 dark:bg-neutral-800/80" style={{ width: 8, height: 8 }} />
+					<div className="rounded-[2px] bg-emerald-200 dark:bg-emerald-900/60" style={{ width: 8, height: 8 }} />
+					<div className="rounded-[2px] bg-emerald-400 dark:bg-emerald-700/80" style={{ width: 8, height: 8 }} />
+					<div className="rounded-[2px] bg-emerald-500 dark:bg-emerald-600" style={{ width: 8, height: 8 }} />
+					<div className="rounded-[2px] bg-emerald-600 dark:bg-emerald-500" style={{ width: 8, height: 8 }} />
 				</div>
 				<span>More</span>
 			</div>

@@ -1,8 +1,8 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import dayjs from 'dayjs'
-import type { Diary } from './diary-card'
+import type { Diary } from '@/types/diary'
 import { Clock } from 'lucide-react'
 import DiaryDetailModal from './diary-detail-modal'
 import HistoricalDiariesModal from './historical-diaries-modal'
@@ -10,6 +10,7 @@ import HistoricalDiariesModal from './historical-diaries-modal'
 interface OnThisDayProps {
 	diaries: Diary[]
 }
+
 export default function OnThisDay({ diaries }: OnThisDayProps) {
 	const [isDetailOpen, setIsDetailOpen] = useState(false)
 	const [isHovered, setIsHovered] = useState(false)
@@ -26,11 +27,11 @@ export default function OnThisDay({ diaries }: OnThisDayProps) {
 		return (
 			<div 
 				style={{ width: 220, height: 160, minWidth: 220, flexShrink: 0 }}
-				className="rounded-2xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-center cursor-default"
+				className="rounded-2xl border-2 border-dashed border-neutral-300 dark:border-neutral-700/60 flex flex-col items-center justify-center text-center cursor-default bg-neutral-50/50 dark:bg-neutral-800/10"
 			>
-				<Clock size={22} className="text-gray-400 mb-1.5" />
-				<span className="text-xs text-gray-400 font-medium">往年今日</span>
-				<span className="text-[10px] text-gray-300 mt-0.5">无回忆</span>
+				<Clock size={22} className="text-neutral-400 dark:text-neutral-500 mb-1.5" />
+				<span className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">往年今日</span>
+				<span className="text-[10px] text-neutral-400 dark:text-neutral-500 mt-0.5">今天暂无往年回忆</span>
 			</div>
 		)
 	}
@@ -53,17 +54,17 @@ export default function OnThisDay({ diaries }: OnThisDayProps) {
 	return (
 		<>
 			<div 
-				className="relative cursor-pointer" 
+				className="relative cursor-pointer select-none" 
 				style={{ width: 220, height: 160, minWidth: 220, flexShrink: 0 }} 
 				onClick={() => setIsDetailOpen(true)} 
 				onMouseEnter={() => setIsHovered(true)}
 				onMouseLeave={() => setIsHovered(false)}
-				title="往年今日"
+				title="往年今日回忆"
 			>
-				{/* Stacked Cards Background (only if multiple) */}
+				{/* Stacked Cards Background (only if >= 3) */}
 				{historicalDiaries.length >= 3 && (
 					<div 
-						className="absolute inset-0 bg-white dark:bg-neutral-800 rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex items-center justify-center origin-center transition-all duration-500 ease-out"
+						className="absolute inset-0 bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-xs overflow-hidden flex items-center justify-center origin-center transition-all duration-500 ease-out"
 						style={{
 							transform: isHovered 
 								? 'rotate(-16deg) translateX(-56px) translateY(-8px) scale(1)' 
@@ -74,14 +75,15 @@ export default function OnThisDay({ diaries }: OnThisDayProps) {
 						{coverUrl3 ? (
 							<img src={coverUrl3} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
 						) : (
-							<div className="w-full h-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center"><Clock size={20} className="text-gray-400" /></div>
+							<div className="w-full h-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center"><Clock size={20} className="text-neutral-400" /></div>
 						)}
 					</div>
 				)}
 
+				{/* Stacked Cards Background (only if >= 2) */}
 				{historicalDiaries.length >= 2 && (
 					<div 
-						className="absolute inset-0 bg-white dark:bg-neutral-800 rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex items-center justify-center origin-center transition-all duration-500 ease-out"
+						className="absolute inset-0 bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-xs overflow-hidden flex items-center justify-center origin-center transition-all duration-500 ease-out"
 						style={{
 							transform: isHovered 
 								? 'rotate(16deg) translateX(56px) translateY(-4px) scale(1)' 
@@ -92,32 +94,33 @@ export default function OnThisDay({ diaries }: OnThisDayProps) {
 						{coverUrl2 ? (
 							<img src={coverUrl2} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
 						) : (
-							<div className="w-full h-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center"><Clock size={24} className="text-gray-400" /></div>
+							<div className="w-full h-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center"><Clock size={24} className="text-neutral-400" /></div>
 						)}
 					</div>
 				)}
 				
 				{/* Main Front Card */}
 				<div 
-					className="absolute inset-0 rounded-2xl overflow-hidden border border-gray-200 bg-white transition-all duration-500 ease-out z-10"
+					className="absolute inset-0 rounded-2xl overflow-hidden border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 transition-all duration-500 ease-out z-10"
 					style={{
-						transform: isHovered ? 'translateY(-16px)' : 'translateY(0)',
-						boxShadow: isHovered ? '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)' : '0 1px 2px 0 rgb(0 0 0 / 0.05)'
+						transform: isHovered ? 'translateY(-14px)' : 'translateY(0)',
+						boxShadow: isHovered ? '0 20px 25px -5px rgb(0 0 0 / 0.15), 0 8px 10px -6px rgb(0 0 0 / 0.1)' : '0 1px 3px 0 rgb(0 0 0 / 0.05)'
 					}}
 				>
 					{coverUrl ? (
 						<img 
 							src={coverUrl} 
-							alt={`往年今日`} 
+							alt="往年今日" 
 							style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-							className="group-hover:scale-105 transition-transform duration-500"
+							className="transition-transform duration-500 hover:scale-105"
 						/>
 					) : (
-						<div style={{ width: '100%', height: '100%' }} className="flex items-center justify-center bg-gray-100 dark:bg-neutral-800">
-							<Clock size={28} className="text-gray-400" />
+						<div style={{ width: '100%', height: '100%' }} className="flex flex-col items-center justify-center bg-neutral-100 dark:bg-neutral-800 p-4 text-center">
+							<Clock size={28} className="text-brand mb-2" />
+							<span className="text-xs font-serif font-bold text-[var(--color-primary)] line-clamp-2">{diary.content}</span>
 						</div>
 					)}
-					<div className="absolute inset-x-0 bottom-0 py-1.5 px-2 bg-gradient-to-t from-black/60 to-transparent text-center flex items-center justify-center">
+					<div className="absolute inset-x-0 bottom-0 py-1.5 px-2 bg-gradient-to-t from-black/70 to-transparent text-center flex items-center justify-center">
 						<span className="text-[11px] text-white font-bold">往年今日</span>
 					</div>
 					
