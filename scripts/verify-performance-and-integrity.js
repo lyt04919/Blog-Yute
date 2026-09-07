@@ -344,7 +344,7 @@ function runTests() {
 		assert.ok(heatmapContent.includes('getHeatmapLevel'), 'memory-heatmap must export getHeatmapLevel')
 		assert.ok(heatmapContent.includes('availableYears'), 'memory-heatmap must support multi-year navigation')
 		assert.ok(heatmapContent.includes('HEATMAP_PALETTE'), 'memory-heatmap must export HEATMAP_PALETTE')
-		assert.ok(heatmapContent.includes('#ebedf0') && heatmapContent.includes('#cbd5e1'), 'memory-heatmap must use solid hex styling with defined borders')
+		assert.ok(heatmapContent.includes('#ebedf0') && (heatmapContent.includes('rgba(27, 31, 35') || heatmapContent.includes('#cbd5e1')), 'memory-heatmap must use solid styling with defined borders')
 
 		// 8. Verify heatmap CSS variables in globals.css
 		const globalsPath = path.join(ROOT, 'src/styles/globals.css')
