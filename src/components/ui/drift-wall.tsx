@@ -71,8 +71,7 @@ export default function DriftWall({
   const containerRef = useRef<HTMLDivElement>(null)
   const planeRef = useRef<HTMLDivElement>(null)
   const rafIdRef = useRef<number | null>(null)
-  const [isInView, setIsInView] = useState(false)
-  const [isHovered, setIsHovered] = useState(false)
+  const [isInView, setIsInView] = useState(true)
 
   // Tracking click displacement to prevent dropped clicks in 3D animated environment
   const pointerDownPosRef = useRef<{ x: number; y: number; time: number } | null>(null)
@@ -135,7 +134,7 @@ export default function DriftWall({
     }
     const observer = new IntersectionObserver(([entry]) => {
       setIsInView(entry.isIntersecting)
-    }, { threshold: 0.05 })
+    }, { threshold: 0.01, rootMargin: '200px' })
     observer.observe(el)
     return () => observer.disconnect()
   }, [])
@@ -200,8 +199,6 @@ export default function DriftWall({
       `translateZ(0)`
   }, [tilt, turn, roll])
 
-  const isPaused = !isInView || (pauseOnHover && isHovered)
-
   const cssVars = useMemo(() => {
     const vars: Record<string, any> = {
       '--dw-tile-w': `${tileWidth}px`,
@@ -221,11 +218,10 @@ export default function DriftWall({
   return (
     <div
       ref={containerRef}
-      className={`drift-wall ${pauseOnHover && isHovered ? 'drift-wall--paused' : ''} ${className}`.trim()}
+      className={`drift-wall ${className}`.trim()}
       style={cssVars}
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
-      onMouseEnter={() => setIsHovered(true)}
       role="group"
       aria-label="Drifting wall of tiles"
     >
@@ -250,7 +246,7 @@ export default function DriftWall({
                 style={{
                   animation: `drift-wall-vertical ${duration} linear infinite`,
                   animationDirection: isReverse ? 'reverse' : 'normal',
-                  animationPlayState: isPaused ? 'paused' : 'running',
+                  animationPlayState: isInView ? 'running' : 'paused',
                 }}
               >
                 {/* 2 seamless loops for infinite vertical scroll */}

@@ -57,9 +57,7 @@
   gap: var(--dw-gap);
 }
 
-/* Instant hardware pause on hovered column or entire wall */
-.drift-wall--paused .drift-wall__track,
-.drift-wall:hover .drift-wall__track,
+/* Instant hardware pause ONLY on hovered column so the rest of the wall keeps flowing */
 .drift-wall__col:hover .drift-wall__track {
   animation-play-state: paused !important;
 }

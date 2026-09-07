@@ -282,9 +282,9 @@ function runTests() {
 		assert.ok(spiralContent.includes('cancelAnimationFrame'), 'InfiniteSpiral must cancelAnimationFrame when offscreen')
 		assert.ok(!spiralContent.includes('card.style.filter ='), 'InfiniteSpiral must not execute per-frame style.filter updates')
 
-		// 3. Check DriftWall viewport and hover awareness
+		// 3. Check DriftWall viewport awareness
 		const driftContent = fs.readFileSync(path.join(ROOT, 'src/components/ui/drift-wall.tsx'), 'utf8')
-		assert.ok(driftContent.includes("isPaused") && driftContent.includes("isInView"), 'DriftWall must pause tracks when offscreen or hovered')
+		assert.ok(driftContent.includes("isInView") && driftContent.includes("animationPlayState"), 'DriftWall must pause tracks when offscreen')
 
 		// 4. Check Marquee viewport awareness
 		const marqueeContent = fs.readFileSync(path.join(ROOT, 'src/components/ui/marquee.tsx'), 'utf8')
