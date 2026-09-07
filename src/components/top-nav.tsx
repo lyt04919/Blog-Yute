@@ -10,7 +10,8 @@ import { useConfigStore } from '@/app/(home)/stores/config-store'
 import { useTheme } from '@/hooks/use-theme'
 import { toast } from 'sonner'
 import { Dock, DockIcon } from '@/components/magicui/dock'
-import { Sun, Moon, ChevronDown, ChevronUp, Globe } from 'lucide-react'
+import { ChevronDown, ChevronUp, Globe } from 'lucide-react'
+import { ThemeToggleButton } from '@/components/theme-toggle-button'
 import { useMusicPlayerStore } from '@/hooks/use-music-player'
 
 // Nav Icons
@@ -267,9 +268,9 @@ export default function TopNav() {
 
 							{/* Theme Toggle */}
 							<DockIcon className="rounded-3xl cursor-pointer bg-white dark:bg-[var(--color-card)] border border-[#e4e4e7] dark:border-[var(--color-border)] shadow-sm text-[#52525b] dark:text-[var(--color-secondary)] hover:text-black dark:hover:text-[var(--color-primary)] transition-colors">
-							<TooltipWrapper content={resolvedTheme === 'dark' ? '切换亮色' : '切换暗色'} onClick={toggleTheme}>
-								{resolvedTheme === 'dark' ? <Sun className="size-full p-1.5" /> : <Moon className="size-full p-1.5" />}
-							</TooltipWrapper>
+								<TooltipWrapper content={resolvedTheme === 'dark' ? '切换亮色' : '切换暗色'}>
+									<ThemeToggleButton className="size-full p-1.5 text-inherit" />
+								</TooltipWrapper>
 							</DockIcon>
 						</Dock>
 

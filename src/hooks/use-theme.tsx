@@ -2,42 +2,18 @@
 
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react'
 
-type Theme = 'light' | 'dark' | 'system'
+export type Theme = 'light' | 'dark' | 'system'
 
 interface ThemeContextType {
 	theme: Theme
 	resolvedTheme: 'light' | 'dark'
 	setTheme: (theme: Theme) => void
-	toggleTheme: () => void
+	toggleTheme: (e?: React.MouseEvent) => void
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 const STORAGE_KEY = 'blog-theme'
-
-const lightColors = {
-	'--color-primary': '#111111',
-	'--color-secondary': '#666666',
-	'--color-brand-secondary': '#A0A0A0',
-	'--color-bg': '#FAFAFA',
-	'--color-border': '#E5E5E5',
-	'--color-brand': '#111111',
-	'--color-card': '#FFFFFF99',
-	'--color-article': '#FFFFFF',
-	'--color-accent': '#888888',
-}
-
-const darkColors = {
-	'--color-primary': '#FFFFFF',
-	'--color-secondary': '#A0A0A0',
-	'--color-brand-secondary': '#00F0FF',
-	'--color-bg': '#0A0A0A',
-	'--color-border': '#222222',
-	'--color-brand': '#00FF41',
-	'--color-card': '#111111',
-	'--color-article': '#111111',
-	'--color-accent': '#00FF41',
-}
 
 function getSystemTheme(): 'light' | 'dark' {
 	if (typeof window === 'undefined') return 'light'
@@ -53,62 +29,59 @@ function getStoredTheme(): Theme | null {
 	}
 }
 
-function getResolvedTheme(theme: Theme): 'light' | 'dark' {
-	if (theme === 'system') return getSystemTheme()
-	return theme
-}
-
 export function ThemeProvider({ children }: { children: ReactNode }) {
 	const [theme, setThemeState] = useState<Theme>('system')
 	const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light')
 	const [mounted, setMounted] = useState(false)
 
-	// Apply theme colors directly to document
-	const applyTheme = useCallback((newTheme: Theme) => {
-		const resolved = getResolvedTheme(newTheme)
-		setResolvedTheme(resolved)
-
+	const syncDOM = useCallback((currentTheme: 'light' | 'dark') => {
 		const root = document.documentElement
-		const colors = resolved === 'dark' ? darkColors : lightColors
-
-		Object.entries(colors).forEach(([key, value]) => {
-			root.style.setProperty(key, value)
-		})
-
-		// Also toggle class for any CSS that uses .dark selector
-		if (resolved === 'dark') {
+		if (currentTheme === 'dark') {
 			root.classList.add('dark')
 		} else {
 			root.classList.remove('dark')
 		}
+		root.setAttribute('data-theme', currentTheme)
 	}, [])
 
 	useEffect(() => {
 		const stored = getStoredTheme()
 		const initialTheme = stored || 'system'
 		setThemeState(initialTheme)
-		applyTheme(initialTheme)
+		const resolved = initialTheme === 'system' ? getSystemTheme() : initialTheme
+		setResolvedTheme(resolved)
+		syncDOM(resolved)
 		setMounted(true)
-	}, [applyTheme])
+	}, [syncDOM])
 
+	// Listen for OS theme preference changes
 	useEffect(() => {
-		if (!mounted) return
-		applyTheme(theme)
-	}, [theme, mounted, applyTheme])
-
-	useEffect(() => {
-		if (!mounted) return
-
 		const media = window.matchMedia('(prefers-color-scheme: dark)')
-		const handler = (e: MediaQueryListEvent) => {
+		const handler = () => {
 			if (theme === 'system') {
-				applyTheme('system')
+				const resolved = getSystemTheme()
+				setResolvedTheme(resolved)
+				syncDOM(resolved)
 			}
 		}
-
 		media.addEventListener('change', handler)
 		return () => media.removeEventListener('change', handler)
-	}, [theme, mounted, applyTheme])
+	}, [theme, syncDOM])
+
+	// Sync across tabs via storage event
+	useEffect(() => {
+		const handleStorage = (e: StorageEvent) => {
+			if (e.key === STORAGE_KEY && e.newValue) {
+				const newTheme = e.newValue as Theme
+				setThemeState(newTheme)
+				const resolved = newTheme === 'system' ? getSystemTheme() : newTheme
+				setResolvedTheme(resolved)
+				syncDOM(resolved)
+			}
+		}
+		window.addEventListener('storage', handleStorage)
+		return () => window.removeEventListener('storage', handleStorage)
+	}, [syncDOM])
 
 	const setTheme = useCallback((newTheme: Theme) => {
 		setThemeState(newTheme)
@@ -117,18 +90,59 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 		} catch {
 			// ignore
 		}
-	}, [])
+		const resolved = newTheme === 'system' ? getSystemTheme() : newTheme
+		setResolvedTheme(resolved)
+		syncDOM(resolved)
+	}, [syncDOM])
 
-	const toggleTheme = useCallback(() => {
-		const newTheme = resolvedTheme === 'dark' ? 'light' : 'dark'
-		setTheme(newTheme)
+	const toggleTheme = useCallback((e?: React.MouseEvent) => {
+		const nextTheme: 'light' | 'dark' = resolvedTheme === 'dark' ? 'light' : 'dark'
+
+		const prefersReducedMotion =
+			typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+		// Modern View Transitions API with circular ripple originating from click coordinates
+		if (
+			!prefersReducedMotion &&
+			typeof document !== 'undefined' &&
+			'startViewTransition' in document &&
+			e?.clientX !== undefined &&
+			e?.clientY !== undefined
+		) {
+			const x = e.clientX
+			const y = e.clientY
+			const endRadius = Math.hypot(
+				Math.max(x, window.innerWidth - x),
+				Math.max(y, window.innerHeight - y)
+			)
+
+			const transition = (document as any).startViewTransition(() => {
+				setTheme(nextTheme)
+			})
+
+			transition.ready?.then(() => {
+				document.documentElement.animate(
+					{
+						clipPath: [
+							`circle(0px at ${x}px ${y}px)`,
+							`circle(${endRadius}px at ${x}px ${y}px)`
+						]
+					},
+					{
+						duration: 400,
+						easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+						pseudoElement: '::view-transition-new(root)'
+					}
+				)
+			})
+			return
+		}
+
+		setTheme(nextTheme)
 	}, [resolvedTheme, setTheme])
 
-	// We remove the early return during !mounted to ensure Server Rendering matches the wrapper structure
-	// Next.js handles suppressHydrationWarning on html tag which prevents mismatches for the .dark class
-
 	return (
-		<ThemeContext.Provider value={{ theme, resolvedTheme, setTheme, toggleTheme }}>
+		<ThemeContext.Provider value={{ theme, resolvedTheme: mounted ? resolvedTheme : 'light', setTheme, toggleTheme }}>
 			{children}
 		</ThemeContext.Provider>
 	)
@@ -137,7 +151,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 export function useTheme() {
 	const context = useContext(ThemeContext)
 	if (context === undefined) {
-		// Return default values when used outside ThemeProvider (SSR safety)
 		return {
 			theme: 'system' as Theme,
 			resolvedTheme: 'light' as 'light' | 'dark',

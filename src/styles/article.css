@@ -212,3 +212,21 @@
 	border: 1px solid var(--color-border);
 	border-radius: 8px;
 }
+
+/* Shiki dual-theme support */
+html.dark .shiki,
+.dark .shiki,
+html.dark .shiki span,
+.dark .shiki span {
+	color: var(--shiki-dark) !important;
+	background-color: var(--shiki-dark-bg) !important;
+	font-style: var(--shiki-dark-font-style) !important;
+	font-weight: var(--shiki-dark-font-weight) !important;
+	text-decoration: var(--shiki-dark-text-decoration) !important;
+}
+
+html.dark .prose pre,
+.dark .prose pre {
+	background-color: var(--shiki-dark-bg, var(--color-article)) !important;
+}
+

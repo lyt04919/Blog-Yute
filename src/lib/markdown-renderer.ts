@@ -1,5 +1,4 @@
-import { marked } from 'marked'
-import type { Tokens } from 'marked'
+import { Marked, type Tokens } from 'marked'
 
 export type TocItem = { id: string; text: string; level: number }
 
@@ -16,7 +15,7 @@ export function slugify(text: string): string {
 		.replace(/\s+/g, '-')
 }
 
-// Lazy load shiki to handle environments where it's not available (e.g., Cloudflare Workers)
+// Lazy load shiki
 let shikiModule: typeof import('shiki') | null = null
 let shikiLoadAttempted = false
 
@@ -35,7 +34,7 @@ async function loadShiki() {
 	}
 }
 
-// Lazy load katex to handle environments where it's not available (e.g., Cloudflare Workers)
+// Lazy load katex
 let katexModule: typeof import('katex') | null = null
 let katexLoadAttempted = false
 
@@ -45,8 +44,6 @@ async function loadKatex() {
 	katexLoadAttempted = true
 
 	try {
-		// katex is published as CJS; depending on bundler/runtime the dynamic import
-		// may return either the exports object directly or as `default`.
 		const mod: any = await import('katex')
 		katexModule = (mod?.default ?? mod) as any
 		return katexModule
@@ -56,78 +53,34 @@ async function loadKatex() {
 	}
 }
 
-export async function renderMarkdown(markdown: string = ''): Promise<MarkdownRenderResult> {
-	if (!markdown) markdown = ''
-	// Load optional renderers first so they apply on the FIRST lex/parse pass.
-	// (If we lex before registering extensions, math tokens won't ever be produced on a cold refresh.)
-	const codeBlockMap = new Map<string, { html: string; original: string }>()
-	const [shiki, katex] = await Promise.all([loadShiki(), loadKatex()])
-
-	// Render HTML with heading ids
-	const renderer = new marked.Renderer()
-
-	renderer.heading = (token: Tokens.Heading) => {
-		const id = slugify(token.text || '')
-		return `<h${token.depth} id="${id}">${token.text}</h${token.depth}>`
+function renderMathWithKatex(content: string, displayMode: boolean, katex: any) {
+	if (!katex) {
+		return displayMode ? `$$${content}$$` : `$${content}$`
 	}
-
-	renderer.code = (token: Tokens.Code) => {
-		// Check if this code block was pre-processed
-		const codeData = codeBlockMap.get(token.text)
-		if (codeData) {
-			// Add data-code attribute with original code for copy functionality
-			// Escape HTML entities for attribute value
-			const escapedCode = codeData.original.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-			if (codeData.html) {
-				// Shiki highlighted code - inject data-code into the existing pre tag
-				return codeData.html.replace(/^<pre/, `<pre data-code="${escapedCode}"`)
-			}
-			// Fallback for failed highlighting - use escapedCode to prevent raw JSX from being parsed as HTML elements
-			return `<pre data-code="${escapedCode}"><code>${escapedCode}</code></pre>`
-		}
-		// Fallback to default (inline code, not code block)
-		return `<pre><code class="language-${token.lang || 'text'}">${token.text}</code></pre>`
+	try {
+		return katex.renderToString(content, {
+			displayMode,
+			throwOnError: false,
+			output: 'html',
+			strict: 'ignore'
+		})
+	} catch {
+		return displayMode ? `$$${content}$$` : `$${content}$`
 	}
+}
 
-	renderer.listitem = (token: Tokens.ListItem) => {
-		// Render inline markdown inside list items (e.g. links, emphasis)
-		let inner = token.text
-		let tokens = token.tokens
+let markedInstance: Marked | null = null
 
-		if (token.task) tokens = tokens.slice(1)
-		inner = marked.parser(tokens) as string
+function getOrCreateMarked(katex: any) {
+	if (markedInstance) return markedInstance
 
-		if (token.task) {
-			const checkbox = token.checked ? '<input type="checkbox" checked disabled />' : '<input type="checkbox" disabled />'
-			return `<li class="task-list-item">${checkbox} ${inner}</li>\n`
-		}
+	const instance = new Marked({
+		gfm: true,
+		breaks: true
+	})
 
-		return `<li>${inner}</li>\n`
-	}
-
-	const renderMath = (content: string, displayMode: boolean) => {
-		if (!katex) {
-			// Keep original delimiters if katex is not available
-			return displayMode ? `$$${content}$$` : `$${content}$`
-		}
-
-		try {
-			return katex.renderToString(content, {
-				displayMode,
-				throwOnError: false,
-				output: 'html',
-				strict: 'ignore'
-			})
-		} catch {
-			return displayMode ? `$$${content}$$` : `$${content}$`
-		}
-	}
-
-	// Register extensions BEFORE lexing so math gets tokenized on cold refresh.
-	marked.use({
-		renderer,
+	instance.use({
 		extensions: [
-			// Block math: $$ ... $$
 			{
 				name: 'mathBlock',
 				level: 'block',
@@ -144,10 +97,9 @@ export async function renderMarkdown(markdown: string = ''): Promise<MarkdownRen
 					} as any
 				},
 				renderer(token: any) {
-					return `${renderMath(token.text || '', true)}\n`
+					return `${renderMathWithKatex(token.text || '', true, katexModule)}\n`
 				}
 			},
-			// Inline math: $ ... $
 			{
 				name: 'mathInline',
 				level: 'inline',
@@ -156,7 +108,6 @@ export async function renderMarkdown(markdown: string = ''): Promise<MarkdownRen
 					return idx === -1 ? undefined : idx
 				},
 				tokenizer(src: string) {
-					// Avoid $$ (block) and escaped dollars
 					if (src.startsWith('$$')) return
 					if (src.startsWith('\\$')) return
 
@@ -164,7 +115,6 @@ export async function renderMarkdown(markdown: string = ''): Promise<MarkdownRen
 					if (!match) return
 
 					const inner = match[1]
-					// Heuristic: require some non-space content
 					if (!inner || !inner.trim()) return
 
 					return {
@@ -174,26 +124,51 @@ export async function renderMarkdown(markdown: string = ''): Promise<MarkdownRen
 					} as any
 				},
 				renderer(token: any) {
-					return renderMath(token.text || '', false)
+					return renderMathWithKatex(token.text || '', false, katexModule)
 				}
 			}
-		]
+		],
+		renderer: {
+			heading(token: Tokens.Heading) {
+				const id = slugify(token.text || '')
+				return `<h${token.depth} id="${id}">${token.text}</h${token.depth}>`
+			},
+			listitem(token: Tokens.ListItem) {
+				let inner = token.text
+				let tokens = token.tokens
+				if (token.task) tokens = tokens.slice(1)
+				inner = instance.parser(tokens) as string
+
+				if (token.task) {
+					const checkbox = token.checked ? '<input type="checkbox" checked disabled />' : '<input type="checkbox" disabled />'
+					return `<li class="task-list-item">${checkbox} ${inner}</li>\n`
+				}
+				return `<li>${inner}</li>\n`
+			}
+		}
 	})
 
-	// Pre-process with marked lexer first (after extensions are registered)
-	const tokens = marked.lexer(markdown)
+	markedInstance = instance
+	return markedInstance
+}
 
-	// Extract TOC from parsed tokens (this correctly skips code blocks)
+export async function renderMarkdown(markdown: string = ''): Promise<MarkdownRenderResult> {
+	if (!markdown) markdown = ''
+	const [shiki, katex] = await Promise.all([loadShiki(), loadKatex()])
+	const parserInstance = getOrCreateMarked(katex)
+
+	const codeBlockMap = new Map<string, { html: string; original: string }>()
+	const tokens = parserInstance.lexer(markdown)
+
+	// Extract TOC from parsed tokens
 	const toc: TocItem[] = []
 	function extractHeadings(tokenList: typeof tokens) {
 		for (const token of tokenList) {
 			if (token.type === 'heading' && token.depth <= 3) {
-				// Use the parsed text (markdown syntax like links/code already stripped)
 				const text = token.text
 				const id = slugify(text)
 				toc.push({ id, text, level: token.depth })
 			}
-			// Recursively check nested tokens (e.g., in blockquotes, lists)
 			if ('tokens' in token && token.tokens) {
 				extractHeadings(token.tokens as typeof tokens)
 			}
@@ -212,23 +187,43 @@ export async function renderMarkdown(markdown: string = ''): Promise<MarkdownRen
 				try {
 					const html = await shiki.codeToHtml(originalCode, {
 						lang: codeToken.lang || 'text',
-						theme: 'one-light'
+						themes: {
+							light: 'one-light',
+							dark: 'one-dark-pro'
+						}
 					})
 					codeBlockMap.set(key, { html, original: originalCode })
 					codeToken.text = key
 				} catch {
-					// Keep original if highlighting fails
 					codeBlockMap.set(key, { html: '', original: originalCode })
 					codeToken.text = key
 				}
 			} else {
-				// Fallback when shiki is not available
 				codeBlockMap.set(key, { html: '', original: originalCode })
 				codeToken.text = key
 			}
 		}
 	}
-	const html = (marked.parser(tokens) as string) || ''
+
+	let html = (parserInstance.parser(tokens) as string) || ''
+
+	if (codeBlockMap.size > 0) {
+		for (const [key, codeData] of codeBlockMap.entries()) {
+			const escapedCode = codeData.original
+				.replace(/&/g, '&amp;')
+				.replace(/"/g, '&quot;')
+				.replace(/'/g, '&#39;')
+				.replace(/</g, '&lt;')
+				.replace(/>/g, '&gt;')
+
+			const replacement = codeData.html
+				? codeData.html.replace(/^<pre/, `<pre data-code="${escapedCode}"`)
+				: `<pre data-code="${escapedCode}"><code>${escapedCode}</code></pre>`
+
+			const pattern = new RegExp(`<pre><code[^>]*>${key}<\\/code><\\/pre>`, 'g')
+			html = html.replace(pattern, replacement)
+		}
+	}
 
 	return { html, toc }
 }

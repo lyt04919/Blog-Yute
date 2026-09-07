@@ -337,10 +337,21 @@ function runTests() {
 		const calendarContent = fs.readFileSync(calendarPath, 'utf8')
 		assert.ok(calendarContent.includes("day.isSame(endDate, 'day')"), 'diary-calendar must include the end of the week')
 
-		// 7. Verify memory heatmap supports onSelectDate
+		// 7. Verify memory heatmap supports onSelectDate, multi-year switcher, and high-contrast CSS variable styling
 		const heatmapPath = path.join(ROOT, 'src/app/vault/diary/components/memory-heatmap.tsx')
 		const heatmapContent = fs.readFileSync(heatmapPath, 'utf8')
 		assert.ok(heatmapContent.includes('onSelectDate?: (dateStr: string) => void'), 'memory-heatmap must support onSelectDate prop')
+		assert.ok(heatmapContent.includes('getHeatmapLevel'), 'memory-heatmap must export getHeatmapLevel')
+		assert.ok(heatmapContent.includes('availableYears'), 'memory-heatmap must support multi-year navigation')
+		assert.ok(heatmapContent.includes('var(--heatmap-bg-'), 'memory-heatmap must use guaranteed CSS variables for cell styling')
+
+		// 8. Verify heatmap CSS variables in globals.css
+		const globalsPath = path.join(ROOT, 'src/styles/globals.css')
+		const globalsContent = fs.readFileSync(globalsPath, 'utf8')
+		assert.ok(globalsContent.includes('--heatmap-bg-0: #ebedf0'), 'globals.css must define light theme empty cell color')
+		assert.ok(globalsContent.includes('--heatmap-bg-0: #21262d'), 'globals.css must define dark theme empty cell color')
+		assert.ok(globalsContent.includes('--heatmap-bg-1: #9be9a8'), 'globals.css must define light theme level 1 cell color')
+		assert.ok(globalsContent.includes('--heatmap-bg-4: #216e39'), 'globals.css must define light theme level 4 cell color')
 	})
 
 	// 12. Verify Global Audio Ecosystem & High-Performance Decoupled Architecture
@@ -385,6 +396,49 @@ function runTests() {
 		assert.ok(previewRouteContent.includes('trackId'), 'music-preview must support trackId lookup')
 		assert.ok(previewRouteContent.includes('albumId'), 'music-preview must support albumId lookup')
 		assert.ok(engineContent.includes('trackId') && engineContent.includes('albumId'), 'GlobalAudioEngine must extract and pass trackId and albumId')
+	})
+
+	// 13. Check Theme Architecture & Zero-FOUC Implementation
+	test('Theme switching system implements zero-FOUC, accessible toggle, and clean transitions', () => {
+		// 1. Check layout.tsx for synchronous theme initialization script
+		const layoutPath = path.join(ROOT, 'src/app/layout.tsx')
+		const layoutContent = fs.readFileSync(layoutPath, 'utf8')
+		assert.ok(layoutContent.includes('blog-theme'), 'layout.tsx must inspect blog-theme in localStorage')
+		assert.ok(layoutContent.includes('prefers-color-scheme: dark'), 'layout.tsx must check system theme preference')
+		assert.ok(layoutContent.includes("classList.add('dark')"), 'layout.tsx must synchronously add dark class')
+
+		// 2. Check globals.css for transition cleanup
+		const globalsCssPath = path.join(ROOT, 'src/styles/globals.css')
+		const globalsCssContent = fs.readFileSync(globalsCssPath, 'utf8')
+		assert.ok(!globalsCssContent.includes('*, *::before, *::after {\n\t\ttransition: background-color'), 'globals.css must not apply wildcard transition')
+		assert.ok(globalsCssContent.includes('::view-transition-old(root)'), 'globals.css must support view transitions')
+
+		// 3. Check use-theme.tsx for clean DOM sync and view transitions
+		const useThemePath = path.join(ROOT, 'src/hooks/use-theme.tsx')
+		const useThemeContent = fs.readFileSync(useThemePath, 'utf8')
+		assert.ok(!useThemeContent.includes('#00FF41'), 'use-theme.tsx must not contain hardcoded cyberpunk colors')
+		assert.ok(!useThemeContent.includes('root.style.setProperty'), 'use-theme.tsx must not pollute documentElement inline styles')
+		assert.ok(useThemeContent.includes('startViewTransition'), 'use-theme.tsx must support View Transitions API')
+		assert.ok(useThemeContent.includes("addEventListener('storage'"), 'use-theme.tsx must sync across tabs')
+
+		// 4. Check theme-toggle-button.tsx for a11y & tactile feedback
+		const toggleButtonPath = path.join(ROOT, 'src/components/theme-toggle-button.tsx')
+		assert.ok(fs.existsSync(toggleButtonPath), 'theme-toggle-button.tsx must exist')
+		const toggleContent = fs.readFileSync(toggleButtonPath, 'utf8')
+		assert.ok(toggleContent.includes('role="switch"'), 'ThemeToggleButton must declare role=switch')
+		assert.ok(toggleContent.includes('aria-checked='), 'ThemeToggleButton must declare aria-checked')
+		assert.ok(toggleContent.includes('aria-label='), 'ThemeToggleButton must declare aria-label')
+		assert.ok(toggleContent.includes('AudioContext'), 'ThemeToggleButton must synthesize haptic sound')
+
+		// 5. Check markdown-renderer.ts for dual themes
+		const markdownPath = path.join(ROOT, 'src/lib/markdown-renderer.ts')
+		const markdownContent = fs.readFileSync(markdownPath, 'utf8')
+		assert.ok(markdownContent.includes('one-dark-pro'), 'markdown-renderer must support dual themes including dark')
+
+		// 6. Check top-nav.tsx for integration
+		const topNavPath = path.join(ROOT, 'src/components/top-nav.tsx')
+		const topNavContent = fs.readFileSync(topNavPath, 'utf8')
+		assert.ok(topNavContent.includes('ThemeToggleButton'), 'top-nav.tsx must integrate ThemeToggleButton')
 	})
 
 	console.log(`\n🏁 Test Results: ${passed}/${total} passed.`)

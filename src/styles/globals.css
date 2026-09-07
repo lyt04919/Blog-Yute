@@ -69,21 +69,39 @@
 	html {
 		@apply text-primary bg-bg min-h-full leading-tight;
 		scroll-behavior: smooth;
-		transition: background-color 0.3s ease, color 0.3s ease;
 	}
 
-	/* Theme transition for all color-related properties */
-	*, *::before, *::after {
-		transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+	/* Theme transition scoped to major layout surfaces */
+	html, body {
+		transition: background-color 0.25s ease, color 0.25s ease;
 	}
 
 	/* Respect prefers-reduced-motion */
 	@media (prefers-reduced-motion: reduce) {
-		html, *, *::before, *::after {
+		html, body, *, *::before, *::after {
 			transition-duration: 0.01ms !important;
 			animation-duration: 0.01ms !important;
 			animation-iteration-count: 1 !important;
 		}
+	}
+
+	/* View Transitions ripple rules */
+	::view-transition-old(root),
+	::view-transition-new(root) {
+		animation: none;
+		mix-blend-mode: normal;
+	}
+	::view-transition-old(root) {
+		z-index: 1;
+	}
+	::view-transition-new(root) {
+		z-index: 9999;
+	}
+	.dark::view-transition-old(root) {
+		z-index: 9999;
+	}
+	.dark::view-transition-new(root) {
+		z-index: 1;
 	}
 
 	body {
@@ -589,5 +607,34 @@
 
 .bento-card-root:hover .bento-card-bg-widget {
 	transform: scale(1.04) !important;
+}
+
+/* ==========================================================================
+   Diary Memory Heatmap Grid Styling
+   ========================================================================== */
+:root {
+	--heatmap-bg-0: #ebedf0;
+	--heatmap-border-0: rgba(27, 31, 35, 0.08);
+	--heatmap-bg-1: #9be9a8;
+	--heatmap-border-1: rgba(27, 31, 35, 0.12);
+	--heatmap-bg-2: #40c463;
+	--heatmap-border-2: rgba(27, 31, 35, 0.14);
+	--heatmap-bg-3: #30a14e;
+	--heatmap-border-3: rgba(27, 31, 35, 0.16);
+	--heatmap-bg-4: #216e39;
+	--heatmap-border-4: rgba(27, 31, 35, 0.2);
+}
+
+.dark {
+	--heatmap-bg-0: #21262d;
+	--heatmap-border-0: rgba(255, 255, 255, 0.08);
+	--heatmap-bg-1: #0e4429;
+	--heatmap-border-1: rgba(0, 255, 128, 0.12);
+	--heatmap-bg-2: #006d32;
+	--heatmap-border-2: rgba(0, 255, 128, 0.18);
+	--heatmap-bg-3: #26a641;
+	--heatmap-border-3: rgba(0, 255, 128, 0.24);
+	--heatmap-bg-4: #39d353;
+	--heatmap-border-4: rgba(0, 255, 128, 0.3);
 }
 

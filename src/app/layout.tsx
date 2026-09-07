@@ -50,6 +50,21 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
 				<script
 					dangerouslySetInnerHTML={{
 						__html: `
+					try {
+						var storageKey = 'blog-theme';
+						var stored = localStorage.getItem(storageKey);
+						var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+						var theme = stored || 'system';
+						var isDark = theme === 'dark' || (theme === 'system' && systemDark);
+						var root = document.documentElement;
+						if (isDark) {
+							root.classList.add('dark');
+						} else {
+							root.classList.remove('dark');
+						}
+						root.setAttribute('data-theme', isDark ? 'dark' : 'light');
+					} catch (e) {}
+
 					if (/windows|win32/i.test(navigator.userAgent)) {
 						document.documentElement.classList.add('windows');
 					}
