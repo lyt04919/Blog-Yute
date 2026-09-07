@@ -6,7 +6,7 @@
     "dev": "NAPI_RS_FORCE_WASI=1 NEXT_TEST_WASM=1 next dev --webpack -p 2025",
     "svg": "node scripts/gen-svgs-index.js",
     "test": "node scripts/verify-performance-and-integrity.js",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "build:cf": "opennextjs-cloudflare build",
     "preview": "opennextjs-cloudflare preview",

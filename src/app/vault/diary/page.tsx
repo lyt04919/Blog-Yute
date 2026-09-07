@@ -165,7 +165,7 @@ export default function Page() {
 						<OnThisDay diaries={diaries} />
 					</div>
 					<div className="w-[1px] h-32 bg-neutral-200 dark:bg-neutral-800 hidden md:block shrink-0" />
-					<div className="flex-1 w-full flex md:justify-end shrink-0 min-w-max">
+					<div className="flex-1 w-full flex justify-start md:justify-end min-w-0">
 						<MemoryHeatmap 
 							diaries={diaries} 
 							selectedDate={filters.date} 
