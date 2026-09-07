@@ -163,7 +163,7 @@ export default function AudioCinemaLounge() {
 			}))
 	}, [])
 
-	const cardPitchHorizontal = 205
+	const cardPitchHorizontal = 240
 	const speedPxPerSec = 65
 
 	const gamesDuration = `${Math.max(12, Math.round((gamesList.length * cardPitchHorizontal) / speedPxPerSec))}s`
@@ -554,12 +554,12 @@ export default function AudioCinemaLounge() {
 											link: game.link,
 											review: game.review
 										})}
-										style={{ width: '185px' }}
-										className="shrink-0 group/card cursor-pointer flex flex-col items-center mx-1.5"
+										style={{ width: '224px' }}
+										className="shrink-0 group/card cursor-pointer flex flex-col items-center mx-2"
 									>
 										{/* Steam 16:9 横版胶囊相框 */}
 										<div 
-											style={{ width: '185px', height: '104px' }}
+											style={{ width: '224px', height: '126px' }}
 											className="relative rounded-2xl overflow-hidden bg-zinc-950 shadow-[0_8px_20px_rgba(0,0,0,0.16)] dark:shadow-[0_10px_24px_rgba(0,0,0,0.55)] border border-zinc-200/90 dark:border-zinc-800 transition-all duration-300 group-hover/card:scale-104 group-hover/card:-translate-y-1"
 										>
 											<img
@@ -575,26 +575,14 @@ export default function AudioCinemaLounge() {
 											</div>
 										</div>
 
-										{/* 标题与真实星级 */}
-										<div className="pt-2 text-center w-full px-1">
+										{/* 标题与副标题 */}
+										<div className="pt-2 text-center w-full px-1.5">
 											<h4 className="text-xs font-serif font-bold text-zinc-900 dark:text-zinc-100 truncate tracking-tight">
 												{game.title}
 											</h4>
 											<p className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
 												{game.subtitle}
 											</p>
-											<div className="flex items-center justify-center gap-0.5 mt-1">
-												{Array.from({ length: 5 }).map((_, i) => (
-													<Star 
-														key={i} 
-														className={`w-2.5 h-2.5 ${
-															i < (game.stars || 5) 
-																? 'fill-amber-400 text-amber-400' 
-																: 'fill-transparent text-zinc-300 dark:text-zinc-700'
-														}`} 
-													/>
-												))}
-											</div>
 										</div>
 									</div>
 								))}
@@ -622,12 +610,12 @@ export default function AudioCinemaLounge() {
 								{videosList.map((video) => (
 									<div
 										key={video.id}
-										style={{ width: '185px' }}
-										className="shrink-0 group/card cursor-pointer flex flex-col items-center mx-1.5"
+										style={{ width: '224px' }}
+										className="shrink-0 group/card cursor-pointer flex flex-col items-center mx-2"
 									>
 										{/* YouTube 16:9 宽屏相框：点击直接唤起 HeroVideoModal 原地播放 */}
 										<div 
-											style={{ width: '185px', height: '104px' }}
+											style={{ width: '224px', height: '126px' }}
 											className="relative rounded-2xl overflow-hidden bg-zinc-950 shadow-[0_8px_20px_rgba(0,0,0,0.16)] dark:shadow-[0_10px_24px_rgba(0,0,0,0.55)] border border-zinc-200/90 dark:border-zinc-800 transition-all duration-300 group-hover/card:scale-104 group-hover/card:-translate-y-1"
 											onClick={(e) => {
 												e.stopPropagation()
@@ -655,9 +643,9 @@ export default function AudioCinemaLounge() {
 											</div>
 										</div>
 
-										{/* 标题与真实星级：点击打开详情弹窗 */}
+										{/* 标题与副标题：点击打开详情弹窗 */}
 										<div 
-											className="pt-2 text-center w-full px-1"
+											className="pt-2 text-center w-full px-1.5"
 											onClick={() => setSelectedItem({
 												title: video.title,
 												cover: video.cover,
@@ -680,18 +668,6 @@ export default function AudioCinemaLounge() {
 											<p className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
 												{video.subtitle}
 											</p>
-											<div className="flex items-center justify-center gap-0.5 mt-1">
-												{Array.from({ length: 5 }).map((_, i) => (
-													<Star 
-														key={i} 
-														className={`w-2.5 h-2.5 ${
-															i < (video.stars || 5) 
-																? 'fill-amber-400 text-amber-400' 
-																: 'fill-transparent text-zinc-300 dark:text-zinc-700'
-														}`} 
-													/>
-												))}
-											</div>
 										</div>
 									</div>
 								))}

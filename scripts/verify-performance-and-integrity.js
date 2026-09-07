@@ -143,7 +143,10 @@ function runTests() {
 		assert.ok(loungeContent.includes('mask-image:linear-gradient'), 'AudioCinemaLounge must use CSS mask-image for feathering')
 		assert.ok(loungeContent.includes('HeroVideoModal'), 'AudioCinemaLounge must integrate HeroVideoModal for cinema video playback')
 		assert.ok(loungeContent.includes('useMusicPlayerStore'), 'AudioCinemaLounge must integrate useMusicPlayerStore for unified playback')
-		assert.ok(loungeContent.includes('togglePlayState'), 'AudioCinemaLounge must support unified playback control')
+		assert.ok(loungeContent.includes("style={{ width: '224px' }}"), 'AudioCinemaLounge cards must have enlarged width of 224px')
+		assert.ok(loungeContent.includes("style={{ width: '224px', height: '126px' }}"), 'AudioCinemaLounge covers must have 16:9 224px x 126px dimensions')
+		assert.ok(!loungeContent.includes('i < (game.stars || 5)'), 'AudioCinemaLounge game marquee card must not display inline stars')
+		assert.ok(!loungeContent.includes('i < (video.stars || 5)'), 'AudioCinemaLounge video marquee card must not display inline stars')
 
 		const geekBentoContent = fs.readFileSync(path.join(ROOT, 'src/components/geek-identity-bento.tsx'), 'utf8')
 		assert.ok(geekBentoContent.includes("import shareData from '@/app/favorite/share/list.json'"), 'GeekIdentityBento must import shareData for Web & Tools')
