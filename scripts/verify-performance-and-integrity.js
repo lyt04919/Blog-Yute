@@ -441,6 +441,36 @@ function runTests() {
 		assert.ok(topNavContent.includes('ThemeToggleButton'), 'top-nav.tsx must integrate ThemeToggleButton')
 	})
 
+	// 14. Verify CornerMusicPlayer inspired by clay-blog: floating vinyl disc and expandable console
+	test('CornerMusicPlayer implements floating vinyl toggle, expandable glass console and queue drawer', () => {
+		const playerPath = path.join(ROOT, 'src/app/favorite/components/corner-music-player.tsx')
+		assert.ok(fs.existsSync(playerPath), 'corner-music-player.tsx must exist')
+		const playerContent = fs.readFileSync(playerPath, 'utf8')
+
+		// 1. Vinyl disc styling and animation
+		assert.ok(playerContent.includes('vinyl-disc'), 'CornerMusicPlayer must style vinyl disc')
+		assert.ok(playerContent.includes('animate-spin-slow'), 'CornerMusicPlayer must have smooth rotating animation')
+		assert.ok(playerContent.includes('repeating-radial-gradient'), 'CornerMusicPlayer must have concentric groove texture')
+
+		// 2. Expandable console
+		assert.ok(playerContent.includes('isExpanded'), 'CornerMusicPlayer must manage isExpanded state')
+		assert.ok(playerContent.includes('AudioProgressBar'), 'CornerMusicPlayer must embed decoupled AudioProgressBar')
+		assert.ok(playerContent.includes('ListMusic'), 'CornerMusicPlayer must display queue drawer')
+		assert.ok(playerContent.includes('activeList'), 'CornerMusicPlayer must support playlist switching')
+		assert.ok(playerContent.includes('Escape'), 'CornerMusicPlayer must support Escape key to collapse')
+
+		// 3. Layout coordination
+		const layoutPath = path.join(ROOT, 'src/layout/index.tsx')
+		const layoutContent = fs.readFileSync(layoutPath, 'utf8')
+		assert.ok(!layoutContent.includes('<MusicCard'), 'Root layout must not render obsolete MusicCard')
+		assert.ok(layoutContent.includes('bottom-24'), 'ScrollTopButton must be positioned at bottom-24 to avoid collision')
+
+		// 4. Compatibility export
+		const dockPath = path.join(ROOT, 'src/app/favorite/components/music-player-dock.tsx')
+		const dockContent = fs.readFileSync(dockPath, 'utf8')
+		assert.ok(dockContent.includes('CornerMusicPlayer'), 'music-player-dock must export CornerMusicPlayer')
+	})
+
 	console.log(`\n🏁 Test Results: ${passed}/${total} passed.`)
 	if (passed === total) {
 		console.log('✨ All performance and integrity tests PASSED successfully!\n')

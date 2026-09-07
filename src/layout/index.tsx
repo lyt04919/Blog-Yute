@@ -9,7 +9,6 @@ import { CircleCheckIcon, InfoIcon, Loader2Icon, OctagonXIcon, TriangleAlertIcon
 import { useSize, useSizeInit } from '@/hooks/use-size'
 import { useConfigStore } from '@/app/(home)/stores/config-store'
 import { ScrollTopButton } from '@/components/scroll-top-button'
-import MusicCard from '@/components/music-card'
 import ModeToggle from '@/components/mode-toggle'
 import { ThemeProvider } from '@/hooks/use-theme'
 import Footer from './footer'
@@ -101,9 +100,8 @@ export default function Layout({ children }: PropsWithChildren) {
 			{!isWrite && <TopNav />}
 			<GlobalAudioEngine />
 			{!isWrite && <MusicPlayerDock />}
-			{!isHome && !isFullMap && !isWrite && !maxSM && cardStyles.musicCard?.enabled !== false && <MusicCard />}
 
-			{!isFullMap && !isWrite && init && <ScrollTopButton className='bg-brand/20 fixed right-6 bottom-28 z-50 shadow-md' />}
+			{!isFullMap && !isWrite && init && <ScrollTopButton className='bg-brand/20 fixed right-6 bottom-24 z-40 shadow-md' />}
 			{!isHome && !isFullMap && <Footer />}
 		</ThemeProvider>
 	)
