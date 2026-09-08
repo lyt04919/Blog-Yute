@@ -566,9 +566,6 @@ export default function AudioCinemaLounge() {
 												style={{ width: '100%', height: '100%', objectFit: 'cover' }}
 												className="transition-transform duration-500 group-hover/card:scale-106 select-none pointer-events-none"
 											/>
-											<div className="absolute top-2 left-2 px-2 py-0.5 rounded-full backdrop-blur-md bg-black/65 text-purple-300 text-[8.5px] font-mono font-bold border border-purple-400/30">
-												{game.status}
-											</div>
 										</div>
 
 										{/* 标题与副标题 */}
