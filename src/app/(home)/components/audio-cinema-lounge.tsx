@@ -17,7 +17,6 @@ import {
 	Tv, 
 	Disc, 
 	Sparkles, 
-	PlayCircle,
 	Copy,
 	Check,
 	Loader2
@@ -633,10 +632,6 @@ export default function AudioCinemaLounge() {
 												<div className="w-10 h-10 rounded-full bg-rose-600/90 text-white flex items-center justify-center shadow-lg transform group-hover/card:scale-110 transition-transform">
 													<Play className="w-5 h-5 fill-white translate-x-0.5" />
 												</div>
-											</div>
-											<div className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded-md backdrop-blur-md bg-black/70 text-rose-300 text-[8.5px] font-mono font-bold border border-rose-400/30 flex items-center gap-1">
-												<PlayCircle className="w-2.5 h-2.5 text-rose-400" />
-												<span>PLAY</span>
 											</div>
 										</div>
 
