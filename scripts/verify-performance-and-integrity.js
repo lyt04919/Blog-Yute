@@ -258,6 +258,7 @@ function runTests() {
 		assert.ok(fs.existsSync(blogEditorialPath), 'src/components/blog-editorial-card.tsx should exist')
 		const editorialContent = fs.readFileSync(blogEditorialPath, 'utf8')
 		assert.ok(editorialContent.includes('isHero'), 'BlogEditorialCard must support isHero variant')
+		assert.ok(editorialContent.includes('absolute inset-0 w-full h-full object-cover'), 'BlogEditorialCard must contain images absolutely to prevent vertical aspect-ratio blowout')
 
 		const toolbarPath = path.join(ROOT, 'src/components/ui/standard-toolbar.tsx')
 		const toolbarContent = fs.readFileSync(toolbarPath, 'utf8')

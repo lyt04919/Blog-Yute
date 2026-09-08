@@ -94,8 +94,8 @@ export function BlogEditorialCard({
 						className={cn(
 							'relative overflow-hidden shrink-0 bg-slate-100 dark:bg-zinc-800/80',
 							isHero
-								? 'w-full md:w-1/2 min-h-[260px] sm:min-h-[340px] md:min-h-[400px]'
-								: 'w-full md:w-2/5 min-h-[220px] md:min-h-[260px]'
+								? 'w-full md:w-5/12 lg:w-4/12 h-52 sm:h-60 md:h-auto min-h-[190px] md:min-h-[220px]'
+								: 'w-full md:w-4/12 lg:w-3/12 h-44 sm:h-52 md:h-auto min-h-[170px] md:min-h-[190px]'
 						)}
 					>
 						{blog.cover && !imageError ? (
@@ -110,14 +110,14 @@ export function BlogEditorialCard({
 									onLoad={() => setImageLoaded(true)}
 									onError={() => setImageError(true)}
 									className={cn(
-										'w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105',
+										'absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105',
 										!imageLoaded && 'opacity-0'
 									)}
 								/>
 							</>
 						) : (
 							<div className="w-full h-full flex flex-col items-center justify-center text-[var(--color-secondary)]/40 gap-3 p-8">
-								<BookIcon className="h-12 w-12 stroke-[1.2]" />
+								<BookIcon className="h-10 w-10 stroke-[1.2]" />
 								<span className="text-xs tracking-widest uppercase font-mono">Editorial Essay</span>
 							</div>
 						)}
@@ -127,8 +127,8 @@ export function BlogEditorialCard({
 
 						{/* 头条精选角标 */}
 						{isHero && (
-							<div className="absolute top-4 left-4 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900/85 dark:bg-white/90 text-white dark:text-slate-950 backdrop-blur-md text-xs font-semibold tracking-wide shadow-lg">
-								<Sparkles className="w-3.5 h-3.5 text-amber-400 dark:text-amber-500 fill-amber-400 dark:fill-amber-500" />
+							<div className="absolute top-3.5 left-3.5 z-10 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900/85 dark:bg-white/90 text-white dark:text-slate-950 backdrop-blur-md text-[11px] font-semibold tracking-wide shadow-md">
+								<Sparkles className="w-3 h-3 text-amber-400 dark:text-amber-500 fill-amber-400 dark:fill-amber-500" />
 								<span>精选头条 · FEATURED</span>
 							</div>
 						)}
@@ -137,13 +137,13 @@ export function BlogEditorialCard({
 					{/* 右侧深度导读内容区 */}
 					<div
 						className={cn(
-							'flex flex-col justify-between flex-grow',
-							isHero ? 'p-6 sm:p-8 lg:p-10' : 'p-5 sm:p-7'
+							'flex flex-col justify-between flex-grow min-w-0',
+							isHero ? 'p-5 sm:p-6 lg:p-7' : 'p-4 sm:p-5 lg:p-6'
 						)}
 					>
 						<div>
 							{/* 元信息标签栏 */}
-							<div className="flex items-center gap-2 mb-3.5 flex-wrap text-xs">
+							<div className="flex items-center gap-2 mb-2.5 flex-wrap text-xs">
 								{/* 草稿标识 */}
 								{blog.status === 'draft' && (
 									<span className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
@@ -180,10 +180,10 @@ export function BlogEditorialCard({
 							{/* 标题 */}
 							<h3
 								className={cn(
-									'font-semibold tracking-tight transition-colors mb-3 leading-snug',
+									'font-semibold tracking-tight transition-colors mb-2 leading-snug',
 									isHero
-										? 'text-xl sm:text-2xl lg:text-3xl line-clamp-2'
-										: 'text-lg sm:text-xl line-clamp-2',
+										? 'text-lg sm:text-xl lg:text-2xl line-clamp-2'
+										: 'text-base sm:text-lg line-clamp-2',
 									isRead
 										? 'text-slate-700 dark:text-zinc-300 group-hover:text-[var(--color-brand)]'
 										: 'text-[var(--color-primary)] group-hover:text-[var(--color-brand)]'
@@ -195,10 +195,10 @@ export function BlogEditorialCard({
 							{/* 摘要导读 */}
 							<p
 								className={cn(
-									'text-[var(--color-secondary)] leading-relaxed mb-6',
+									'text-[var(--color-secondary)] leading-relaxed mb-4 text-xs sm:text-sm',
 									isHero
-										? 'text-sm sm:text-base line-clamp-3 sm:line-clamp-4'
-										: 'text-xs sm:text-sm line-clamp-2 sm:line-clamp-3'
+										? 'line-clamp-2 sm:line-clamp-3'
+										: 'line-clamp-2'
 								)}
 							>
 								{summaryText}
@@ -206,7 +206,7 @@ export function BlogEditorialCard({
 						</div>
 
 						{/* 底部：标签云与阅读动作 */}
-						<div className="pt-4 border-t border-[var(--color-border)]/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+						<div className="pt-3 border-t border-[var(--color-border)]/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
 							{/* 标签组 */}
 							<div className="flex items-center gap-1.5 flex-wrap">
 								{allTags.slice(0, 3).map(tag => (
@@ -222,7 +222,7 @@ export function BlogEditorialCard({
 							{/* 阅读动作 CTA */}
 							<div className="self-end sm:self-auto">
 								{isHero ? (
-									<span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-semibold shadow-md group-hover:bg-[var(--color-brand)] transition-colors">
+									<span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-semibold shadow-sm group-hover:bg-[var(--color-brand)] transition-colors">
 										开始阅读
 										<ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" />
 									</span>
