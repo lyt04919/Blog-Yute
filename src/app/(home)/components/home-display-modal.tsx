@@ -25,7 +25,7 @@ export function HomeDisplayModal() {
 
 	const allProjects = projectsData.map(p => p.name)
 	const allBlogs = (blogIndex as { slug: string; title: string; hidden?: boolean; status?: string }[]).filter(
-		p => !p.hidden
+		p => !p.hidden && p.status !== 'draft'
 	)
 
 	const toggleProject = (projectName: string) => {

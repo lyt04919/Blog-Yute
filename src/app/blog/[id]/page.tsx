@@ -166,11 +166,11 @@ export default function Page() {
 	}
 
 	if (error) {
-		return <div className='flex h-full items-center justify-center text-sm text-red-500'>{error}</div>
+		return <div className='flex h-full items-center justify-center text-sm text-zinc-500'>文章不存在或未公开</div>
 	}
 
-	if (!blog) {
-		return <div className='text-[var(--color-secondary)] flex h-full items-center justify-center text-sm'>文章不存在</div>
+	if (!blog || (!isAuth && (blog.config.status === 'draft' || blog.config.hidden))) {
+		return <div className='text-[var(--color-secondary)] flex h-full items-center justify-center text-sm'>文章不存在或未公开</div>
 	}
 
 	return (
@@ -186,22 +186,20 @@ export default function Page() {
 				/>
 			</div>
 
-			<div className="absolute left-6 z-40 max-sm:left-4 flex flex-col gap-2" style={{ top: '5.5rem' }}>
-				<Breadcrumb items={[{ label: 'Blog', href: '/blog' }, { label: title }]} />
-			</div>
-			<motion.button
-				initial={{ opacity: 0, scale: 0.6 }}
-				animate={{ opacity: 1, scale: 1 }}
-
-				onClick={handleBack}
-				className='absolute left-6 rounded-xl border bg-[var(--color-bg)]/60 dark:bg-[var(--color-card)]/60 px-4 py-2 text-sm backdrop-blur-sm transition-colors hover:bg-[var(--color-bg)] dark:hover:bg-[var(--color-card)] flex items-center gap-1.5 z-40 max-sm:left-4'
-				style={{ top: '7rem' }}>
-				<ArrowLeft className='h-4 w-4' />
-				返回
-			</motion.button>
-
 			{/* Main Content */}
-			<div className='mx-auto w-full max-w-6xl px-6 pt-32 pb-20'>
+			<div className='mx-auto w-full max-w-6xl px-6 pt-24 pb-20'>
+				<div className="flex flex-col gap-4 mb-8">
+					<Breadcrumb items={[{ label: 'Blog', href: '/blog' }, { label: title }]} />
+					<motion.button
+						initial={{ opacity: 0, scale: 0.6 }}
+						animate={{ opacity: 1, scale: 1 }}
+						onClick={handleBack}
+						className='w-fit rounded-xl border bg-[var(--color-bg)]/60 dark:bg-[var(--color-card)]/60 px-4 py-2 text-sm backdrop-blur-sm transition-colors hover:bg-[var(--color-bg)] dark:hover:bg-[var(--color-card)] flex items-center gap-1.5 z-40'
+					>
+						<ArrowLeft className='h-4 w-4' />
+						返回
+					</motion.button>
+				</div>
 				<div className='grid grid-cols-1 lg:grid-cols-12 gap-12'>
 					{/* Left: Article Content */}
 					<div className='lg:col-span-8'>

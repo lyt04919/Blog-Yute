@@ -45,7 +45,7 @@ export default function ReportPage() {
 		const filteredBooks = books.filter(b => b.status === 'finished' && filterByYear(b.readDate))
 		const filteredMovies = movies.filter(m => m.status === 'watched' && filterByYear(m.watchDate))
 		const filteredFootprints = footprints.filter(f => filterByYear(f.date))
-		const filteredBlogs = blogs.filter(b => !b.hidden && filterByYear(b.date))
+		const filteredBlogs = blogs.filter(b => !b.hidden && b.status !== 'draft' && filterByYear(b.date))
 		const filteredProjects = projects.filter(p => filterByYear(p.year))
 
 		// Metrics

@@ -19,16 +19,17 @@ const fetcher = async (url: string) => {
 
 export function useBlogIndex() {
 	const { isAuth } = useAuthStore()
-	const { data, error, isLoading } = useSWR<BlogIndexItem[]>('/blogs/index.json', fetcher, {
+	const swrKey = isAuth ? '/api/blogs?role=admin' : '/api/blogs'
+	const { data, error, isLoading, mutate } = useSWR<BlogIndexItem[]>(swrKey, fetcher, {
 		revalidateOnFocus: false,
 		revalidateOnReconnect: true
 	})
 
-	let result = data || []
+	const result = data || []
 	
 	const filteredResult = useMemo(() => {
 		if (!isAuth) {
-			return result.filter(item => !item.hidden)
+			return result.filter(item => !item.hidden && item.status !== 'draft')
 		}
 		return result
 	}, [result, isAuth])
@@ -36,7 +37,8 @@ export function useBlogIndex() {
 	return {
 		items: filteredResult,
 		loading: isLoading,
-		error
+		error,
+		mutate
 	}
 }
 

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { verifyAdminAuth } from '@/lib/server-auth'
+import blogIndex from '@/../public/blogs/index.json'
 
 const PROTECTED_PAGE_PREFIXES = ['/admin', '/write']
 const PROTECTED_API_PREFIXES = [
@@ -14,9 +15,37 @@ const PROTECTED_API_PREFIXES = [
 	'/api/private'
 ]
 
+// Pre-compute set of draft or hidden blog slugs for fast edge matching
+const RESTRICTED_BLOG_SLUGS = new Set<string>(
+	(blogIndex as Array<{ slug: string; status?: string; hidden?: boolean }>)
+		.filter((b) => b.status === 'draft' || b.hidden === true)
+		.map((b) => b.slug)
+)
+
 export async function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl
 
+	// 1. Rewrite static /blogs/index.json to sanitized /api/blogs endpoint
+	if (pathname === '/blogs/index.json') {
+		const rewriteUrl = request.nextUrl.clone()
+		rewriteUrl.pathname = '/api/blogs'
+		return NextResponse.rewrite(rewriteUrl)
+	}
+
+	// 2. Protect static files of draft/hidden blogs from public crawling/direct download
+	if (pathname.startsWith('/blogs/')) {
+		const parts = pathname.split('/')
+		// /blogs/:slug/...
+		const slug = parts[2]
+		if (slug && RESTRICTED_BLOG_SLUGS.has(slug)) {
+			const isAuthorized = await verifyAdminAuth(request)
+			if (!isAuthorized) {
+				return NextResponse.json({ error: 'Not found' }, { status: 404 })
+			}
+		}
+	}
+
+	// 3. Protected admin/write pages and sensitive APIs
 	const isProtectedPage = PROTECTED_PAGE_PREFIXES.some(
 		(prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
 	)
@@ -54,6 +83,7 @@ export const config = {
 	matcher: [
 		'/admin/:path*',
 		'/write/:path*',
+		'/blogs/:path*',
 		'/api/admin/:path*',
 		'/api/save-data',
 		'/api/save-local',

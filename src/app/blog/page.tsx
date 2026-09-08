@@ -390,7 +390,7 @@ export default function BlogPage() {
 			setSelectedSlugs(new Set())
 			setCategoryModalOpen(false)
 			// 强制刷新 SWR 缓存
-			await mutate('/blogs/index.json')
+			await mutate((key: any) => typeof key === 'string' && (key.startsWith('/api/blogs') || key.startsWith('/blogs/index.json')))
 			await mutate('/blogs/categories.json')
 			toast.success('推送到 GitHub 成功！')
 		} catch (error: any) {
@@ -449,7 +449,7 @@ export default function BlogPage() {
 			setSelectedSlugs(new Set())
 			setCategoryModalOpen(false)
 			// 强制刷新 SWR 缓存
-			await mutate('/blogs/index.json')
+			await mutate((key: any) => typeof key === 'string' && (key.startsWith('/api/blogs') || key.startsWith('/blogs/index.json')))
 			await mutate('/blogs/categories.json')
 			toast.success('本地保存成功！')
 		} catch (error: any) {

@@ -615,6 +615,59 @@ async function runTests() {
 		assert.ok(authLib.includes("fetch('/api/auth/logout'"), 'clearAllAuthCache must trigger /api/auth/logout')
 	})
 
+	// 18. Blog Data Layer & Draft Isolation
+	await test('Blog Data Layer & Draft Isolation: /api/blogs and /api/blogs/[slug] filter drafts and protect private content', () => {
+		// 1. Check /api/blogs
+		const apiBlogsPath = path.join(ROOT, 'src/app/api/blogs/route.ts')
+		assert.ok(fs.existsSync(apiBlogsPath), 'src/app/api/blogs/route.ts must exist')
+		const apiBlogsContent = fs.readFileSync(apiBlogsPath, 'utf8')
+		assert.ok(apiBlogsContent.includes('verifyAdminAuth'), '/api/blogs must check admin auth')
+		assert.ok(apiBlogsContent.includes("item.status !== 'draft'"), '/api/blogs must filter drafts for visitors')
+		assert.ok(apiBlogsContent.includes('!item.hidden'), '/api/blogs must filter hidden items for visitors')
+
+		// 2. Check /api/blogs/[slug]
+		const apiBlogSlugPath = path.join(ROOT, 'src/app/api/blogs/[slug]/route.ts')
+		assert.ok(fs.existsSync(apiBlogSlugPath), 'src/app/api/blogs/[slug]/route.ts must exist')
+		const apiBlogSlugContent = fs.readFileSync(apiBlogSlugPath, 'utf8')
+		assert.ok(apiBlogSlugContent.includes('verifyAdminAuth'), '/api/blogs/[slug] must check admin auth for restricted blogs')
+		assert.ok(apiBlogSlugContent.includes('status: 404'), '/api/blogs/[slug] must return 404 for unauthenticated draft access')
+
+		// 3. Check loadBlog and useBlogIndex
+		const loadBlogContent = fs.readFileSync(path.join(ROOT, 'src/lib/load-blog.ts'), 'utf8')
+		assert.ok(loadBlogContent.includes('/api/blogs/'), 'loadBlog must fetch through /api/blogs/')
+
+		const useBlogIndexContent = fs.readFileSync(path.join(ROOT, 'src/hooks/use-blog-index.ts'), 'utf8')
+		assert.ok(useBlogIndexContent.includes('/api/blogs'), 'useBlogIndex must query /api/blogs endpoint')
+
+		// 4. Check middleware static protection
+		const middlewareContent = fs.readFileSync(path.join(ROOT, 'src/middleware.ts'), 'utf8')
+		assert.ok(middlewareContent.includes("pathname === '/blogs/index.json'"), 'middleware must intercept /blogs/index.json')
+		assert.ok(middlewareContent.includes("rewriteUrl.pathname = '/api/blogs'"), 'middleware must rewrite /blogs/index.json to /api/blogs')
+		assert.ok(middlewareContent.includes('RESTRICTED_BLOG_SLUGS'), 'middleware must protect static draft assets')
+	})
+
+	// 19. SEO, RSS, and Analytics Integrity
+	await test('SEO, RSS, and Analytics Integrity: sitemap.ts, rss.xml, and report exclude drafts and hidden items from public feeds', () => {
+		// 1. Sitemap
+		const sitemapContent = fs.readFileSync(path.join(ROOT, 'src/app/sitemap.ts'), 'utf8')
+		assert.ok(sitemapContent.includes("post.status !== 'draft'"), 'sitemap must exclude draft posts')
+		assert.ok(sitemapContent.includes('!post.hidden'), 'sitemap must exclude hidden posts')
+
+		// 2. RSS feed
+		const rssContent = fs.readFileSync(path.join(ROOT, 'src/app/rss.xml/route.ts'), 'utf8')
+		assert.ok(rssContent.includes("item.status !== 'draft'"), 'rss.xml must exclude draft posts')
+		assert.ok(rssContent.includes('!item.hidden'), 'rss.xml must exclude hidden posts')
+
+		// 3. Report analytics
+		const reportContent = fs.readFileSync(path.join(ROOT, 'src/app/report/page.tsx'), 'utf8')
+		assert.ok(reportContent.includes("b.status !== 'draft'"), 'report page must exclude drafts from statistics')
+
+		// 4. Type definitions
+		const typesContent = fs.readFileSync(path.join(ROOT, 'src/app/blog/types.ts'), 'utf8')
+		assert.ok(typesContent.includes('PublicBlogIndexItem'), 'types.ts must define PublicBlogIndexItem')
+		assert.ok(typesContent.includes('AdminBlogIndexItem'), 'types.ts must define AdminBlogIndexItem')
+	})
+
 	console.log(`\n🏁 Test Results: ${passed}/${total} passed.`)
 	if (passed === total) {
 		console.log('✨ All performance and integrity tests PASSED successfully!\n')

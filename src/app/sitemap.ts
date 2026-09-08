@@ -13,7 +13,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
 	console.log(`[Sitemap] Generating for: ${baseUrl}`)
 
-	let posts: BlogIndexItem[] = blogIndex as BlogIndexItem[]
+	// Only expose published and visible blog posts to search engines
+	const posts: BlogIndexItem[] = (blogIndex as BlogIndexItem[]).filter(
+		post => !post.hidden && post.status !== 'draft'
+	)
 
 	const postEntries: MetadataRoute.Sitemap = posts.map(post => ({
 		url: `${baseUrl}/blog/${post.slug}`,
