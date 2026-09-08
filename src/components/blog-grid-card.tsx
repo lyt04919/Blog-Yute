@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import dayjs from 'dayjs'
 import { cn } from '@/lib/utils'
-import { Check, ArrowRight, BookIcon, Clock } from 'lucide-react'
+import { Check, ArrowRight, BookIcon, Clock, Sparkles } from 'lucide-react'
 import type { BlogIndexItem } from '@/hooks/use-blog-index'
 
 export interface BlogGridCardProps {
@@ -85,6 +85,14 @@ export function BlogGridCard({
 				>
 					{/* 封面容器：微内衬底与画框边缘 */}
 					<div className="overflow-hidden aspect-[16/10] relative bg-slate-100/80 dark:bg-zinc-800/60 border-b border-black/[0.04] dark:border-white/[0.05]">
+						{/* 精选标签 */}
+						{blog.isFeatured && (
+							<div className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-900/80 dark:bg-white/90 text-white dark:text-slate-900 backdrop-blur-md text-[10px] font-semibold tracking-wide shadow-xs">
+								<Sparkles className="w-2.5 h-2.5 text-amber-400 dark:text-amber-500 fill-amber-400 dark:fill-amber-500" />
+								<span>精选</span>
+							</div>
+						)}
+
 						{blog.cover && !imageError ? (
 							<>
 								{!imageLoaded && (

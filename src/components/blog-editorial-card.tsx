@@ -92,10 +92,7 @@ export function BlogEditorialCard({
 					{/* 左侧封面大图容器 */}
 					<div
 						className={cn(
-							'relative overflow-hidden shrink-0 bg-slate-100 dark:bg-zinc-800/80',
-							isHero
-								? 'w-full md:w-5/12 lg:w-4/12 h-52 sm:h-60 md:h-auto min-h-[190px] md:min-h-[220px]'
-								: 'w-full md:w-4/12 lg:w-3/12 h-44 sm:h-52 md:h-auto min-h-[170px] md:min-h-[190px]'
+							'relative overflow-hidden shrink-0 bg-slate-100 dark:bg-zinc-800/80 w-full md:w-72 lg:w-80 h-48 sm:h-56 md:h-auto min-h-[180px]'
 						)}
 					>
 						{blog.cover && !imageError ? (

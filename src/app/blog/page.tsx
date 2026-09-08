@@ -722,50 +722,18 @@ export default function BlogPage() {
 					{gridFilteredItems.length === 0 ? (
 						<EmptyState type="blog" />
 					) : viewLayout === 'grid' ? (
-						<div className="flex flex-col gap-10">
-							{/* 沉浸式头条精选 */}
-							{featuredArticle && (
-								<div className="relative">
-									<BlogEditorialCard
-										blog={featuredArticle}
-										isHero={true}
-										editMode={editMode}
-										isSelected={selectedSlugs.has(featuredArticle.slug)}
-										isRead={isRead(featuredArticle.slug)}
-										onToggleSelect={toggleSelect}
-										onClick={handleItemClick}
-									/>
-								</div>
-							)}
-
-							{/* 归档文章分隔头 */}
-							{featuredArticle && remainingArticles.length > 0 && (
-								<div className="flex items-center justify-between pt-4 pb-1 border-t border-[var(--color-border)]/70">
-									<span className="text-xs font-semibold tracking-wider uppercase text-[var(--color-secondary)]">
-										精选沉淀 · ARCHIVED ESSAYS
-									</span>
-									<span className="text-xs text-[var(--color-secondary)] font-medium">
-										{remainingArticles.length} 篇文章
-									</span>
-								</div>
-							)}
-
-							{/* 网格列表 */}
-							{(featuredArticle ? remainingArticles : gridFilteredItems).length > 0 && (
-								<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 relative">
-									{(featuredArticle ? remainingArticles : gridFilteredItems).map((blog) => (
-										<BlogGridCard
-											key={blog.slug}
-											blog={blog}
-											editMode={editMode}
-											isSelected={selectedSlugs.has(blog.slug)}
-											isRead={isRead(blog.slug)}
-											onToggleSelect={toggleSelect}
-											onClick={handleItemClick}
-										/>
-									))}
-								</div>
-							)}
+						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 relative">
+							{gridFilteredItems.map((blog) => (
+								<BlogGridCard
+									key={blog.slug}
+									blog={blog}
+									editMode={editMode}
+									isSelected={selectedSlugs.has(blog.slug)}
+									isRead={isRead(blog.slug)}
+									onToggleSelect={toggleSelect}
+									onClick={handleItemClick}
+								/>
+							))}
 						</div>
 					) : viewLayout === 'magazine' ? (
 						<div className="flex flex-col gap-6 max-w-5xl mx-auto">
