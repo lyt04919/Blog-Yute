@@ -9,9 +9,9 @@ import MovieStatsPanel from './components/movie-stats-panel'
 import MovieTimelineView from './components/movie-timeline-view'
 import MovieYearlyStatsView from './components/movie-yearly-stats-view'
 import MovieDetailModal from './components/movie-detail-modal'
-import MovieEditModal from './components/movie-edit-modal'
-import MovieMarkWatchedModal from './components/movie-mark-watched-modal'
 import dynamic from 'next/dynamic'
+const MovieEditModal = dynamic(() => import('./components/movie-edit-modal'), { ssr: false })
+const MovieMarkWatchedModal = dynamic(() => import('./components/movie-mark-watched-modal'), { ssr: false })
 const MovieTop250Modal = dynamic(() => import('./components/movie-top250-modal'), { ssr: false })
 import { StandardToolbar } from '@/components/ui/standard-toolbar'
 
@@ -19,7 +19,7 @@ import initialFranchisesData from '@/data/franchises.json'
 import initialPlaylistsData from '@/data/custom-playlists.json'
 import { FranchiseCard, type FranchiseInfo } from './components/franchise-card'
 import { FranchiseDetailModal } from './components/franchise-detail-modal'
-import { FranchiseEditModal } from './components/franchise-edit-modal'
+const FranchiseEditModal = dynamic(() => import('./components/franchise-edit-modal').then(m => m.FranchiseEditModal), { ssr: false })
 import type { CustomPlaylist } from './components/playlist-edit-modal'
 
 interface GridViewProps {
@@ -845,18 +845,20 @@ export default function GridView({ movies, isEditMode = false, isManagement = fa
 			/>
 
 			{/* Franchise Edit & Creation Modal */}
-			<FranchiseEditModal
-				key={editingFranchise?.id || 'new-franchise'}
-				isOpen={isFranchiseEditOpen}
-				franchise={editingFranchise}
-				allMovies={movies}
-				onClose={() => setIsFranchiseEditOpen(false)}
-				onSave={handleSaveFranchise}
-				onDelete={handleDeleteFranchise}
-			/>
+			{canEdit && isFranchiseEditOpen && (
+				<FranchiseEditModal
+					key={editingFranchise?.id || 'new-franchise'}
+					isOpen={isFranchiseEditOpen}
+					franchise={editingFranchise}
+					allMovies={movies}
+					onClose={() => setIsFranchiseEditOpen(false)}
+					onSave={handleSaveFranchise}
+					onDelete={handleDeleteFranchise}
+				/>
+			)}
 
 			{/* In-place Movie Edit Modal for timeline/detail view edit trigger */}
-			{editingMovie && (
+			{canEdit && editingMovie && (
 				<MovieEditModal
 					movie={editingMovie}
 					onClose={() => setEditingMovie(null)}
@@ -868,7 +870,7 @@ export default function GridView({ movies, isEditMode = false, isManagement = fa
 			)}
 
 			{/* Movie Mark Watched Modal */}
-			{markingMovie && (
+			{canEdit && markingMovie && (
 				<MovieMarkWatchedModal
 					movie={markingMovie}
 					onClose={() => setMarkingMovie(null)}

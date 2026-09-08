@@ -7,9 +7,9 @@ import { toast } from 'sonner'
 import Link from 'next/link'
 import { ArrowLeft, Plus, Trophy, Pencil, Sparkles, BarChart3 } from 'lucide-react'
 import MovieGridView from '@/app/favorite/movie-grid-view'
-import MovieCreateDialog from '@/app/favorite/components/movie-create-dialog'
-import MovieTop10Modal from '@/app/favorite/components/movie-top10-modal'
 import dynamic from 'next/dynamic'
+const MovieCreateDialog = dynamic(() => import('@/app/favorite/components/movie-create-dialog'), { ssr: false })
+const MovieTop10Modal = dynamic(() => import('@/app/favorite/components/movie-top10-modal'), { ssr: false })
 const MovieReportModal = dynamic(() => import('@/app/favorite/components/movie-report-modal'), { ssr: false })
 import { useAuthStore } from '@/hooks/use-auth'
 import { pushMovies } from '@/app/favorite/movies/services/push-movies'

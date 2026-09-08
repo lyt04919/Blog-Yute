@@ -668,6 +668,51 @@ async function runTests() {
 		assert.ok(typesContent.includes('AdminBlogIndexItem'), 'types.ts must define AdminBlogIndexItem')
 	})
 
+	// 20. Frontend Component Isolation & Bundle Size Optimization
+	await test('Frontend Component Isolation & Bundle Size Optimization: Admin modals and edit dialogs are dynamically loaded and conditionally rendered', () => {
+		// 1. Blog page
+		const blogPageContent = fs.readFileSync(path.join(ROOT, 'src/app/blog/page.tsx'), 'utf8')
+		assert.ok(blogPageContent.includes("dynamic(() => import('./components/category-modal')"), 'CategoryModal must be dynamically imported')
+		assert.ok(blogPageContent.includes("dynamic(() => import('./components/status-modal')"), 'StatusModal must be dynamically imported')
+		assert.ok(blogPageContent.includes("dynamic(() => import('@/components/delete-confirm-dialog')"), 'DeleteConfirmDialog must be dynamically imported')
+		assert.ok(blogPageContent.includes('{isAuth && categoryModalOpen && ('), 'CategoryModal must be conditionally rendered on isAuth')
+		assert.ok(blogPageContent.includes('{isAuth && statusModalOpen && ('), 'StatusModal must be conditionally rendered on isAuth')
+		assert.ok(blogPageContent.includes('{isAuth && deleteDialogOpen && ('), 'DeleteConfirmDialog must be conditionally rendered on isAuth')
+
+		// 2. Book & Movie Grid Views
+		const bookGridViewContent = fs.readFileSync(path.join(ROOT, 'src/app/favorite/book-grid-view.tsx'), 'utf8')
+		assert.ok(bookGridViewContent.includes("dynamic(() => import('./components/book-edit-modal')"), 'BookEditModal must be dynamically imported')
+		assert.ok(bookGridViewContent.includes("dynamic(() => import('./components/book-mark-read-modal')"), 'BookMarkReadModal must be dynamically imported')
+		assert.ok(bookGridViewContent.includes('{canEdit && editingBook && ('), 'BookEditModal must be guarded by canEdit')
+		assert.ok(bookGridViewContent.includes('{canEdit && markingReadBook && ('), 'BookMarkReadModal must be guarded by canEdit')
+
+		const movieGridViewContent = fs.readFileSync(path.join(ROOT, 'src/app/favorite/movie-grid-view.tsx'), 'utf8')
+		assert.ok(movieGridViewContent.includes("dynamic(() => import('./components/movie-edit-modal')"), 'MovieEditModal must be dynamically imported')
+		assert.ok(movieGridViewContent.includes("dynamic(() => import('./components/movie-mark-watched-modal')"), 'MovieMarkWatchedModal must be dynamically imported')
+		assert.ok(movieGridViewContent.includes("dynamic(() => import('./components/franchise-edit-modal')"), 'FranchiseEditModal must be dynamically imported')
+		assert.ok(movieGridViewContent.includes('{canEdit && isFranchiseEditOpen && ('), 'FranchiseEditModal must be guarded by canEdit')
+		assert.ok(movieGridViewContent.includes('{canEdit && editingMovie && ('), 'MovieEditModal must be guarded by canEdit')
+		assert.ok(movieGridViewContent.includes('{canEdit && markingMovie && ('), 'MovieMarkWatchedModal must be guarded by canEdit')
+
+		// 3. Card level modals
+		const bookCardContent = fs.readFileSync(path.join(ROOT, 'src/app/favorite/components/book-card.tsx'), 'utf8')
+		assert.ok(bookCardContent.includes("dynamic(() => import('./book-edit-modal')"), 'BookEditModal in book-card must be dynamic')
+
+		const movieCardContent = fs.readFileSync(path.join(ROOT, 'src/app/favorite/components/movie-card.tsx'), 'utf8')
+		assert.ok(movieCardContent.includes("dynamic(() => import('./movie-edit-modal')"), 'MovieEditModal in movie-card must be dynamic')
+
+		const shareCardContent = fs.readFileSync(path.join(ROOT, 'src/app/favorite/share/components/share-card.tsx'), 'utf8')
+		assert.ok(shareCardContent.includes("dynamic(() => import('./share-edit-modal')"), 'ShareEditModal in share-card must be dynamic')
+
+		const favCardContent = fs.readFileSync(path.join(ROOT, 'src/app/favorite/components/favorite-item-card.tsx'), 'utf8')
+		assert.ok(favCardContent.includes("dynamic(() => import('./favorite-item-edit-modal')"), 'FavoriteItemEditModal must be dynamic')
+
+		// 4. Share page
+		const sharePageContent = fs.readFileSync(path.join(ROOT, 'src/app/favorite/share/page.tsx'), 'utf8')
+		assert.ok(sharePageContent.includes("dynamic(() => import('./components/create-dialog')"), 'CreateDialog in share page must be dynamic')
+		assert.ok(sharePageContent.includes('{isAuth && isCreateDialogOpen &&'), 'CreateDialog must be guarded by isAuth')
+	})
+
 	console.log(`\n🏁 Test Results: ${passed}/${total} passed.`)
 	if (passed === total) {
 		console.log('✨ All performance and integrity tests PASSED successfully!\n')

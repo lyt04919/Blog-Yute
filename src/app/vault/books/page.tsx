@@ -4,9 +4,11 @@ import { useState, useEffect } from 'react'
 import { motion } from 'motion/react'
 import { toast } from 'sonner'
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Search } from 'lucide-react'
 import BookGridView from '@/app/favorite/book-grid-view'
-import BookCreateDialog from '@/app/favorite/components/book-create-dialog'
+import dynamic from 'next/dynamic'
+const BookCreateDialog = dynamic(() => import('@/app/favorite/components/book-create-dialog'), { ssr: false })
+const BookSearchDialog = dynamic(() => import('@/app/favorite/components/book-search-dialog'), { ssr: false })
 import { useConfigStore } from '@/app/(home)/stores/config-store'
 import { useAuthStore } from '@/hooks/use-auth'
 import { pushBooks } from '@/app/favorite/books/services/push-books'
@@ -44,6 +46,7 @@ function VaultBooksContent() {
 	const [originalCategories, setOriginalCategories] = useState<string[]>(initialCategories as string[])
 	const [editingBook, setEditingBook] = useState<Book | null>(null)
 	const [isBookDialogOpen, setIsBookDialogOpen] = useState(false)
+	const [isSearchOpen, setIsSearchOpen] = useState(false)
 
 	const { isAuth } = useAuthStore()
 
@@ -219,8 +222,12 @@ function VaultBooksContent() {
 								<motion.button onClick={() => setIsEditMode(false)} className='rounded-full border bg-[var(--color-bg)] dark:bg-[var(--color-card)] px-4 py-2 text-sm shadow-sm font-medium text-[var(--color-primary)]'>
 									退出编辑
 								</motion.button>
+								<motion.button onClick={() => setIsSearchOpen(true)} className='rounded-full border border-blue-500/40 bg-blue-500/10 text-blue-600 dark:text-blue-400 px-4 py-2 text-sm shadow-sm font-medium flex items-center gap-1.5 hover:bg-blue-500/20 transition-all'>
+									<Search className="w-3.5 h-3.5" />
+									<span>搜书录入</span>
+								</motion.button>
 								<motion.button onClick={() => { setEditingBook(null); setIsBookDialogOpen(true); }} className='rounded-full border bg-[var(--color-bg)] dark:bg-[var(--color-card)] px-4 py-2 text-sm shadow-sm font-medium text-[var(--color-primary)]'>
-									+ 添加
+									+ 手动添加
 								</motion.button>
 								<motion.button onClick={handlePublishCloudClick} disabled={isSaving} className='brand-btn px-6 py-2 rounded-full text-sm shadow-sm font-medium'>
 									{isSaving ? '发布中...' : '发布云端'}
@@ -248,6 +255,15 @@ function VaultBooksContent() {
 			</div>
 
 			{isBookDialogOpen && <BookCreateDialog bookList={books} books={editingBook} categories={categories} onClose={() => setIsBookDialogOpen(false)} onSave={handleSaveBook} />}
+			
+			<BookSearchDialog
+				open={isSearchOpen}
+				onClose={() => setIsSearchOpen(false)}
+				onSelect={(selected) => {
+					setEditingBook(selected as Book)
+					setIsBookDialogOpen(true)
+				}}
+			/>
 		</div>
 	)
 }

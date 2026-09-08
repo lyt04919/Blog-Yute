@@ -22,9 +22,10 @@ import { cn } from '@/lib/utils'
 import { saveBlogEdits } from './services/save-blog-edits'
 import { Check, ArrowRight, BookIcon, Trash2, Save, Upload, X, FolderOpen, SquareCheck, Activity, LayoutGrid, BookOpen, Calendar, Sparkles, Clock, Compass } from 'lucide-react'
 import { BlogCoverHoverPreview, useBlogCoverHover } from './components/blog-cover-hover'
-import { CategoryModal } from './components/category-modal'
-import { StatusModal } from './components/status-modal'
-import { DeleteConfirmDialog } from '@/components/delete-confirm-dialog'
+import dynamic from 'next/dynamic'
+const CategoryModal = dynamic(() => import('./components/category-modal').then(m => m.CategoryModal), { ssr: false })
+const StatusModal = dynamic(() => import('./components/status-modal').then(m => m.StatusModal), { ssr: false })
+const DeleteConfirmDialog = dynamic(() => import('@/components/delete-confirm-dialog').then(m => m.DeleteConfirmDialog), { ssr: false })
 
 import { BlogGridCard } from '@/components/blog-grid-card'
 import { BlogEditorialCard } from '@/components/blog-editorial-card'
@@ -485,24 +486,28 @@ export default function BlogPage() {
 	return (
 		<>
 			<PageTitle title="Blog" />
-			<CategoryModal
-				open={categoryModalOpen}
-				onClose={() => setCategoryModalOpen(false)}
-				categoryList={categoryList}
-				newCategory={newCategory}
-				onNewCategoryChange={setNewCategory}
-				onAddCategory={handleAddCategory}
-				onRemoveCategory={handleRemoveCategory}
-				onReorderCategories={handleReorderCategories}
-				editableItems={editableItems}
-				onAssignCategory={handleAssignCategory}
-			/>
-			<StatusModal
-				open={statusModalOpen}
-				onClose={() => setStatusModalOpen(false)}
-				editableItems={editableItems}
-				onAssignStatus={handleAssignStatus}
-			/>
+			{isAuth && categoryModalOpen && (
+				<CategoryModal
+					open={categoryModalOpen}
+					onClose={() => setCategoryModalOpen(false)}
+					categoryList={categoryList}
+					newCategory={newCategory}
+					onNewCategoryChange={setNewCategory}
+					onAddCategory={handleAddCategory}
+					onRemoveCategory={handleRemoveCategory}
+					onReorderCategories={handleReorderCategories}
+					editableItems={editableItems}
+					onAssignCategory={handleAssignCategory}
+				/>
+			)}
+			{isAuth && statusModalOpen && (
+				<StatusModal
+					open={statusModalOpen}
+					onClose={() => setStatusModalOpen(false)}
+					editableItems={editableItems}
+					onAssignStatus={handleAssignStatus}
+				/>
+			)}
 
 			{/* Edit Mode Toolbar */}
 			{editMode && (
@@ -918,25 +923,14 @@ export default function BlogPage() {
 
 			<BlogCoverHoverPreview preview={hoverCoverPreview} position={mousePosition} />
 
-			<CategoryModal
-				open={categoryModalOpen}
-				onClose={() => setCategoryModalOpen(false)}
-				categoryList={categoryList}
-				newCategory={newCategory}
-				onNewCategoryChange={setNewCategory}
-				onAddCategory={handleAddCategory}
-				onRemoveCategory={handleRemoveCategory}
-				onReorderCategories={handleReorderCategories}
-				editableItems={editableItems}
-				onAssignCategory={handleAssignCategory}
-			/>
-
-			<DeleteConfirmDialog
-				open={deleteDialogOpen}
-				count={selectedCount}
-				onConfirm={confirmDelete}
-				onCancel={() => setDeleteDialogOpen(false)}
-			/>
+			{isAuth && deleteDialogOpen && (
+				<DeleteConfirmDialog
+					open={deleteDialogOpen}
+					count={selectedCount}
+					onConfirm={confirmDelete}
+					onCancel={() => setDeleteDialogOpen(false)}
+				/>
+			)}
 		</>
 	)
 }
