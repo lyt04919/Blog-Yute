@@ -1,8 +1,13 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import { verifyAdminAuth } from '@/lib/server-auth';
 
 export async function POST(request: Request) {
+  if (!(await verifyAdminAuth(request))) {
+    return NextResponse.json({ error: 'Unauthorized: Admin privileges required' }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
     const { target, data } = body;
@@ -27,9 +32,9 @@ export async function POST(request: Request) {
     } else if (target === 'share') {
       targetPath = path.join(process.cwd(), 'src/app/favorite/share/list.json');
     } else if (target === 'gears') {
-      targetPath = path.join(process.cwd(), 'src/app/favorite/gears.json');
+      targetPath = path.join(process.cwd(), 'src/app/about/gears.json');
     } else if (target === 'software') {
-      targetPath = path.join(process.cwd(), 'src/app/favorite/software.json');
+      targetPath = path.join(process.cwd(), 'src/app/about/software.json');
     } else if (target === 'music') {
       targetPath = path.join(process.cwd(), 'src/app/favorite/music.json');
     } else if (target === 'games') {
@@ -46,8 +51,12 @@ export async function POST(request: Request) {
       targetPath = path.join(process.cwd(), 'src/data/footprints.json');
     } else if (target === 'wishlist') {
       targetPath = path.join(process.cwd(), 'src/data/wishlist.json');
+    } else if (target === 'franchises') {
+      targetPath = path.join(process.cwd(), 'src/data/franchises.json');
+    } else if (target === 'custom-playlists') {
+      targetPath = path.join(process.cwd(), 'src/data/custom-playlists.json');
     } else {
-      return NextResponse.json({ error: 'Invalid target. Only "movies", "books", "book-categories", "share", "gears", "software", "music", "games", "videos", "blog-index", "blog-categories", "projects", "footprints", or "wishlist" are allowed.' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid target. Only "movies", "books", "book-categories", "share", "gears", "software", "music", "games", "videos", "blog-index", "blog-categories", "projects", "footprints", "wishlist", "franchises", or "custom-playlists" are allowed.' }, { status: 400 });
     }
 
     // Write the formatted JSON back to the local file

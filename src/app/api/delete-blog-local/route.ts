@@ -1,10 +1,15 @@
 import { NextResponse } from 'next/server'
 import fs from 'fs/promises'
 import path from 'path'
+import { verifyAdminAuth } from '@/lib/server-auth'
 
 export async function POST(req: Request) {
     if (process.env.NODE_ENV !== 'development') {
         return NextResponse.json({ success: false, error: '仅在开发环境下支持本地删除' }, { status: 403 })
+    }
+
+    if (!(await verifyAdminAuth(req))) {
+        return NextResponse.json({ success: false, error: 'Unauthorized: Admin privileges required' }, { status: 401 })
     }
 
     try {

@@ -60,10 +60,15 @@ function clearPasswordCache(): void {
 export function clearAllAuthCache(): void {
 	clearTokenCache()
 	clearPasswordCache()
+	if (typeof window !== 'undefined') {
+		fetch('/api/auth/logout', { method: 'POST' }).catch((err) => {
+			console.error('Failed to clear server session:', err)
+		})
+	}
 }
 
 export async function hasAuth(): Promise<boolean> {
-	return !!getTokenFromCache() || getPasswordFromCache() === '111'
+	return !!getTokenFromCache() || !!getPasswordFromCache()
 }
 
 /**
@@ -78,7 +83,7 @@ export async function getAuthToken(): Promise<string> {
 	}
 
 	const password = getPasswordFromCache()
-	if (!password || password !== '111') {
+	if (!password) {
 		throw new Error('未授权，请先登录')
 	}
 

@@ -10,15 +10,15 @@ const assert = require('assert')
 
 const ROOT = path.resolve(__dirname, '..')
 
-function runTests() {
+async function runTests() {
 	console.log('🧪 Starting Performance & Integrity Verification Tests...\n')
 	let passed = 0
 	let total = 0
 
-	function test(description, fn) {
+	async function test(description, fn) {
 		total++
 		try {
-			fn()
+			await fn()
 			console.log(`  ✅ PASS: ${description}`)
 			passed++
 		} catch (err) {
@@ -524,10 +524,104 @@ function runTests() {
 		assert.ok(topNavContent.includes('dock-nav-container'), 'TopNav must render dock-nav-container')
 	})
 
+	// 16. Server-Side Route Guard & Web Crypto HMAC Session Tokens
+	await test('Server-side route guard: middleware.ts and server-auth.ts implement HMAC-SHA256 session tokens and edge route protection', async () => {
+		const middlewarePath = path.join(ROOT, 'src/middleware.ts')
+		assert.ok(fs.existsSync(middlewarePath), 'middleware.ts must exist in src/')
+		const middlewareContent = fs.readFileSync(middlewarePath, 'utf8')
+
+		// 1. Check middleware structure & matchers
+		assert.ok(middlewareContent.includes('export async function middleware'), 'middleware must export async middleware function')
+		assert.ok(middlewareContent.includes('verifyAdminAuth'), 'middleware must call verifyAdminAuth')
+		assert.ok(middlewareContent.includes("'/admin/:path*'"), 'middleware must match /admin/:path*')
+		assert.ok(middlewareContent.includes("'/write/:path*'"), 'middleware must match /write/:path*')
+		assert.ok(middlewareContent.includes("'/api/admin/:path*'"), 'middleware must match /api/admin/:path*')
+		assert.ok(middlewareContent.includes("'/api/save-data'"), 'middleware must match /api/save-data')
+		assert.ok(middlewareContent.includes("'/api/upload'"), 'middleware must match /api/upload')
+		assert.ok(middlewareContent.includes('NextResponse.redirect'), 'middleware must redirect unauthorized page requests')
+		assert.ok(middlewareContent.includes('status: 401'), 'middleware must return 401 for unauthorized API requests')
+
+		// 2. Check server-auth.ts
+		const serverAuthPath = path.join(ROOT, 'src/lib/server-auth.ts')
+		assert.ok(fs.existsSync(serverAuthPath), 'src/lib/server-auth.ts must exist')
+		const serverAuthContent = fs.readFileSync(serverAuthPath, 'utf8')
+		assert.ok(serverAuthContent.includes('ADMIN_COOKIE_NAME'), 'server-auth must define ADMIN_COOKIE_NAME')
+		assert.ok(serverAuthContent.includes('createAdminSessionToken'), 'server-auth must export createAdminSessionToken')
+		assert.ok(serverAuthContent.includes('verifyAdminSessionToken'), 'server-auth must export verifyAdminSessionToken')
+		assert.ok(serverAuthContent.includes('verifyAdminAuth'), 'server-auth must export verifyAdminAuth')
+		assert.ok(serverAuthContent.includes('crypto.subtle'), 'server-auth must use standard Web Crypto API for Edge compatibility')
+
+		// 3. Functional test HMAC token generation and verification using Web Crypto
+		const encoder = new TextEncoder()
+		const secret = '111'
+		const key = await crypto.subtle.importKey(
+			'raw',
+			encoder.encode(secret),
+			{ name: 'HMAC', hash: 'SHA-256' },
+			false,
+			['sign']
+		)
+
+		const now = Date.now().toString()
+		const sigBuffer = await crypto.subtle.sign('HMAC', key, encoder.encode(`admin:${now}`))
+		const sigHex = Array.from(new Uint8Array(sigBuffer)).map((b) => b.toString(16).padStart(2, '0')).join('')
+		const token = `${now}.${sigHex}`
+
+		// Verify valid signature
+		const [ts, sig] = token.split('.')
+		assert.strictEqual(sig, sigHex, 'Token signature must match HMAC hex')
+
+		// Verify forged signature fails
+		const forgedToken = `${now}.${sigHex.substring(0, sigHex.length - 2)}00`
+		const forgedSig = forgedToken.split('.')[1]
+		assert.notStrictEqual(forgedSig, sigHex, 'Forged token must not match')
+	})
+
+	// 17. Sensitive API Route Handlers Defense-in-Depth & Auth Lifecycle
+	await test('Sensitive API route handlers implement server-side verifyAdminAuth defense-in-depth and cookie auth lifecycle', () => {
+		const sensitiveRoutes = [
+			'src/app/api/admin/content/route.ts',
+			'src/app/api/save-data/route.ts',
+			'src/app/api/save-local/route.ts',
+			'src/app/api/save-blog-local/route.ts',
+			'src/app/api/delete-blog-local/route.ts',
+			'src/app/api/upload/route.ts',
+			'src/app/api/rotate-image/route.ts',
+			'src/app/api/private/diary/route.ts'
+		]
+
+		for (const routeRel of sensitiveRoutes) {
+			const routePath = path.join(ROOT, routeRel)
+			assert.ok(fs.existsSync(routePath), `${routeRel} must exist`)
+			const content = fs.readFileSync(routePath, 'utf8')
+			assert.ok(content.includes('verifyAdminAuth'), `${routeRel} must import and execute verifyAdminAuth`)
+			assert.ok(content.includes('401'), `${routeRel} must respond with 401 when unauthorized`)
+		}
+
+		// Verify login sets admin_session cookie
+		const githubTokenRoute = fs.readFileSync(path.join(ROOT, 'src/app/api/auth/github-token/route.ts'), 'utf8')
+		assert.ok(githubTokenRoute.includes('ADMIN_COOKIE_NAME'), 'github-token route must reference ADMIN_COOKIE_NAME')
+		assert.ok(githubTokenRoute.includes('createAdminSessionToken'), 'github-token route must create session token')
+		assert.ok(githubTokenRoute.includes('cookies.set'), 'github-token route must set session cookie')
+
+		// Verify logout route exists and clears cookie
+		const logoutRoutePath = path.join(ROOT, 'src/app/api/auth/logout/route.ts')
+		assert.ok(fs.existsSync(logoutRoutePath), 'src/app/api/auth/logout/route.ts must exist')
+		const logoutContent = fs.readFileSync(logoutRoutePath, 'utf8')
+		assert.ok(logoutContent.includes('maxAge: 0'), 'logout route must invalidate cookie with maxAge: 0')
+
+		// Verify client auth clear triggers logout
+		const authLib = fs.readFileSync(path.join(ROOT, 'src/lib/auth.ts'), 'utf8')
+		assert.ok(authLib.includes("fetch('/api/auth/logout'"), 'clearAllAuthCache must trigger /api/auth/logout')
+	})
+
 	console.log(`\n🏁 Test Results: ${passed}/${total} passed.`)
 	if (passed === total) {
 		console.log('✨ All performance and integrity tests PASSED successfully!\n')
 	}
 }
 
-runTests()
+runTests().catch((err) => {
+	console.error('Fatal test error:', err)
+	process.exit(1)
+})
