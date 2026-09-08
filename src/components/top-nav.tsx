@@ -286,9 +286,9 @@ export default function TopNav() {
 										}
 									}}
 								>
-									<button type="button" className="size-full flex items-center justify-center cursor-pointer" aria-label={isAuth ? "退出作者模式" : "切换作者模式"}>
+									<span className="size-full flex items-center justify-center" aria-label={isAuth ? "退出作者模式" : "切换作者模式"}>
 										{isAuth ? <Unlock className="size-4 text-brand p-0.5" /> : <Lock className="size-4 p-0.5" />}
-									</button>
+									</span>
 								</TooltipWrapper>
 							</DockIcon>
 						</Dock>
