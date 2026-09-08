@@ -10,8 +10,9 @@ import { useConfigStore } from '@/app/(home)/stores/config-store'
 import { useTheme } from '@/hooks/use-theme'
 import { toast } from 'sonner'
 import { Dock, DockIcon } from '@/components/magicui/dock'
-import { ChevronUp, Globe } from 'lucide-react'
+import { ChevronUp, Globe, Lock, Unlock } from 'lucide-react'
 import { ThemeToggleButton } from '@/components/theme-toggle-button'
+import { useAuthStore } from '@/hooks/use-auth'
 
 // Nav Icons
 import ScrollOutlineSVG from '@/svgs/scroll-outline.svg'
@@ -94,6 +95,7 @@ const TooltipWrapper = ({ children, content, href, onClick, external }: { childr
 export default function TopNav() {
 	const pathname = usePathname()
 	const { siteContent } = useConfigStore()
+	const { isAuth, clearAuth, setAuthModalOpen } = useAuthStore()
 	const activeNavList = navList
 
 	const { resolvedTheme, toggleTheme } = useTheme()
@@ -263,6 +265,30 @@ export default function TopNav() {
 							<DockIcon className="rounded-3xl cursor-pointer bg-white dark:bg-[var(--color-card)] border border-[#e4e4e7] dark:border-[var(--color-border)] shadow-sm text-[#52525b] dark:text-[var(--color-secondary)] hover:text-black dark:hover:text-[var(--color-primary)] transition-colors">
 								<TooltipWrapper content={resolvedTheme === 'dark' ? '切换亮色' : '切换暗色'}>
 									<ThemeToggleButton className="size-full text-inherit" />
+								</TooltipWrapper>
+							</DockIcon>
+
+							{/* Mode Toggle (Visitor / Admin) */}
+							<DockIcon className={cn(
+								"rounded-3xl cursor-pointer border shadow-sm transition-colors",
+								isAuth 
+									? "bg-brand/10 border-brand/30 text-brand hover:bg-brand/20" 
+									: "bg-white dark:bg-[var(--color-card)] border-[#e4e4e7] dark:border-[var(--color-border)] text-[#52525b] dark:text-[var(--color-secondary)] hover:text-black dark:hover:text-[var(--color-primary)]"
+							)}>
+								<TooltipWrapper 
+									content={isAuth ? '退出作者模式 (当前已解锁)' : '切换作者模式 (点击解锁)'} 
+									onClick={() => {
+										if (isAuth) {
+											clearAuth()
+											toast.success('已切换至访客模式')
+										} else {
+											setAuthModalOpen(true)
+										}
+									}}
+								>
+									<button type="button" className="size-full flex items-center justify-center cursor-pointer" aria-label={isAuth ? "退出作者模式" : "切换作者模式"}>
+										{isAuth ? <Unlock className="size-4 text-brand p-0.5" /> : <Lock className="size-4 p-0.5" />}
+									</button>
 								</TooltipWrapper>
 							</DockIcon>
 						</Dock>

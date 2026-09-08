@@ -3,12 +3,15 @@
 import { useEffect, useState } from 'react'
 import { Command } from 'cmdk'
 import { useRouter } from 'next/navigation'
-import { Book, Film, Home, Search, Lock, Mail, MapPin, Map } from 'lucide-react'
+import { Book, Film, Home, Search, Lock, Unlock, Mail, MapPin, Map } from 'lucide-react'
 import { motion, AnimatePresence } from 'motion/react'
+import { useAuthStore } from '@/hooks/use-auth'
+import { toast } from 'sonner'
 
 export function CommandMenu() {
 	const [open, setOpen] = useState(false)
 	const router = useRouter()
+	const { isAuth, clearAuth, setAuthModalOpen } = useAuthStore()
 
 	useEffect(() => {
 		const down = (e: KeyboardEvent) => {
@@ -93,6 +96,20 @@ export function CommandMenu() {
 								</Command.Group>
 
 								<Command.Group heading="Author Actions" className="text-xs font-semibold tracking-wider text-slate-400 px-2 py-2 uppercase mt-2">
+									<Command.Item 
+										onSelect={() => runCommand(() => {
+											if (isAuth) {
+												clearAuth()
+												toast.success('已切换至访客模式')
+											} else {
+												setAuthModalOpen(true)
+											}
+										})}
+										className="flex items-center gap-3 px-3 py-3 mt-1 text-sm font-medium text-slate-700 dark:text-slate-200 rounded-lg cursor-pointer aria-selected:bg-amber-50 dark:aria-selected:bg-amber-900/30 aria-selected:text-amber-600 dark:aria-selected:text-amber-400 transition-colors"
+									>
+										{isAuth ? <Unlock className="w-4 h-4 text-amber-500" /> : <Lock className="w-4 h-4" />}
+										<span>{isAuth ? '退出作者模式 (当前已解锁)' : '解锁作者模式 (输入密码)'}</span>
+									</Command.Item>
 									<Command.Item 
 										onSelect={() => runCommand(() => router.push('/vault'))}
 										className="flex items-center gap-3 px-3 py-3 mt-1 text-sm font-medium text-slate-700 dark:text-slate-200 rounded-lg cursor-pointer aria-selected:bg-amber-50 dark:aria-selected:bg-amber-900/30 aria-selected:text-amber-600 dark:aria-selected:text-amber-400 transition-colors"

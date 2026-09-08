@@ -5,26 +5,35 @@ interface AuthStore {
 	// State
 	isAuth: boolean
 	password: string | null
+	authModalOpen: boolean
 
 	// Actions
-	setPassword: (password: string) => void
+	setAuthModalOpen: (open: boolean) => void
+	setPassword: (password: string) => Promise<void>
 	clearAuth: () => void
 	refreshAuthState: () => void
 	getAuthToken: () => Promise<string>
-	setPrivateKey: (key: string) => void
 }
 
 export const useAuthStore = create<AuthStore>((set, get) => ({
 	isAuth: false,
 	password: null,
+	authModalOpen: false,
+
+	setAuthModalOpen: (open: boolean) => set({ authModalOpen: open }),
 
 	setPassword: async (password: string) => {
-		set({ isAuth: password === '111', password })
-		if (password === '111') {
-			await savePasswordToCache(password)
-		} else {
-			throw new Error('密码错误')
+		const res = await fetch('/api/auth/github-token', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ password })
+		})
+		const data = await res.json()
+		if (!res.ok || !data.success) {
+			throw new Error(data.error || '密码错误')
 		}
+		savePasswordToCache(password)
+		set({ isAuth: true, password })
 	},
 
 	clearAuth: () => {
@@ -40,20 +49,16 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 		const token = await getToken()
 		get().refreshAuthState()
 		return token
-	},
-
-	setPrivateKey: (key: string) => {
-		console.log('setPrivateKey called, token authorization is used instead.')
 	}
 }))
 
 const pwd = getPasswordFromCache()
 if (pwd) {
-	useAuthStore.setState({ password: pwd, isAuth: pwd === '111' })
+	useAuthStore.setState({ password: pwd, isAuth: true })
 }
 
 checkAuth().then((isAuth) => {
 	if (isAuth) {
-		useAuthStore.setState({ isAuth })
+		useAuthStore.setState({ isAuth: true })
 	}
 })
