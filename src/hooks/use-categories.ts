@@ -22,13 +22,15 @@ const fetcher = async (url: string): Promise<CategoriesConfig> => {
 	return { categories: [] }
 }
 
+const EMPTY_CATEGORIES: string[] = []
+
 export function useCategories() {
 	const { data, error, isLoading } = useSWR<CategoriesConfig>('/blogs/categories.json', fetcher, {
 		revalidateOnFocus: false,
 		revalidateOnReconnect: true
 	})
 
-	const categories = useMemo(() => data?.categories ?? [], [data])
+	const categories = useMemo(() => data?.categories ?? EMPTY_CATEGORIES, [data])
 
 	return {
 		categories,

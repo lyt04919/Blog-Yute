@@ -17,6 +17,8 @@ const fetcher = async (url: string) => {
 	return Array.isArray(data) ? data : []
 }
 
+const EMPTY_BLOG_ITEMS: BlogIndexItem[] = []
+
 export function useBlogIndex() {
 	const { isAuth } = useAuthStore()
 	const swrKey = isAuth ? '/api/blogs?role=admin' : '/api/blogs'
@@ -25,14 +27,13 @@ export function useBlogIndex() {
 		revalidateOnReconnect: true
 	})
 
-	const result = data || []
-	
 	const filteredResult = useMemo(() => {
+		if (!data) return EMPTY_BLOG_ITEMS
 		if (!isAuth) {
-			return result.filter(item => !item.hidden && item.status !== 'draft')
+			return data.filter(item => !item.hidden && item.status !== 'draft')
 		}
-		return result
-	}, [result, isAuth])
+		return data
+	}, [data, isAuth])
 
 	return {
 		items: filteredResult,
