@@ -15,6 +15,7 @@ interface DockProps {
 interface DockIconProps {
   className?: string;
   children?: ReactNode;
+  onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
 
 const DEFAULT_MAGNIFICATION = 60;
@@ -49,7 +50,7 @@ const Dock = ({ className, style, children, iconMagnification = DEFAULT_MAGNIFIC
   );
 };
 
-const DockIcon = ({ className, children }: DockIconProps) => {
+const DockIcon = ({ className, children, onClick }: DockIconProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const context = useContext(DockContext);
 
@@ -76,6 +77,7 @@ const DockIcon = ({ className, children }: DockIconProps) => {
   return (
     <motion.div
       ref={ref}
+      onClick={onClick}
       style={{ width: containerSize, height: containerSize }}
       className={cn("relative flex aspect-square items-center justify-center rounded-full shrink-0", className)}
     >

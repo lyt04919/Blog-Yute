@@ -269,24 +269,24 @@ export default function TopNav() {
 							</DockIcon>
 
 							{/* Mode Toggle (Visitor / Admin) */}
-							<DockIcon className={cn(
-								"rounded-3xl cursor-pointer border shadow-sm transition-colors",
-								isAuth 
-									? "bg-brand/10 border-brand/30 text-brand hover:bg-brand/20" 
-									: "bg-white dark:bg-[var(--color-card)] border-[#e4e4e7] dark:border-[var(--color-border)] text-[#52525b] dark:text-[var(--color-secondary)] hover:text-black dark:hover:text-[var(--color-primary)]"
-							)}>
-								<TooltipWrapper 
-									content={isAuth ? '退出作者模式 (当前已解锁)' : '切换作者模式 (点击解锁)'} 
-									onClick={() => {
-										if (isAuth) {
-											clearAuth()
-											toast.success('已切换至访客模式')
-										} else {
-											setAuthModalOpen(true)
-										}
-									}}
-								>
-									<span className="size-full flex items-center justify-center" aria-label={isAuth ? "退出作者模式" : "切换作者模式"}>
+							<DockIcon 
+								onClick={() => {
+									if (isAuth) {
+										clearAuth()
+										toast.success('已切换至访客模式')
+									} else {
+										setAuthModalOpen(true)
+									}
+								}}
+								className={cn(
+									"rounded-3xl cursor-pointer border shadow-sm transition-colors",
+									isAuth 
+										? "bg-brand/10 border-brand/30 text-brand hover:bg-brand/20" 
+										: "bg-white dark:bg-[var(--color-card)] border-[#e4e4e7] dark:border-[var(--color-border)] text-[#52525b] dark:text-[var(--color-secondary)] hover:text-black dark:hover:text-[var(--color-primary)]"
+								)}
+							>
+								<TooltipWrapper content={isAuth ? '退出作者模式 (当前已解锁)' : '切换作者模式 (点击解锁)'}>
+									<span className="size-full flex items-center justify-center pointer-events-none" aria-label={isAuth ? "退出作者模式" : "切换作者模式"}>
 										{isAuth ? <Unlock className="size-4 text-brand p-0.5" /> : <Lock className="size-4 p-0.5" />}
 									</span>
 								</TooltipWrapper>
