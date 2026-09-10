@@ -160,22 +160,37 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 				})
 			})
 
-			transition.ready?.then(() => {
-				document.documentElement.animate(
-					{
-						clipPath: [
-							`circle(0px at ${xPercent.toFixed(4)}% ${yPercent.toFixed(4)}%)`,
-							`circle(${maxRadius}px at ${xPercent.toFixed(4)}% ${yPercent.toFixed(4)}%)`
-						]
-					},
-					{
-						duration: 1200,
-						easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-						fill: 'forwards',
-						pseudoElement: '::view-transition-new(root)'
-					}
-				)
-			})
+			transition.ready
+				?.then(() => {
+					// 1. 确保旧画面在整个 1200ms 扩散周期内受到主动合成与绘制，绝对杜绝组件和文字瞬隐消失
+					document.documentElement.animate(
+						{
+							opacity: [1, 1]
+						},
+						{
+							duration: 1200,
+							fill: 'forwards',
+							pseudoElement: '::view-transition-old(root)'
+						}
+					)
+
+					// 2. 新主题画面以切换按钮为圆心，向外平滑扩散涟漪直至覆盖全屏
+					document.documentElement.animate(
+						{
+							clipPath: [
+								`circle(0px at ${xPercent.toFixed(4)}% ${yPercent.toFixed(4)}%)`,
+								`circle(${maxRadius}px at ${xPercent.toFixed(4)}% ${yPercent.toFixed(4)}%)`
+							]
+						},
+						{
+							duration: 1200,
+							easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+							fill: 'forwards',
+							pseudoElement: '::view-transition-new(root)'
+						}
+					)
+				})
+				.catch(() => {})
 
 			transition.finished
 				.catch(() => {})

@@ -86,29 +86,32 @@
 	}
 
 	/* View Transitions ripple rules */
-	::view-transition-group(root) {
-		animation: none;
-	}
-
-	::view-transition-image-pair(root) {
-		isolation: isolate;
+	@keyframes keep-visible {
+		from {
+			opacity: 1;
+		}
+		to {
+			opacity: 1;
+		}
 	}
 
 	::view-transition-old(root),
 	::view-transition-new(root) {
-		animation: none;
 		mix-blend-mode: normal;
 	}
 
 	::view-transition-old(root) {
+		/* 确保旧画面在整个扩散周期内保持 100% 渲染与合成，底层的组件和文字绝不消失 */
+		animation: keep-visible 1200ms cubic-bezier(0.4, 0, 0.2, 1) both;
 		z-index: 1;
 		opacity: 1 !important;
 	}
 
 	::view-transition-new(root) {
+		animation: none;
 		z-index: 9999;
 		opacity: 1 !important;
-		/* Initial state: start clipped at 0px directly on pseudo-element in CSS before JS executes, preventing any full-screen flash */
+		/* 诞生瞬间预裁切为 0px，确保首帧绝无全屏跳变 */
 		clip-path: circle(0px at 0 0);
 	}
 
