@@ -142,24 +142,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 		const xPercent = (x / vw) * 100
 		const yPercent = (y / vh) * 100
 
-		const radius =
+		// 计算按钮到视口最远角落的真实最大几何距离（px），确保涟漪能 100% 完整覆盖全屏四角
+		const maxRadius = Math.ceil(
 			Math.hypot(
 				Math.max(x, vw - x),
 				Math.max(y, vh - y)
-			) + 40
-
-		const radiusReference = Math.hypot(vw, vh) / Math.SQRT2
-		const radiusPercent = (radius / radiusReference) * 100
+			) + 60
+		)
 
 		if (!isReducedMotion && typeof document !== 'undefined' && 'startViewTransition' in document) {
 			isTransitioningRef.current = true
-			setIsSwitching(true)
-
-			// 关键：在触发 startViewTransition 前注入坐标变量并添加 theme-vt 类，
-			// 使 ::view-transition-new(root) 诞生即处于 circle(0%) 裁切态，杜绝首帧全屏白闪或画面瞬变缺失
-			root.style.setProperty('--vt-x', `${xPercent.toFixed(4)}%`)
-			root.style.setProperty('--vt-y', `${yPercent.toFixed(4)}%`)
-			root.style.setProperty('--vt-r', `${radiusPercent.toFixed(4)}%`)
 			root.classList.add('theme-vt')
 
 			const transition = (document as any).startViewTransition(() => {
@@ -172,8 +164,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 				document.documentElement.animate(
 					{
 						clipPath: [
-							`circle(0% at ${xPercent.toFixed(4)}% ${yPercent.toFixed(4)}%)`,
-							`circle(${radiusPercent.toFixed(4)}% at ${xPercent.toFixed(4)}% ${yPercent.toFixed(4)}%)`
+							`circle(0px at ${xPercent.toFixed(4)}% ${yPercent.toFixed(4)}%)`,
+							`circle(${maxRadius}px at ${xPercent.toFixed(4)}% ${yPercent.toFixed(4)}%)`
 						]
 					},
 					{
@@ -189,11 +181,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 				.catch(() => {})
 				.finally(() => {
 					isTransitioningRef.current = false
-					setIsSwitching(false)
 					root.classList.remove('theme-vt')
-					root.style.removeProperty('--vt-x')
-					root.style.removeProperty('--vt-y')
-					root.style.removeProperty('--vt-r')
 				})
 			return
 		}

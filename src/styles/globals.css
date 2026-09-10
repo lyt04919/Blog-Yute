@@ -108,11 +108,8 @@
 	::view-transition-new(root) {
 		z-index: 9999;
 		opacity: 1 !important;
-	}
-
-	/* Initial state: start clipped at 0% directly in CSS before JS executes, preventing any full-screen flash */
-	html.theme-vt::view-transition-new(root) {
-		clip-path: circle(0% at var(--vt-x, 50%) var(--vt-y, 50%));
+		/* Initial state: start clipped at 0px directly on pseudo-element in CSS before JS executes, preventing any full-screen flash */
+		clip-path: circle(0px at 0 0);
 	}
 
 	/* Freeze element-level transitions during theme reveal to ensure 60FPS main-thread performance */
