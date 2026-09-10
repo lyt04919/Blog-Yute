@@ -10,7 +10,7 @@ interface ThemeToggleButtonProps {
 }
 
 export function ThemeToggleButton({ className = '', showLabel = false }: ThemeToggleButtonProps) {
-	const { resolvedTheme, toggleTheme, isSwitching } = useTheme()
+	const { resolvedTheme, toggleTheme, isSwitching, mounted } = useTheme()
 	const isDark = resolvedTheme === 'dark'
 
 	const handleClick = useCallback(
@@ -30,8 +30,9 @@ export function ThemeToggleButton({ className = '', showLabel = false }: ThemeTo
 		<button
 			type="button"
 			onClick={handleClick}
+			suppressHydrationWarning
 			data-theme-toggle=""
-			data-theme-icon={resolvedTheme}
+			data-theme-icon={mounted ? resolvedTheme : 'light'}
 			role="switch"
 			aria-checked={isDark}
 			aria-pressed={isDark}

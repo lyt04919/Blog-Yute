@@ -8,6 +8,7 @@ export type Theme = 'light' | 'dark' | 'system'
 interface ThemeContextType {
 	theme: Theme
 	resolvedTheme: 'light' | 'dark'
+	mounted: boolean
 	isSwitching?: boolean
 	setTheme: (theme: Theme) => void
 	toggleTheme: (e?: React.MouseEvent | { clientX: number; clientY: number } | HTMLElement) => void
@@ -33,10 +34,7 @@ function getStoredTheme(): Theme | null {
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
 	const [theme, setThemeState] = useState<Theme>('system')
-	const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => {
-		if (typeof window === 'undefined') return 'light'
-		return document.documentElement.classList.contains('dark') ? 'dark' : 'light'
-	})
+	const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light')
 	const [mounted, setMounted] = useState(false)
 	const [isSwitching, setIsSwitching] = useState(false)
 
@@ -196,7 +194,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 	}, [resolvedTheme, setTheme])
 
 	return (
-		<ThemeContext.Provider value={{ theme, resolvedTheme, isSwitching, setTheme, toggleTheme }}>
+		<ThemeContext.Provider value={{ theme, resolvedTheme, mounted, isSwitching, setTheme, toggleTheme }}>
 			{children}
 		</ThemeContext.Provider>
 	)
@@ -208,6 +206,7 @@ export function useTheme() {
 		return {
 			theme: 'system' as Theme,
 			resolvedTheme: 'light' as 'light' | 'dark',
+			mounted: false,
 			setTheme: () => {},
 			toggleTheme: () => {}
 		}
