@@ -119,8 +119,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 		const vw = typeof window !== 'undefined' ? (document.documentElement.clientWidth || window.innerWidth) : 1920
 		const vh = typeof window !== 'undefined' ? (document.documentElement.clientHeight || window.innerHeight) : 1080
 
-		let x = vw / 2
-		let y = vh / 2
+		let x = Math.round(vw / 2)
+		let y = Math.round(vh / 2)
 
 		const buttonEl =
 			(event instanceof HTMLElement ? event : null) ??
@@ -131,60 +131,49 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
 		if (buttonEl) {
 			const rect = buttonEl.getBoundingClientRect()
-			x = rect.left + rect.width / 2
-			y = rect.top + rect.height / 2
+			x = Math.round(rect.left + rect.width / 2)
+			y = Math.round(rect.top + rect.height / 2)
 		} else if (event && 'clientX' in event && typeof event.clientX === 'number' && event.clientX > 0) {
-			x = event.clientX
-			y = event.clientY
+			x = Math.round(event.clientX)
+			y = Math.round(event.clientY)
 		}
-
-		// 使用归一化视口百分比坐标，根治 Mac Retina (2x/3x) 高分屏下绝对 px 坐标造成的圆心漂移
-		const xPercent = (x / vw) * 100
-		const yPercent = (y / vh) * 100
 
 		// 计算按钮到视口最远角落的真实最大几何距离（px），确保涟漪能 100% 完整覆盖全屏四角
 		const maxRadius = Math.ceil(
 			Math.hypot(
 				Math.max(x, vw - x),
 				Math.max(y, vh - y)
-			) + 60
+			) + 40
 		)
 
 		if (!isReducedMotion && typeof document !== 'undefined' && 'startViewTransition' in document) {
 			isTransitioningRef.current = true
+			root.style.setProperty('--vt-x', `${x}px`)
+			root.style.setProperty('--vt-y', `${y}px`)
 			root.classList.add('theme-vt')
 
 			const transition = (document as any).startViewTransition(() => {
 				flushSync(() => {
 					setTheme(nextTheme)
 				})
+				// 强制同步计算新主题的全部计算样式与文本颜色，杜绝首帧文字或背景未就绪导致的视觉缺失
+				void root.offsetHeight
 			})
 
 			transition.ready
 				?.then(() => {
-					// 1. 确保旧画面在整个 1200ms 扩散周期内受到主动合成与绘制，绝对杜绝组件和文字瞬隐消失
-					document.documentElement.animate(
-						{
-							opacity: [1, 1]
-						},
-						{
-							duration: 1200,
-							fill: 'forwards',
-							pseudoElement: '::view-transition-old(root)'
-						}
-					)
-
-					// 2. 新主题画面以切换按钮为圆心，向外平滑扩散涟漪直至覆盖全屏
+					// 底层旧画面 ::view-transition-old(root) 在 globals.css 中设置为 animation: none 静态展示，底层的组件和文字绝不消失
+					// 新主题画面以切换按钮为圆心，向外平滑扩散涟漪直至覆盖全屏
 					document.documentElement.animate(
 						{
 							clipPath: [
-								`circle(0px at ${xPercent.toFixed(4)}% ${yPercent.toFixed(4)}%)`,
-								`circle(${maxRadius}px at ${xPercent.toFixed(4)}% ${yPercent.toFixed(4)}%)`
+								`circle(0px at ${x}px ${y}px)`,
+								`circle(${maxRadius}px at ${x}px ${y}px)`
 							]
 						},
 						{
-							duration: 1200,
-							easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+							duration: 750,
+							easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
 							fill: 'forwards',
 							pseudoElement: '::view-transition-new(root)'
 						}
@@ -197,6 +186,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 				.finally(() => {
 					isTransitioningRef.current = false
 					root.classList.remove('theme-vt')
+					root.style.removeProperty('--vt-x')
+					root.style.removeProperty('--vt-y')
 				})
 			return
 		}

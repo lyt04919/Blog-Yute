@@ -437,8 +437,8 @@ async function runTests() {
 		assert.ok(globalsCssContent.includes('::view-transition-new(root)'), 'globals.css must configure root view transition')
 		assert.ok(!globalsCssContent.includes('view-transition-name: theme-toggle'), 'globals.css must unify theme toggle with root transition')
 
-		assert.ok(globalsCssContent.includes('keep-visible'), 'globals.css must define keep-visible animation to maintain old view compositor lifetime')
-		assert.ok(globalsCssContent.includes('circle(0px at 0 0)'), 'globals.css must pre-clip view-transition-new to 0px')
+		assert.ok(globalsCssContent.includes('::view-transition-image-pair(root)'), 'globals.css must isolate view-transition-image-pair')
+		assert.ok(globalsCssContent.includes('var(--vt-x'), 'globals.css must pre-clip view-transition-new with button coordinate origin')
 
 		// 3. Check use-theme.tsx for clean DOM sync, viewport coordinates and view transitions
 		const useThemePath = path.join(ROOT, 'src/hooks/use-theme.tsx')
@@ -446,11 +446,12 @@ async function runTests() {
 		assert.ok(!useThemeContent.includes('#00FF41'), 'use-theme.tsx must not contain hardcoded cyberpunk colors')
 		assert.ok(useThemeContent.includes('startViewTransition'), 'use-theme.tsx must support View Transitions API')
 		assert.ok(useThemeContent.includes('flushSync'), 'use-theme.tsx must use flushSync for synchronous DOM transition capture')
+		assert.ok(useThemeContent.includes('void root.offsetHeight'), 'use-theme.tsx must force synchronous style recalc before capturing snapshot')
 		assert.ok(useThemeContent.includes('document.documentElement.animate'), 'use-theme.tsx must animate using document.documentElement.animate')
-		assert.ok(useThemeContent.includes('::view-transition-old(root)'), 'use-theme.tsx must animate ::view-transition-old(root) to prevent old screen disappearance')
+		assert.ok(useThemeContent.includes('::view-transition-old(root)'), 'use-theme.tsx must reference ::view-transition-old(root) compositor lifetime')
 		assert.ok(useThemeContent.includes('::view-transition-new(root)'), 'use-theme.tsx must animate ::view-transition-new(root) with clipPath')
 		assert.ok(useThemeContent.includes('Math.hypot'), 'use-theme.tsx must calculate maximum distance to farthest corner using Math.hypot')
-		assert.ok(useThemeContent.includes('cubic-bezier(0.4, 0, 0.2, 1)'), 'use-theme.tsx must use cubic-bezier(0.4, 0, 0.2, 1) easing')
+		assert.ok(useThemeContent.includes('cubic-bezier(0.22, 1, 0.36, 1)'), 'use-theme.tsx must use cubic-bezier(0.22, 1, 0.36, 1) smooth non-stalling easing')
 		assert.ok(useThemeContent.includes('prefers-reduced-motion: reduce'), 'use-theme.tsx must respect prefers-reduced-motion: reduce')
 		assert.ok(useThemeContent.includes('clipPath'), 'use-theme.tsx must animate circular ripple clipPath from click origin')
 		assert.ok(useThemeContent.includes("addEventListener('storage'"), 'use-theme.tsx must sync across tabs')
