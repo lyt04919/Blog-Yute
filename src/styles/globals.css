@@ -86,7 +86,14 @@
 	}
 
 	/* View Transitions ripple rules */
-	::view-transition-group(root),
+	::view-transition-group(root) {
+		animation: none;
+	}
+
+	::view-transition-image-pair(root) {
+		isolation: isolate;
+	}
+
 	::view-transition-old(root),
 	::view-transition-new(root) {
 		animation: none;
@@ -95,13 +102,21 @@
 
 	::view-transition-old(root) {
 		z-index: 1;
+		opacity: 1 !important;
 	}
 
 	::view-transition-new(root) {
 		z-index: 9999;
+		opacity: 1 !important;
+	}
+
+	/* Initial state: start clipped at 0% directly in CSS before JS executes, preventing any full-screen flash */
+	html.theme-vt::view-transition-new(root) {
+		clip-path: circle(0% at var(--vt-x, 50%) var(--vt-y, 50%));
 	}
 
 	/* Freeze element-level transitions during theme reveal to ensure 60FPS main-thread performance */
+	html.theme-vt,
 	html.theme-vt *,
 	html.theme-vt *::before,
 	html.theme-vt *::after {

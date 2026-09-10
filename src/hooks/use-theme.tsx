@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback, useRef, type ReactNode } from 'react'
 import { flushSync } from 'react-dom'
 
 export type Theme = 'light' | 'dark' | 'system'
@@ -37,6 +37,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 	const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light')
 	const [mounted, setMounted] = useState(false)
 	const [isSwitching, setIsSwitching] = useState(false)
+	const isTransitioningRef = useRef(false)
 
 	const syncDOM = useCallback((currentTheme: 'light' | 'dark') => {
 		const root = document.documentElement
@@ -100,6 +101,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 	}, [syncDOM])
 
 	const toggleTheme = useCallback((event?: React.MouseEvent | { clientX: number; clientY: number } | HTMLElement) => {
+		if (isTransitioningRef.current) return
+
 		const nextTheme: 'light' | 'dark' = resolvedTheme === 'dark' ? 'light' : 'dark'
 
 		const isReducedMotion =
@@ -149,7 +152,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 		const radiusPercent = (radius / radiusReference) * 100
 
 		if (!isReducedMotion && typeof document !== 'undefined' && 'startViewTransition' in document) {
+			isTransitioningRef.current = true
 			setIsSwitching(true)
+
+			// 关键：在触发 startViewTransition 前注入坐标变量并添加 theme-vt 类，
+			// 使 ::view-transition-new(root) 诞生即处于 circle(0%) 裁切态，杜绝首帧全屏白闪或画面瞬变缺失
+			root.style.setProperty('--vt-x', `${xPercent.toFixed(4)}%`)
+			root.style.setProperty('--vt-y', `${yPercent.toFixed(4)}%`)
+			root.style.setProperty('--vt-r', `${radiusPercent.toFixed(4)}%`)
 			root.classList.add('theme-vt')
 
 			const transition = (document as any).startViewTransition(() => {
@@ -169,6 +179,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 					{
 						duration: 1200,
 						easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+						fill: 'forwards',
 						pseudoElement: '::view-transition-new(root)'
 					}
 				)
@@ -177,8 +188,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 			transition.finished
 				.catch(() => {})
 				.finally(() => {
+					isTransitioningRef.current = false
 					setIsSwitching(false)
 					root.classList.remove('theme-vt')
+					root.style.removeProperty('--vt-x')
+					root.style.removeProperty('--vt-y')
+					root.style.removeProperty('--vt-r')
 				})
 			return
 		}
