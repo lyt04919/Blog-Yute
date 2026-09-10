@@ -17,12 +17,9 @@ export function ThemeToggleButton({ className = '', showLabel = false }: ThemeTo
 		(e: React.MouseEvent<HTMLButtonElement>) => {
 			e.stopPropagation()
 			const rect = e.currentTarget.getBoundingClientRect()
-			const hasPointerCoords =
-				typeof e.clientX === 'number' && e.clientX > 0 &&
-				typeof e.clientY === 'number' && e.clientY > 0
 			const coords = {
-				clientX: hasPointerCoords ? Math.round(e.clientX) : Math.round(rect.left + rect.width / 2),
-				clientY: hasPointerCoords ? Math.round(e.clientY) : Math.round(rect.top + rect.height / 2)
+				clientX: Math.round(rect.left + rect.width / 2),
+				clientY: Math.round(rect.top + rect.height / 2)
 			}
 			toggleTheme(coords)
 		},

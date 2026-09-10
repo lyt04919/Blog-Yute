@@ -434,7 +434,8 @@ async function runTests() {
 		assert.ok(globalsCssContent.includes('::view-transition-old(root)'), 'globals.css must support view transitions')
 		assert.ok(globalsCssContent.includes('view-transition-') || globalsCssContent.includes('theme-reveal'), 'globals.css must include view transition rules')
 		assert.ok(globalsCssContent.includes('html.theme-vt *'), 'globals.css must freeze child transitions during reveal')
-		assert.ok(globalsCssContent.includes('view-transition-name: theme-toggle'), 'globals.css must isolate theme-toggle layer')
+		assert.ok(globalsCssContent.includes('::view-transition-new(root)'), 'globals.css must configure root view transition')
+		assert.ok(!globalsCssContent.includes('view-transition-name: theme-toggle'), 'globals.css must unify theme toggle with root transition')
 
 		// 3. Check use-theme.tsx for clean DOM sync, viewport coordinates and view transitions
 		const useThemePath = path.join(ROOT, 'src/hooks/use-theme.tsx')
@@ -457,6 +458,7 @@ async function runTests() {
 		assert.ok(toggleContent.includes('aria-checked='), 'ThemeToggleButton must declare aria-checked')
 		assert.ok(toggleContent.includes('aria-label='), 'ThemeToggleButton must declare aria-label')
 		assert.ok(toggleContent.includes('data-theme-toggle'), 'ThemeToggleButton must include data-theme-toggle attribute')
+		assert.ok(toggleContent.includes('rect.left + rect.width / 2'), 'ThemeToggleButton must calculate exact button center for ripple origin')
 		assert.ok(toggleContent.includes('theme-toggle__moon'), 'ThemeToggleButton must render moon icon')
 		assert.ok(toggleContent.includes('theme-toggle__sun'), 'ThemeToggleButton must render sun icon')
 		assert.ok(toggleContent.includes('lucide-react'), 'ThemeToggleButton must use Lucide vector icons')

@@ -114,23 +114,24 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 			return
 		}
 
+		// 确定扩散起点：优先以切换按钮的几何中心为绝对原点向外扩散
 		let x = window.innerWidth / 2
 		let y = window.innerHeight / 2
 
-		if (event && 'clientX' in event && typeof event.clientX === 'number' && event.clientX > 0) {
-			x = event.clientX
-			y = event.clientY
-		} else if (event instanceof HTMLElement) {
-			const rect = event.getBoundingClientRect()
-			x = rect.left + rect.width / 2
-			y = rect.top + rect.height / 2
-		} else {
-			const buttonEl = document.querySelector<HTMLElement>('[data-theme-toggle]')
-			if (buttonEl) {
-				const rect = buttonEl.getBoundingClientRect()
-				x = rect.left + rect.width / 2
-				y = rect.top + rect.height / 2
-			}
+		const buttonEl =
+			(event instanceof HTMLElement ? event : null) ??
+			(event && 'currentTarget' in event && (event.currentTarget as HTMLElement) instanceof HTMLElement
+				? (event.currentTarget as HTMLElement)
+				: null) ??
+			(typeof document !== 'undefined' ? document.querySelector<HTMLElement>('[data-theme-toggle]') : null)
+
+		if (buttonEl) {
+			const rect = buttonEl.getBoundingClientRect()
+			x = Math.round(rect.left + rect.width / 2)
+			y = Math.round(rect.top + rect.height / 2)
+		} else if (event && 'clientX' in event && typeof event.clientX === 'number' && event.clientX > 0) {
+			x = Math.round(event.clientX)
+			y = Math.round(event.clientY)
 		}
 
 		const radius = Math.hypot(

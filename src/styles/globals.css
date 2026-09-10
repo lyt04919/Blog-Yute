@@ -86,6 +86,7 @@
 	}
 
 	/* View Transitions ripple rules */
+	::view-transition-group(root),
 	::view-transition-old(root),
 	::view-transition-new(root) {
 		animation: none;
@@ -107,46 +108,9 @@
 		transition: none !important;
 	}
 
-	/* Isolate theme toggle button into its own transition layer */
-	html.theme-vt .theme-toggle {
-		view-transition-name: theme-toggle !important;
-	}
-
+	/* Ensure theme toggle transitions seamlessly with the root circular ripple */
 	html.theme-vt .theme-toggle svg {
 		transition: none !important;
-	}
-
-	html.theme-vt::view-transition-group(theme-toggle) {
-		z-index: 10000;
-		animation: none;
-	}
-
-	html.theme-vt::view-transition-old(theme-toggle) {
-		animation: theme-toggle-out 0.18s ease-in both;
-		mix-blend-mode: normal;
-	}
-
-	html.theme-vt::view-transition-new(theme-toggle) {
-		animation: theme-toggle-in 0.46s 0.04s cubic-bezier(0.22, 1, 0.36, 1) both;
-		mix-blend-mode: normal;
-	}
-
-	@keyframes theme-toggle-out {
-		to {
-			opacity: 0;
-			transform: rotate(28deg) scale(0.72);
-		}
-	}
-
-	@keyframes theme-toggle-in {
-		from {
-			opacity: 0;
-			transform: rotate(-32deg) scale(0.62);
-		}
-		to {
-			opacity: 1;
-			transform: rotate(0deg) scale(1);
-		}
 	}
 
 	/* Fallback: animate one composited layer when View Transitions are unavailable */
