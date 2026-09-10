@@ -101,12 +101,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 		syncDOM(resolved)
 	}, [syncDOM])
 
-	const toggleTheme = useCallback((target?: React.MouseEvent | { clientX: number; clientY: number } | HTMLElement) => {
+	const toggleTheme = useCallback((event?: React.MouseEvent | { clientX: number; clientY: number } | HTMLElement) => {
 		const nextTheme: 'light' | 'dark' = resolvedTheme === 'dark' ? 'light' : 'dark'
 
-		const motionOK =
+		const isReducedMotion =
 			typeof window !== 'undefined' &&
-			window.matchMedia('(prefers-reduced-motion: no-preference)').matches
+			window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 		const root = typeof document !== 'undefined' ? document.documentElement : null
 		if (!root) {
@@ -114,81 +114,60 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 			return
 		}
 
-		let buttonEl: HTMLElement | null = null
-		let x: number | undefined
-		let y: number | undefined
+		let x = window.innerWidth / 2
+		let y = window.innerHeight / 2
 
-		if (target instanceof HTMLElement) {
-			buttonEl = target
-			const rect = buttonEl.getBoundingClientRect()
+		if (event && 'clientX' in event && typeof event.clientX === 'number' && event.clientX > 0) {
+			x = event.clientX
+			y = event.clientY
+		} else if (event instanceof HTMLElement) {
+			const rect = event.getBoundingClientRect()
 			x = rect.left + rect.width / 2
 			y = rect.top + rect.height / 2
-		} else if (target && 'currentTarget' in target && (target.currentTarget as HTMLElement) instanceof HTMLElement) {
-			buttonEl = target.currentTarget as HTMLElement
-			const mouseEvent = target as React.MouseEvent
-			if (typeof mouseEvent.clientX === 'number' && mouseEvent.clientX > 0) {
-				x = mouseEvent.clientX
-				y = mouseEvent.clientY
-			} else {
-				const rect = buttonEl.getBoundingClientRect()
-				x = rect.left + rect.width / 2
-				y = rect.top + rect.height / 2
-			}
-		} else if (target && 'clientX' in target && typeof target.clientX === 'number' && target.clientX > 0) {
-			x = target.clientX
-			y = target.clientY
-			buttonEl = document.querySelector<HTMLElement>('[data-theme-toggle]')
 		} else {
-			buttonEl = document.querySelector<HTMLElement>('[data-theme-toggle]')
+			const buttonEl = document.querySelector<HTMLElement>('[data-theme-toggle]')
 			if (buttonEl) {
 				const rect = buttonEl.getBoundingClientRect()
 				x = rect.left + rect.width / 2
 				y = rect.top + rect.height / 2
-			} else {
-				x = window.innerWidth / 2
-				y = window.innerHeight / 2
 			}
 		}
 
-		if (motionOK && typeof document !== 'undefined' && 'startViewTransition' in document && x !== undefined && y !== undefined) {
-			const radius =
-				Math.hypot(
-					Math.max(x, window.innerWidth - x),
-					Math.max(y, window.innerHeight - y)
-				) + 30
+		const radius = Math.hypot(
+			Math.max(x, window.innerWidth - x),
+			Math.max(y, window.innerHeight - y)
+		)
 
-			const xPercent = (x / window.innerWidth) * 100
-			const yPercent = (y / window.innerHeight) * 100
-			const radiusReference =
-				Math.hypot(window.innerWidth, window.innerHeight) / Math.SQRT2
-			const radiusPercent = (radius / radiusReference) * 100
-
-			const themeRevealStyle =
-				document.getElementById('theme-reveal-style') ??
-				(() => {
-					const styleEl = document.createElement('style')
-					styleEl.id = 'theme-reveal-style'
-					document.head.append(styleEl)
-					return styleEl
-				})()
-
-			themeRevealStyle.textContent = `@keyframes theme-reveal { from { clip-path: circle(0 at ${xPercent.toFixed(4)}% ${yPercent.toFixed(4)}%); } to { clip-path: circle(${radiusPercent.toFixed(4)}% at ${xPercent.toFixed(4)}% ${yPercent.toFixed(4)}%); } }`
-
+		if (!isReducedMotion && typeof document !== 'undefined' && 'startViewTransition' in document) {
 			setIsSwitching(true)
 			root.classList.add('theme-vt')
-			buttonEl?.classList.add('is-switching')
 
-			const vt = (document as any).startViewTransition(() => {
+			const transition = (document as any).startViewTransition(() => {
 				flushSync(() => {
 					setTheme(nextTheme)
 				})
 			})
 
-			vt.finished
+			transition.ready?.then(() => {
+				document.documentElement.animate(
+					{
+						clipPath: [
+							`circle(0px at ${x}px ${y}px)`,
+							`circle(${radius}px at ${x}px ${y}px)`
+						]
+					},
+					{
+						duration: 450,
+						easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+						pseudoElement: '::view-transition-new(root)'
+					}
+				)
+			})
+
+			transition.finished
 				.catch(() => {})
 				.finally(() => {
 					setIsSwitching(false)
-					buttonEl?.classList.remove('is-switching')
 					root.classList.remove('theme-vt')
 				})
 			return
@@ -196,7 +175,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
 		// Fallback for browsers without View Transitions or when motion is reduced
 		setTheme(nextTheme)
-		if (motionOK) {
+		if (!isReducedMotion) {
 			root.classList.remove('theme-anim')
 			void root.offsetWidth
 			root.classList.add('theme-anim')

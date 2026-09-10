@@ -86,21 +86,18 @@
 	}
 
 	/* View Transitions ripple rules */
-	html.theme-vt::view-transition-old(root),
-	html.theme-vt::view-transition-new(root) {
+	::view-transition-old(root),
+	::view-transition-new(root) {
+		animation: none;
 		mix-blend-mode: normal;
 	}
 
-	html.theme-vt::view-transition-old(root) {
-		animation: none;
-		opacity: 1;
+	::view-transition-old(root) {
 		z-index: 1;
 	}
 
-	html.theme-vt::view-transition-new(root) {
-		animation: theme-reveal 0.52s linear both;
-		opacity: 1;
-		z-index: 2;
+	::view-transition-new(root) {
+		z-index: 9999;
 	}
 
 	/* Freeze element-level transitions during theme reveal to ensure 60FPS main-thread performance */

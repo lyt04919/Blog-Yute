@@ -436,14 +436,17 @@ async function runTests() {
 		assert.ok(globalsCssContent.includes('html.theme-vt *'), 'globals.css must freeze child transitions during reveal')
 		assert.ok(globalsCssContent.includes('view-transition-name: theme-toggle'), 'globals.css must isolate theme-toggle layer')
 
-		// 3. Check use-theme.tsx for clean DOM sync, percentage coordinates and view transitions
+		// 3. Check use-theme.tsx for clean DOM sync, viewport coordinates and view transitions
 		const useThemePath = path.join(ROOT, 'src/hooks/use-theme.tsx')
 		const useThemeContent = fs.readFileSync(useThemePath, 'utf8')
 		assert.ok(!useThemeContent.includes('#00FF41'), 'use-theme.tsx must not contain hardcoded cyberpunk colors')
 		assert.ok(useThemeContent.includes('startViewTransition'), 'use-theme.tsx must support View Transitions API')
 		assert.ok(useThemeContent.includes('flushSync'), 'use-theme.tsx must use flushSync for synchronous DOM transition capture')
-		assert.ok(useThemeContent.includes('Math.SQRT2'), 'use-theme.tsx must normalize percentage circle radius using Math.SQRT2')
-		assert.ok(useThemeContent.includes('clip-path') || useThemeContent.includes('clipPath'), 'use-theme.tsx must animate circular ripple clip-path from click origin')
+		assert.ok(useThemeContent.includes('document.documentElement.animate'), 'use-theme.tsx must animate using document.documentElement.animate')
+		assert.ok(useThemeContent.includes('Math.hypot'), 'use-theme.tsx must calculate maximum distance to farthest corner using Math.hypot')
+		assert.ok(useThemeContent.includes('cubic-bezier(0.4, 0, 0.2, 1)'), 'use-theme.tsx must use cubic-bezier(0.4, 0, 0.2, 1) easing')
+		assert.ok(useThemeContent.includes('prefers-reduced-motion: reduce'), 'use-theme.tsx must respect prefers-reduced-motion: reduce')
+		assert.ok(useThemeContent.includes('clipPath'), 'use-theme.tsx must animate circular ripple clipPath from click origin')
 		assert.ok(useThemeContent.includes("addEventListener('storage'"), 'use-theme.tsx must sync across tabs')
 
 		// 4. Check theme-toggle-button.tsx for a11y & pointer precision
