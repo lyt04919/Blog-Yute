@@ -441,10 +441,12 @@ async function runTests() {
 		const useThemeContent = fs.readFileSync(useThemePath, 'utf8')
 		assert.ok(!useThemeContent.includes('#00FF41'), 'use-theme.tsx must not contain hardcoded cyberpunk colors')
 		assert.ok(useThemeContent.includes('startViewTransition'), 'use-theme.tsx must support View Transitions API')
-		assert.ok(useThemeContent.includes('clipPath'), 'use-theme.tsx must animate circular ripple clipPath from click origin')
+		assert.ok(useThemeContent.includes('flushSync'), 'use-theme.tsx must use flushSync for synchronous DOM transition capture')
+		assert.ok(useThemeContent.includes('Math.SQRT2'), 'use-theme.tsx must normalize percentage circle radius using Math.SQRT2')
+		assert.ok(useThemeContent.includes('clip-path') || useThemeContent.includes('clipPath'), 'use-theme.tsx must animate circular ripple clip-path from click origin')
 		assert.ok(useThemeContent.includes("addEventListener('storage'"), 'use-theme.tsx must sync across tabs')
 
-		// 4. Check theme-toggle-button.tsx for a11y & tactile feedback
+		// 4. Check theme-toggle-button.tsx for a11y & pointer precision
 		const toggleButtonPath = path.join(ROOT, 'src/components/theme-toggle-button.tsx')
 		assert.ok(fs.existsSync(toggleButtonPath), 'theme-toggle-button.tsx must exist')
 		const toggleContent = fs.readFileSync(toggleButtonPath, 'utf8')
@@ -456,7 +458,7 @@ async function runTests() {
 		assert.ok(toggleContent.includes('theme-toggle__sun'), 'ThemeToggleButton must render sun icon')
 		assert.ok(toggleContent.includes('lucide-react'), 'ThemeToggleButton must use Lucide vector icons')
 		assert.ok(toggleContent.includes('isDark ?') && toggleContent.includes('theme-toggle__moon'), 'ThemeToggleButton must exclusively render Moon in dark mode and Sun in light mode')
-		assert.ok(toggleContent.includes('AudioContext'), 'ThemeToggleButton must synthesize haptic sound')
+		assert.ok(!toggleContent.includes('AudioContext'), 'ThemeToggleButton should avoid jarring synthetic audio beeps')
 
 		// 5. Check markdown-renderer.ts for dual themes
 		const markdownPath = path.join(ROOT, 'src/lib/markdown-renderer.ts')

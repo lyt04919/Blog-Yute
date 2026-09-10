@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react'
+import { flushSync } from 'react-dom'
 
 export type Theme = 'light' | 'dark' | 'system'
 
@@ -124,10 +125,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 			y = rect.top + rect.height / 2
 		} else if (target && 'currentTarget' in target && (target.currentTarget as HTMLElement) instanceof HTMLElement) {
 			buttonEl = target.currentTarget as HTMLElement
-			const rect = buttonEl.getBoundingClientRect()
-			x = rect.left + rect.width / 2
-			y = rect.top + rect.height / 2
-		} else if (target && 'clientX' in target && typeof target.clientX === 'number') {
+			const mouseEvent = target as React.MouseEvent
+			if (typeof mouseEvent.clientX === 'number' && mouseEvent.clientX > 0) {
+				x = mouseEvent.clientX
+				y = mouseEvent.clientY
+			} else {
+				const rect = buttonEl.getBoundingClientRect()
+				x = rect.left + rect.width / 2
+				y = rect.top + rect.height / 2
+			}
+		} else if (target && 'clientX' in target && typeof target.clientX === 'number' && target.clientX > 0) {
 			x = target.clientX
 			y = target.clientY
 			buttonEl = document.querySelector<HTMLElement>('[data-theme-toggle]')
@@ -144,34 +151,37 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 		}
 
 		if (motionOK && typeof document !== 'undefined' && 'startViewTransition' in document && x !== undefined && y !== undefined) {
-			const endRadius =
+			const radius =
 				Math.hypot(
 					Math.max(x, window.innerWidth - x),
 					Math.max(y, window.innerHeight - y)
-				) + 20
+				) + 30
+
+			const xPercent = (x / window.innerWidth) * 100
+			const yPercent = (y / window.innerHeight) * 100
+			const radiusReference =
+				Math.hypot(window.innerWidth, window.innerHeight) / Math.SQRT2
+			const radiusPercent = (radius / radiusReference) * 100
+
+			const themeRevealStyle =
+				document.getElementById('theme-reveal-style') ??
+				(() => {
+					const styleEl = document.createElement('style')
+					styleEl.id = 'theme-reveal-style'
+					document.head.append(styleEl)
+					return styleEl
+				})()
+
+			themeRevealStyle.textContent = `@keyframes theme-reveal { from { clip-path: circle(0 at ${xPercent.toFixed(4)}% ${yPercent.toFixed(4)}%); } to { clip-path: circle(${radiusPercent.toFixed(4)}% at ${xPercent.toFixed(4)}% ${yPercent.toFixed(4)}%); } }`
 
 			setIsSwitching(true)
 			root.classList.add('theme-vt')
 			buttonEl?.classList.add('is-switching')
 
 			const vt = (document as any).startViewTransition(() => {
-				setTheme(nextTheme)
-			})
-
-			vt.ready?.then(() => {
-				document.documentElement.animate(
-					{
-						clipPath: [
-							`circle(0px at ${x}px ${y}px)`,
-							`circle(${endRadius}px at ${x}px ${y}px)`
-						]
-					},
-					{
-						duration: 650,
-						easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
-						pseudoElement: '::view-transition-new(root)'
-					}
-				)
+				flushSync(() => {
+					setTheme(nextTheme)
+				})
 			})
 
 			vt.finished

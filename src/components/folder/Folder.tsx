@@ -50,9 +50,9 @@ const Folder: React.FC<FolderProps> = ({
   const paper2 = darkenColor('#ffffff', 0.05);
   const paper3 = '#ffffff';
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = (e?: React.SyntheticEvent) => {
     if (!allowToggle) return;
-    e.stopPropagation();
+    e?.stopPropagation();
     setOpen(prev => !prev);
     if (open) {
       setPaperOffsets(Array.from({ length: maxItems }, () => ({ x: 0, y: 0 })));

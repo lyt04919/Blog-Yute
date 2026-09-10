@@ -86,19 +86,21 @@
 	}
 
 	/* View Transitions ripple rules */
-	::view-transition-group(root) {
-		animation-duration: 0.7s;
-	}
-	::view-transition-old(root),
-	::view-transition-new(root) {
-		animation: none;
+	html.theme-vt::view-transition-old(root),
+	html.theme-vt::view-transition-new(root) {
 		mix-blend-mode: normal;
 	}
-	::view-transition-old(root) {
+
+	html.theme-vt::view-transition-old(root) {
+		animation: none;
+		opacity: 1;
 		z-index: 1;
 	}
-	::view-transition-new(root) {
-		z-index: 9999;
+
+	html.theme-vt::view-transition-new(root) {
+		animation: theme-reveal 0.52s linear both;
+		opacity: 1;
+		z-index: 2;
 	}
 
 	/* Freeze element-level transitions during theme reveal to ensure 60FPS main-thread performance */
@@ -185,10 +187,6 @@
 
 	.theme-toggle:hover :is(.theme-toggle__moon, .theme-toggle__sun) {
 		transform: scale(1.12);
-	}
-
-	.theme-toggle.is-switching {
-		color: var(--color-accent, #0054f9) !important;
 	}
 
 	body {

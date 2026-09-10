@@ -4,31 +4,6 @@ import { useCallback } from 'react'
 import { Sun, Moon } from 'lucide-react'
 import { useTheme } from '@/hooks/use-theme'
 
-// Synthesize lightweight haptic click/pop without external audio files
-function playHapticTick(targetDark: boolean) {
-	if (typeof window === 'undefined') return
-	try {
-		const AudioCtx = window.AudioContext || (window as any).webkitAudioContext
-		if (!AudioCtx) return
-		const ctx = new AudioCtx()
-		const osc = ctx.createOscillator()
-		const gain = ctx.createGain()
-
-		osc.type = 'sine'
-		// 880Hz pop for light, warm 440Hz tick for dark
-		osc.frequency.setValueAtTime(targetDark ? 440 : 880, ctx.currentTime)
-		osc.frequency.exponentialRampToValueAtTime(targetDark ? 220 : 440, ctx.currentTime + 0.035)
-
-		gain.gain.setValueAtTime(0.04, ctx.currentTime)
-		gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.035)
-
-		osc.connect(gain)
-		gain.connect(ctx.destination)
-		osc.start()
-		osc.stop(ctx.currentTime + 0.035)
-	} catch {}
-}
-
 interface ThemeToggleButtonProps {
 	className?: string
 	showLabel?: boolean
@@ -41,15 +16,17 @@ export function ThemeToggleButton({ className = '', showLabel = false }: ThemeTo
 	const handleClick = useCallback(
 		(e: React.MouseEvent<HTMLButtonElement>) => {
 			e.stopPropagation()
-			playHapticTick(!isDark)
 			const rect = e.currentTarget.getBoundingClientRect()
+			const hasPointerCoords =
+				typeof e.clientX === 'number' && e.clientX > 0 &&
+				typeof e.clientY === 'number' && e.clientY > 0
 			const coords = {
-				clientX: Math.round(rect.left + rect.width / 2),
-				clientY: Math.round(rect.top + rect.height / 2)
+				clientX: hasPointerCoords ? Math.round(e.clientX) : Math.round(rect.left + rect.width / 2),
+				clientY: hasPointerCoords ? Math.round(e.clientY) : Math.round(rect.top + rect.height / 2)
 			}
 			toggleTheme(coords)
 		},
-		[isDark, toggleTheme]
+		[toggleTheme]
 	)
 
 	return (
