@@ -53,7 +53,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 		const stored = getStoredTheme()
 		const initialTheme = stored || 'system'
 		setThemeState(initialTheme)
-		const resolved = initialTheme === 'system' ? getSystemTheme() : initialTheme
+		const isDomDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+		const resolved = initialTheme === 'system' ? (isDomDark ? 'dark' : getSystemTheme()) : initialTheme
 		setResolvedTheme(resolved)
 		syncDOM(resolved)
 		setMounted(true)
@@ -103,17 +104,18 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 	const toggleTheme = useCallback((event?: React.MouseEvent | { clientX: number; clientY: number } | HTMLElement) => {
 		if (isTransitioningRef.current) return
 
-		const nextTheme: 'light' | 'dark' = resolvedTheme === 'dark' ? 'light' : 'dark'
+		const root = typeof document !== 'undefined' ? document.documentElement : null
+		if (!root) {
+			setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
+			return
+		}
+
+		const isCurrentlyDark = root.classList.contains('dark')
+		const nextTheme: 'light' | 'dark' = isCurrentlyDark ? 'light' : 'dark'
 
 		const isReducedMotion =
 			typeof window !== 'undefined' &&
 			window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-		const root = typeof document !== 'undefined' ? document.documentElement : null
-		if (!root) {
-			setTheme(nextTheme)
-			return
-		}
 
 		// 确定扩散起点：优先以切换按钮的几何中心为绝对原点向外扩散
 		const vw = typeof window !== 'undefined' ? (document.documentElement.clientWidth || window.innerWidth) : 1920
@@ -150,6 +152,33 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 			isTransitioningRef.current = true
 			root.style.setProperty('--vt-x', `${x}px`)
 			root.style.setProperty('--vt-y', `${y}px`)
+
+			// 动态在 head 中注入首帧与扩展关键帧，确保在第 0 帧诞生瞬间即为 0px 裁切态，绝无全屏闪白/闪黑，同时平滑向外扩散
+			let animStyle = document.getElementById('theme-vt-preclip') as HTMLStyleElement | null
+			if (!animStyle) {
+				animStyle = document.createElement('style')
+				animStyle.id = 'theme-vt-preclip'
+				document.head.appendChild(animStyle)
+			}
+			animStyle.textContent = `
+				@keyframes vt-ripple-expand {
+					from {
+						clip-path: circle(0px at ${x}px ${y}px);
+					}
+					to {
+						clip-path: circle(${maxRadius}px at ${x}px ${y}px);
+					}
+				}
+				::view-transition-old(root) {
+					animation: vt-old-persist 1150ms cubic-bezier(0.37, 0, 0.63, 1) both;
+					z-index: 1;
+				}
+				::view-transition-new(root) {
+					animation: vt-ripple-expand 1150ms cubic-bezier(0.37, 0, 0.63, 1) both;
+					z-index: 9999;
+				}
+			`
+
 			root.classList.add('theme-vt')
 
 			const transition = (document as any).startViewTransition(() => {
@@ -188,6 +217,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 					root.classList.remove('theme-vt')
 					root.style.removeProperty('--vt-x')
 					root.style.removeProperty('--vt-y')
+					if (animStyle && animStyle.parentNode) {
+						animStyle.parentNode.removeChild(animStyle)
+					}
 				})
 			return
 		}

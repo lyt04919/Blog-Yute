@@ -437,7 +437,7 @@ async function runTests() {
 		assert.ok(globalsCssContent.includes('::view-transition-new(root)'), 'globals.css must configure root view transition')
 		assert.ok(!globalsCssContent.includes('view-transition-name: theme-toggle'), 'globals.css must unify theme toggle with root transition')
 
-		assert.ok(globalsCssContent.includes('::view-transition-image-pair(root)'), 'globals.css must isolate view-transition-image-pair')
+		assert.ok(globalsCssContent.includes('z-index: 9999'), 'globals.css must stack view-transition-new over view-transition-old')
 		assert.ok(globalsCssContent.includes('var(--vt-x'), 'globals.css must pre-clip view-transition-new with button coordinate origin')
 
 		// 3. Check use-theme.tsx for clean DOM sync, viewport coordinates and view transitions
