@@ -451,7 +451,7 @@ async function runTests() {
 		assert.ok(useThemeContent.includes('::view-transition-old(root)'), 'use-theme.tsx must reference ::view-transition-old(root) compositor lifetime')
 		assert.ok(useThemeContent.includes('::view-transition-new(root)'), 'use-theme.tsx must animate ::view-transition-new(root) with clipPath')
 		assert.ok(useThemeContent.includes('Math.hypot'), 'use-theme.tsx must calculate maximum distance to farthest corner using Math.hypot')
-		assert.ok(useThemeContent.includes('cubic-bezier(0.22, 1, 0.36, 1)'), 'use-theme.tsx must use cubic-bezier(0.22, 1, 0.36, 1) smooth non-stalling easing')
+		assert.ok(useThemeContent.includes('cubic-bezier(0.37, 0, 0.63, 1)'), 'use-theme.tsx must use cubic-bezier(0.37, 0, 0.63, 1) smooth non-stalling easing')
 		assert.ok(useThemeContent.includes('prefers-reduced-motion: reduce'), 'use-theme.tsx must respect prefers-reduced-motion: reduce')
 		assert.ok(useThemeContent.includes('clipPath'), 'use-theme.tsx must animate circular ripple clipPath from click origin')
 		assert.ok(useThemeContent.includes("addEventListener('storage'"), 'use-theme.tsx must sync across tabs')

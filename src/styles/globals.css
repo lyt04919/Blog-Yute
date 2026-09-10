@@ -114,6 +114,7 @@
 	::view-transition-new(root) {
 		z-index: 9999;
 		opacity: 1 !important;
+		will-change: clip-path;
 		/* 诞生瞬间预裁切为 0px，以按钮实际位置为圆心，确保首帧绝无全屏白闪或圆心跳变 */
 		clip-path: circle(0px at var(--vt-x, 50%) var(--vt-y, 50%));
 	}
