@@ -115,8 +115,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 		}
 
 		// 确定扩散起点：优先以切换按钮的几何中心为绝对原点向外扩散
-		let x = window.innerWidth / 2
-		let y = window.innerHeight / 2
+		const vw = typeof window !== 'undefined' ? (document.documentElement.clientWidth || window.innerWidth) : 1920
+		const vh = typeof window !== 'undefined' ? (document.documentElement.clientHeight || window.innerHeight) : 1080
+
+		let x = vw / 2
+		let y = vh / 2
 
 		const buttonEl =
 			(event instanceof HTMLElement ? event : null) ??
@@ -127,17 +130,25 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
 		if (buttonEl) {
 			const rect = buttonEl.getBoundingClientRect()
-			x = Math.round(rect.left + rect.width / 2)
-			y = Math.round(rect.top + rect.height / 2)
+			x = rect.left + rect.width / 2
+			y = rect.top + rect.height / 2
 		} else if (event && 'clientX' in event && typeof event.clientX === 'number' && event.clientX > 0) {
-			x = Math.round(event.clientX)
-			y = Math.round(event.clientY)
+			x = event.clientX
+			y = event.clientY
 		}
 
-		const radius = Math.hypot(
-			Math.max(x, window.innerWidth - x),
-			Math.max(y, window.innerHeight - y)
-		)
+		// 使用归一化视口百分比坐标，根治 Mac Retina (2x/3x) 高分屏下绝对 px 坐标造成的圆心漂移
+		const xPercent = (x / vw) * 100
+		const yPercent = (y / vh) * 100
+
+		const radius =
+			Math.hypot(
+				Math.max(x, vw - x),
+				Math.max(y, vh - y)
+			) + 40
+
+		const radiusReference = Math.hypot(vw, vh) / Math.SQRT2
+		const radiusPercent = (radius / radiusReference) * 100
 
 		if (!isReducedMotion && typeof document !== 'undefined' && 'startViewTransition' in document) {
 			setIsSwitching(true)
@@ -153,8 +164,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 				document.documentElement.animate(
 					{
 						clipPath: [
-							`circle(0px at ${x}px ${y}px)`,
-							`circle(${radius}px at ${x}px ${y}px)`
+							`circle(0% at ${xPercent.toFixed(4)}% ${yPercent.toFixed(4)}%)`,
+							`circle(${radiusPercent.toFixed(4)}% at ${xPercent.toFixed(4)}% ${yPercent.toFixed(4)}%)`
 						]
 					},
 					{

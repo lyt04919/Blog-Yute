@@ -21,7 +21,7 @@ export function ThemeToggleButton({ className = '', showLabel = false }: ThemeTo
 				clientX: Math.round(rect.left + rect.width / 2),
 				clientY: Math.round(rect.top + rect.height / 2)
 			}
-			toggleTheme(coords)
+			toggleTheme(e.currentTarget || coords)
 		},
 		[toggleTheme]
 	)
