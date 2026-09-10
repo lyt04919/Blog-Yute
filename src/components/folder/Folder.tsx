@@ -26,13 +26,15 @@ interface FolderProps {
   size?: number;
   items?: React.ReactNode[];
   className?: string;
+  allowToggle?: boolean;
 }
 
 const Folder: React.FC<FolderProps> = ({ 
   color = '#5227FF', 
   size = 1, 
   items = [], 
-  className = '' 
+  className = '',
+  allowToggle = false
 }) => {
   const maxItems = 3;
   const papers = items.slice(0, maxItems);
@@ -48,7 +50,9 @@ const Folder: React.FC<FolderProps> = ({
   const paper2 = darkenColor('#ffffff', 0.05);
   const paper3 = '#ffffff';
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    if (!allowToggle) return;
+    e.stopPropagation();
     setOpen(prev => !prev);
     if (open) {
       setPaperOffsets(Array.from({ length: maxItems }, () => ({ x: 0, y: 0 })));
@@ -112,7 +116,7 @@ const Folder: React.FC<FolderProps> = ({
               className={`paper paper-${i + 1}`}
               onMouseMove={e => handlePaperMouseMove(e, i)}
               onMouseLeave={() => handlePaperMouseLeave(i)}
-              onClick={e => e.stopPropagation()}
+              onClick={e => { if (allowToggle) e.stopPropagation(); }}
               style={
                 open
                   ? ({

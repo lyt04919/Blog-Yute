@@ -90,7 +90,7 @@ export default function HeroSection() {
 					className="drop-shadow-lg" 
 					style={{ width: '50px', height: '50px' }}
 					decoding="async"
-					src="https://code.visualstudio.com/favicon.ico"
+					src="/images/tech-icons/vscode.svg"
 				/>
 			</div>
 
@@ -111,7 +111,7 @@ export default function HeroSection() {
 					className="drop-shadow-lg" 
 					style={{ width: '50px', height: '50px' }}
 					decoding="async"
-					src="https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg"
+					src="/images/tech-icons/react.svg"
 				/>
 			</div>
 
@@ -132,7 +132,7 @@ export default function HeroSection() {
 					className="drop-shadow-lg" 
 					style={{ width: '40px', height: '40px' }}
 					decoding="async"
-					src="https://obsidian.md/favicon.ico"
+					src="/images/tech-icons/obsidian.svg"
 				/>
 			</div>
 
@@ -153,7 +153,7 @@ export default function HeroSection() {
 					className="drop-shadow-lg bg-white rounded-md p-1 border border-neutral-200/50" 
 					style={{ width: '46px', height: '46px' }}
 					decoding="async"
-					src="https://upload.wikimedia.org/wikipedia/commons/e/e9/Notion-logo.svg"
+					src="/images/tech-icons/notion.svg"
 				/>
 			</div>
 
@@ -207,7 +207,7 @@ export default function HeroSection() {
 					className="drop-shadow-lg" 
 					style={{ width: '48px', height: '48px' }}
 					decoding="async"
-					src="https://www.gstatic.com/lamda/images/gemini_sparkle_4g_512_lt_f94943af3be039176192d.png"
+					src="/images/tech-icons/gemini.svg"
 				/>
 			</div>
 
@@ -228,7 +228,7 @@ export default function HeroSection() {
 					className="drop-shadow-lg rounded-full" 
 					style={{ width: '46px', height: '46px' }}
 					decoding="async"
-					src="https://chatgpt.com/cdn/assets/favicon-180x180-od45eci6.webp"
+					src="/images/tech-icons/chatgpt.svg"
 				/>
 			</div>
 

@@ -80,16 +80,16 @@ const TooltipWrapper = ({ children, content, href, onClick, external }: { childr
 
 	if (href) {
 		if (external) {
-			return <a href={href} target="_blank" className="size-full block">{contentNode}</a>
+			return <a href={href} target="_blank" className="size-full flex items-center justify-center">{contentNode}</a>
 		}
-		return <Link href={href} className="size-full block">{contentNode}</Link>
+		return <Link href={href} className="size-full flex items-center justify-center">{contentNode}</Link>
 	}
 
 	if (onClick) {
-		return <button onClick={onClick} className="size-full block">{contentNode}</button>
+		return <button onClick={onClick} className="size-full flex items-center justify-center cursor-pointer">{contentNode}</button>
 	}
 
-	return <div className="size-full">{contentNode}</div>
+	return <div className="size-full flex items-center justify-center">{contentNode}</div>
 }
 
 export default function TopNav() {

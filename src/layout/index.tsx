@@ -14,6 +14,7 @@ import { ThemeProvider } from '@/hooks/use-theme'
 import Footer from './footer'
 import dynamic from 'next/dynamic'
 import { useAuthStore } from '@/hooks/use-auth'
+import { NavigationProgressBar } from '@/components/navigation-progress-bar'
 
 const ConfigDialog = dynamic(() => import('@/app/(home)/config-dialog'), { ssr: false })
 const HomeDisplayModal = dynamic(() => import('@/app/(home)/components/home-display-modal').then(mod => mod.HomeDisplayModal), { ssr: false })
@@ -54,6 +55,7 @@ export default function Layout({ children }: PropsWithChildren) {
 
 	return (
 		<ThemeProvider>
+			<NavigationProgressBar />
 			<Toaster
 				position='bottom-right'
 				richColors

@@ -572,7 +572,8 @@ async function runTests() {
 		assert.strictEqual(sig, sigHex, 'Token signature must match HMAC hex')
 
 		// Verify forged signature fails
-		const forgedToken = `${now}.${sigHex.substring(0, sigHex.length - 2)}00`
+		const replacement = sigHex.endsWith('00') ? 'ff' : '00'
+		const forgedToken = `${now}.${sigHex.substring(0, sigHex.length - 2)}${replacement}`
 		const forgedSig = forgedToken.split('.')[1]
 		assert.notStrictEqual(forgedSig, sigHex, 'Forged token must not match')
 	})
@@ -711,6 +712,38 @@ async function runTests() {
 		const sharePageContent = fs.readFileSync(path.join(ROOT, 'src/app/favorite/share/page.tsx'), 'utf8')
 		assert.ok(sharePageContent.includes("dynamic(() => import('./components/create-dialog')"), 'CreateDialog in share page must be dynamic')
 		assert.ok(sharePageContent.includes('{isAuth && isCreateDialogOpen &&'), 'CreateDialog must be guarded by isAuth')
+	})
+
+	// 21. Navigation Responsiveness, Click Area Coverage, and Network Asset Optimization
+	await test('Navigation responsiveness, Dock hit-area coverage, bounds caching, and clean head assets', async () => {
+		// 1. Check head.tsx for removal of dead googleapis.cn and lazyOnload analytics
+		const headContent = fs.readFileSync(path.join(ROOT, 'src/layout/head.tsx'), 'utf8')
+		assert.ok(!headContent.includes('fonts.googleapis.cn'), 'head.tsx must not contain dead fonts.googleapis.cn')
+		assert.ok(headContent.includes("strategy='lazyOnload'"), 'head.tsx must use lazyOnload for analytics')
+
+		// 2. Check dock.tsx for boundsRef caching and container click delegation
+		const dockContent = fs.readFileSync(path.join(ROOT, 'src/components/magicui/dock.tsx'), 'utf8')
+		assert.ok(dockContent.includes('boundsRef'), 'dock.tsx must cache bounds in boundsRef to prevent layout thrashing')
+		assert.ok(dockContent.includes('interactive.click()') || dockContent.includes('handleClick'), 'dock.tsx must delegate container clicks to interactive children')
+
+		// 3. Check NavigationProgressBar existence and mount in layout
+		const navProgressPath = path.join(ROOT, 'src/components/navigation-progress-bar.tsx')
+		assert.ok(fs.existsSync(navProgressPath), 'navigation-progress-bar.tsx must exist')
+		const layoutContent = fs.readFileSync(path.join(ROOT, 'src/layout/index.tsx'), 'utf8')
+		assert.ok(layoutContent.includes('NavigationProgressBar'), 'layout/index.tsx must mount NavigationProgressBar')
+
+		// 4. Check hero-section.tsx uses local tech icons
+		const heroContent = fs.readFileSync(path.join(ROOT, 'src/app/(home)/components/hero-section.tsx'), 'utf8')
+		assert.ok(heroContent.includes('/images/tech-icons/vscode.svg'), 'hero-section must use local vscode.svg')
+		assert.ok(heroContent.includes('/images/tech-icons/react.svg'), 'hero-section must use local react.svg')
+		assert.ok(heroContent.includes('/images/tech-icons/obsidian.svg'), 'hero-section must use local obsidian.svg')
+		assert.ok(heroContent.includes('/images/tech-icons/notion.svg'), 'hero-section must use local notion.svg')
+		assert.ok(heroContent.includes('/images/tech-icons/gemini.svg'), 'hero-section must use local gemini.svg')
+		assert.ok(heroContent.includes('/images/tech-icons/chatgpt.svg'), 'hero-section must use local chatgpt.svg')
+
+		// 5. Check Folder.tsx supports non-blocking clicks
+		const folderContent = fs.readFileSync(path.join(ROOT, 'src/components/folder/Folder.tsx'), 'utf8')
+		assert.ok(folderContent.includes('allowToggle'), 'Folder.tsx must support allowToggle prop for non-blocking portal links')
 	})
 
 	console.log(`\n🏁 Test Results: ${passed}/${total} passed.`)

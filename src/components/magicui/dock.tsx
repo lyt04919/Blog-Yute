@@ -52,6 +52,7 @@ const Dock = ({ className, style, children, iconMagnification = DEFAULT_MAGNIFIC
 
 const DockIcon = ({ className, children, onClick }: DockIconProps) => {
   const ref = useRef<HTMLDivElement>(null);
+  const boundsRef = useRef<{ x: number; width: number } | null>(null);
   const context = useContext(DockContext);
 
   if (!context) {
@@ -61,7 +62,15 @@ const DockIcon = ({ className, children, onClick }: DockIconProps) => {
   const { mouseX, magnification, distance } = context;
 
   const distanceCalc = useTransform(mouseX, (val: number) => {
-    const bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
+    if (val === Infinity) {
+      boundsRef.current = null;
+      return Infinity;
+    }
+    if (!boundsRef.current && ref.current) {
+      const rect = ref.current.getBoundingClientRect();
+      boundsRef.current = { x: rect.x, width: rect.width };
+    }
+    const bounds = boundsRef.current ?? { x: 0, width: 0 };
     return val - bounds.x - bounds.width / 2;
   });
 
@@ -74,10 +83,22 @@ const DockIcon = ({ className, children, onClick }: DockIconProps) => {
     SPRING
   );
 
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (onClick) {
+      onClick(e);
+      return;
+    }
+    const target = e.target as HTMLElement;
+    const interactive = ref.current?.querySelector<HTMLElement>('a, button');
+    if (interactive && !interactive.contains(target)) {
+      interactive.click();
+    }
+  };
+
   return (
     <motion.div
       ref={ref}
-      onClick={onClick}
+      onClick={handleClick}
       style={{ width: containerSize, height: containerSize }}
       className={cn("relative flex aspect-square items-center justify-center rounded-full shrink-0", className)}
     >

@@ -8,13 +8,8 @@ export default function Head() {
 
 			<link rel='icon' href='/favicon.png' />
 
-			<link rel='preconnect' href='https://fonts.googleapis.cn' />
-			<link rel='preconnect' href='https://fonts.gstatic.cn' crossOrigin='anonymous' />
-
-			<link href='https://fonts.googleapis.cn/css2?family=Averia+Gruesa+Libre&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap' rel='stylesheet' />
-
-			<Script src='https://www.googletagmanager.com/gtag/js?id=G-ZNSFR7C9PM' />
-			<Script id='google-analytics'>
+			<Script src='https://www.googletagmanager.com/gtag/js?id=G-ZNSFR7C9PM' strategy='lazyOnload' />
+			<Script id='google-analytics' strategy='lazyOnload'>
 				{`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
